@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example",
+  "description": "An zeTrax written in TypeScript.",
+  "proposedName": "zeTrax",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/MetaMask/zeTrax-monorepo.git"
   },
   "source": {
-    "shasum": "/bL+Jugx/3+81D1r/shUaYOQP5VUmoop6hcaY+Q33vM=",
+    "shasum": "LsquCDoqrLjkwC4/00z7J1xgIoqNujJz5j1YXLmoL4o=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -19,6 +19,12 @@
   },
   "initialPermissions": {
     "snap_dialog": {},
+    "endowment:ethereum-provider": {},
+    "snap_manageAccounts": {},
+    "endowment:network-access": {},
+    "endowment:transaction-insight": {
+      "allowTransactionOrigin": true
+    },
     "endowment:rpc": {
       "dapps": true,
       "snaps": false

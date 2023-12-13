@@ -10,11 +10,11 @@ const config: GatsbyConfig = {
     {
       resolve: 'gatsby-plugin-manifest',
       options: {
-        name: 'Template Snap',
+        name: 'zeTrax',
         icon: 'src/assets/logo.svg',
         /* eslint-disable @typescript-eslint/naming-convention */
-        theme_color: '#6F4CFF',
-        background_color: '#FFFFFF',
+        theme_color: '#014b3a',
+        background_color: '#0000',
         /* eslint-enable @typescript-eslint/naming-convention */
         display: 'standalone',
       },

@@ -1,4 +1,4 @@
-# @metamask/template-snap-monorepo
+# @metamask/zeTrax-monorepo
 
 This repository demonstrates how to develop a snap with TypeScript. For detailed
 instructions, see [the MetaMask documentation](https://docs.metamask.io/guide/snaps.html#serving-a-snap-to-your-local-environment).
@@ -14,7 +14,7 @@ a canary distribution for developers that provides access to upcoming features.
 
 ## Getting Started
 
-Clone the template-snap repository [using this template](https://github.com/MetaMask/template-snap-monorepo/generate)
+Clone the zeTrax repository [using this template](https://github.com/MetaMask/zeTrax-monorepo/generate)
 and set up the development environment:
 
 ```shell
@@ -24,7 +24,7 @@ yarn install && yarn start
 ## Cloning
 
 This repository contains GitHub Actions that you may find useful, see
-`.github/workflows` and [Releasing & Publishing](https://github.com/MetaMask/template-snap-monorepo/edit/main/README.md#releasing--publishing)
+`.github/workflows` and [Releasing & Publishing](https://github.com/MetaMask/zeTrax-monorepo/edit/main/README.md#releasing--publishing)
 below for more information.
 
 If you clone or create this repository outside the MetaMask GitHub organization,

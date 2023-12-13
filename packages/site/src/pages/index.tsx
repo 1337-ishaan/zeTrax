@@ -2,11 +2,11 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 
 import {
+  Card,
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
-  Card,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
@@ -14,7 +14,7 @@ import {
   connectSnap,
   getSnap,
   isLocalSnap,
-  sendHello,
+  demonstrateCctx,
   shouldDisplayReconnectButton,
 } from '../utils';
 
@@ -124,9 +124,9 @@ const Index = () => {
     }
   };
 
-  const handleSendHelloClick = async () => {
+  const handleDemonstrateCctxClick = async () => {
     try {
-      await sendHello();
+      await demonstrateCctx();
     } catch (error) {
       console.error(error);
       dispatch({ type: MetamaskActions.SetError, payload: error });
@@ -135,11 +135,10 @@ const Index = () => {
 
   return (
     <Container>
-      <Heading>
-        Welcome to <Span>template-snap</Span>
-      </Heading>
+      <Heading>zeTrax</Heading>
       <Subtitle>
-        Get started by editing <code>src/index.ts</code>
+        Enabling users to send & receive assets along with memo operating
+        currenty for (Bitcoin, Ethereum, Binance Smart Chain(BSC), Polygon)
       </Subtitle>
       <CardContainer>
         {state.error && (
@@ -152,7 +151,7 @@ const Index = () => {
             content={{
               title: 'Install',
               description:
-                'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
+                'Install zeTrax, a ZetaChain snap that helps you manage your assets & transaction in a single plane',
               button: <InstallFlaskButton />,
             }}
             fullWidth
@@ -163,7 +162,7 @@ const Index = () => {
             content={{
               title: 'Connect',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Install zeTrax, a ZetaChain snap that helps you manage your assets & transaction in a single plane',
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
@@ -178,8 +177,7 @@ const Index = () => {
           <Card
             content={{
               title: 'Reconnect',
-              description:
-                'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
+              description: `Connected!`,
               button: (
                 <ReconnectButton
                   onClick={handleConnectClick}
@@ -192,12 +190,11 @@ const Index = () => {
         )}
         <Card
           content={{
-            title: 'Send Hello message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
+            title: 'Demonstrate CCTX',
+            description: 'Send 0.001 MATIC to ZetaChain',
             button: (
               <SendHelloButton
-                onClick={handleSendHelloClick}
+                onClick={handleDemonstrateCctxClick}
                 disabled={!state.installedSnap}
               />
             ),
@@ -209,14 +206,6 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-        <Notice>
-          <p>
-            Please note that the <b>snap.manifest.json</b> and{' '}
-            <b>package.json</b> must be located in the server root directory and
-            the bundle must be hosted at the location specified by the location
-            field.
-          </p>
-        </Notice>
       </CardContainer>
     </Container>
   );

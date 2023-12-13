@@ -5,6 +5,7 @@ import { getSnaps } from './snap';
  *
  * @returns True if the MetaMask version supports Snaps, false otherwise.
  */
+
 export const detectSnaps = async () => {
   if (window.ethereum?.detected) {
     for (const provider of window.ethereum.detected) {
