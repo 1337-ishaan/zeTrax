@@ -98,3 +98,14 @@ export const sendBtc = async () => {
     return {};
   }
 };
+
+export const getAccInfo = async () => {
+  const result: any = await ethereum.request({
+    method: 'eth_requestAccounts',
+  });
+  console.log(result, 'result');
+  if (result) {
+    return result[0];
+  }
+  return {};
+};

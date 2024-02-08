@@ -1,5 +1,6 @@
 import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
 import {
+  getAccInfo,
   getAccounts,
   getWalletInfo,
   sendBtc,
@@ -28,6 +29,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getAccounts();
     case 'send-btc':
       return sendBtc();
+    case 'connect-account':
+      return getAccInfo();
     default:
       throw new Error('Method not found.');
   }
