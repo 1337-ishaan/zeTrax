@@ -20,6 +20,7 @@ const CardWrapper = styled.div<{
   width: ${({ fullWidth }) => (fullWidth ? '100%' : '250px')};
   background-color: ${({ theme }) => theme.colors.card?.default};
   margin-top: 2.4rem;
+  color: #eee;
   margin-bottom: 2.4rem;
   padding: 2.4rem;
   border: 1px solid ${({ theme }) => theme.colors.border?.default};

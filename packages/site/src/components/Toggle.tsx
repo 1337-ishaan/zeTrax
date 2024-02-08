@@ -84,7 +84,7 @@ const ToggleCircle = styled.div<CheckedProps>`
   height: 28px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.14);
   border-radius: 50%;
-  background-color: #ffffff;
+  background-color: #1c3b6afff;
   box-sizing: border-box;
   transition: all 0.25s ease;
 `;

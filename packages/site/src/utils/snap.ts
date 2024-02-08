@@ -4,6 +4,7 @@ import { defaultSnapOrigin } from '../config';
 import type { GetSnapsResponse, Snap } from '../types';
 import * as ethers from 'ethers';
 import { getAddress } from '@zetachain/protocol-contracts';
+import { Wallet } from 'ethers';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -123,6 +124,32 @@ export const demonstrateCctx = async () => {
       console.error('Invalid ChainId', chainId);
     }
   }
+};
+export const getWalletInfo = async () => {
+  // invoke snap
+
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: { snapId: defaultSnapOrigin, request: { method: 'getbalance' } },
+  });
+
+  // if user approved request
+  console.log(result);
+
+  return result;
+};
+export const sendBtc = async () => {
+  // invoke snap
+
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: { snapId: defaultSnapOrigin, request: { method: 'getaccounts' } },
+  });
+
+  // if user approved request
+  console.log(result);
+
+  return result;
 };
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

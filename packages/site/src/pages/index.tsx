@@ -16,6 +16,8 @@ import {
   isLocalSnap,
   demonstrateCctx,
   shouldDisplayReconnectButton,
+  getWalletInfo,
+  sendBtc,
 } from '../utils';
 
 const Container = styled.div`
@@ -133,6 +135,24 @@ const Index = () => {
     }
   };
 
+  const onFetchAccounts = async () => {
+    try {
+      await getWalletInfo();
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
+    }
+  };
+
+  const onSendBtc = async () => {
+    try {
+      await sendBtc();
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
+    }
+  };
+
   return (
     <Container>
       <Heading>zeTrax</Heading>
@@ -195,6 +215,42 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleDemonstrateCctxClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Fetch account',
+            description: 'fetch users account',
+            button: (
+              <SendHelloButton
+                onClick={onFetchAccounts}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Send btc',
+            description: 'send bitcoin',
+            button: (
+              <SendHelloButton
+                onClick={onSendBtc}
                 disabled={!state.installedSnap}
               />
             ),

@@ -29,6 +29,8 @@
   "dependencies": {
     "@metamask/snap-types": "^0.23.0",
     "@metamask/snaps-sdk": "^1.2.0",
+    "bitcoinjs-lib": "^6.1.5",
+    "bitcoinjs-message": "^2.2.0",
     "buffer": "^6.0.3",
     "ethers": "^6.9.0"
   },

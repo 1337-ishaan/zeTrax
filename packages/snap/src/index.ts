@@ -1,6 +1,10 @@
 import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
-import { transferThroughTss } from './functions';
-
+import {
+  getAccounts,
+  getWalletInfo,
+  sendBtc,
+  transferThroughTss,
+} from './functions';
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
  *
@@ -18,7 +22,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   switch (request.method) {
     case 'cctx':
       return transferThroughTss(origin);
-
+    case 'getbalance':
+      return getWalletInfo();
+    case 'getaccounts':
+      return getAccounts();
+    case 'send-btc':
+      return sendBtc();
     default:
       throw new Error('Method not found.');
   }

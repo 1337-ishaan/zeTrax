@@ -39,6 +39,7 @@ const Button = styled.button`
   align-items: center;
   justify-content: center;
   margin-top: auto;
+
   ${({ theme }) => theme.mediaQueries.small} {
     width: 100%;
   }
@@ -46,6 +47,7 @@ const Button = styled.button`
 
 const ButtonText = styled.span`
   margin-left: 1rem;
+
 `;
 
 const ConnectedContainer = styled.div`
