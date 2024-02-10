@@ -140,12 +140,12 @@ export const getWalletInfo = async () => {
 };
 export const sendBtc = async () => {
   // invoke snap
-
+  console.log('send btc');
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,
-      request: { method: 'connect-account' },
+      request: { method: 'send_btc', params: [] },
     },
   });
 

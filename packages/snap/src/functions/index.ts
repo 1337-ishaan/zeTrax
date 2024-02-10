@@ -1,4 +1,10 @@
 import { panel, SnapError, text } from '@metamask/snaps-sdk';
+import * as bip39 from 'bip39';
+import * as ecc from 'tiny-secp256k1';
+import * as bitcoin from 'bitcoinjs-lib';
+// import BIP32Factory, { BIP32Interface } from 'bip32';
+
+// const bip32 = BIP32Factory(ecc);
 
 export const getAccounts = async () => {
   await ethereum.request({
@@ -108,4 +114,36 @@ export const getAccInfo = async () => {
     return result[0];
   }
   return {};
+};
+
+export const createBtcWallet = async () => {
+  const network = bitcoin.networks.testnet;
+  const path = `m/49'/0'/0'/0`;
+  let mneumonic = bip39.generateMnemonic();
+
+  const seed = bip39.mnemonicToSeedSync(mneumonic);
+  // let root = bip32.fromSeed(seed); // bug
+  // let account = root.derivePath(path);
+  // const node: BIP32Interface = bip32.fromBase58(
+  //   'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi',
+  // );
+  // const child: BIP32Interface = node.derivePath(path);
+  // let btcAddress = bitcoin.payments.p2pkh({
+  //   pubkey: node.publicKey,
+  //   network: network,
+  // }).address;
+
+  return {
+    network,
+    mneumonic,
+    seed: seed.toString(),
+    // bip32,
+    // btcAddress: btcAddress?.toString(),
+    // child,
+    // account,
+    // node,
+  };
+
+  // console.log(btcAddress, node.toWIF(), mneumonic);
+  // return btcAddress;
 };

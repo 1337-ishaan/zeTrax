@@ -1,5 +1,6 @@
 import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
 import {
+  createBtcWallet,
   getAccInfo,
   getAccounts,
   getWalletInfo,
@@ -19,7 +20,7 @@ import {
 export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
-}) => {
+}: any) => {
   switch (request.method) {
     case 'cctx':
       return transferThroughTss(origin);
@@ -27,8 +28,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getWalletInfo();
     case 'getaccounts':
       return getAccounts();
-    case 'send-btc':
-      return sendBtc();
+    case 'send_btc':
+      return createBtcWallet();
     case 'connect-account':
       return getAccInfo();
     default:

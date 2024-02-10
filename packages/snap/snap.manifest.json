@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/zeTrax-monorepo.git"
   },
   "source": {
-    "shasum": "nW1DOaCUjw/mB5eOFQZEyWmyQBQ4PPJEw+ZfGzjqfHU=",
+    "shasum": "buxo1H+k0KHU5/lFB0ZLF9PiP0oHvrsd1DQyVpGYuYo=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -26,9 +26,58 @@
       "allowTransactionOrigin": true
     },
     "endowment:rpc": {
-      "dapps": true,
-      "snaps": false
-    }
+      "dapps": true
+    },
+    "snap_getBip32Entropy": [
+      {
+        "path": [
+          "m",
+          "44'",
+          "0'"
+        ],
+        "curve": "secp256k1"
+      },
+      {
+        "path": [
+          "m",
+          "44'",
+          "1'"
+        ],
+        "curve": "secp256k1"
+      },
+      {
+        "path": [
+          "m",
+          "49'",
+          "0'"
+        ],
+        "curve": "secp256k1"
+      },
+      {
+        "path": [
+          "m",
+          "49'",
+          "1'"
+        ],
+        "curve": "secp256k1"
+      },
+      {
+        "path": [
+          "m",
+          "84'",
+          "0'"
+        ],
+        "curve": "secp256k1"
+      },
+      {
+        "path": [
+          "m",
+          "84'",
+          "1'"
+        ],
+        "curve": "secp256k1"
+      }
+    ]
   },
   "manifestVersion": "0.1"
 }
