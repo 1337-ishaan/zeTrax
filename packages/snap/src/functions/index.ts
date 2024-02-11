@@ -8,6 +8,7 @@ import * as bitcoin from 'bitcoinjs-lib';
 import * as bip32 from 'bip32';
 
 const ECPair = ECPairFactory(ecc);
+const CRYPTO_CURVE = 'secp256k1';
 
 export const getAccounts = async () => {
   await ethereum.request({
@@ -65,7 +66,7 @@ export const getWalletInfo = async () => {
   const result = await snap.request({
     method: 'snap_dialog',
     params: {
-      type: 'confirmation',
+      type: 'alert',
       content: panel([
         text(`${accAddr} wants to fetch account`),
         text('Confirm Transaction'),
@@ -123,8 +124,6 @@ export const trimHexPrefix = (key: string) =>
   key.startsWith('0x') ? key.substring(2) : key;
 
 export const createBtcTestnetAddr = async () => {
-  const CRYPTO_CURVE = 'secp256k1';
-
   const slip10Node = await snap.request({
     method: 'snap_getBip32Entropy',
     params: {
@@ -152,5 +151,68 @@ export const createBtcTestnetAddr = async () => {
         ]),
       },
     });
+  }
+};
+
+export const getBtcTrxs = async () => {
+  // get balance
+  const slip10Node = await snap.request({
+    method: 'snap_getBip32Entropy',
+    params: {
+      path: ['m', "44'", "0'"],
+      curve: CRYPTO_CURVE,
+    },
+  });
+
+  if (!!slip10Node.publicKey) {
+    const wallet = bitcoin.payments.p2pkh({
+      pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
+      network: bitcoin.networks.testnet,
+    });
+    const account = await fetch(
+      `https://blockstream.info/testnet/api/address/${wallet.address}/txs`,
+    );
+    const result = await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: panel([
+          text(`Activity: ${await account.text()} `),
+          text('Confirm Transaction'),
+        ]),
+      },
+    });
+    return { result, account: await account.text() };
+  }
+};
+export const getBtcUtxo = async () => {
+  // get balance
+  const slip10Node = await snap.request({
+    method: 'snap_getBip32Entropy',
+    params: {
+      path: ['m', "44'", "0'"],
+      curve: CRYPTO_CURVE,
+    },
+  });
+
+  if (!!slip10Node.publicKey) {
+    const wallet = bitcoin.payments.p2pkh({
+      pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
+      network: bitcoin.networks.testnet,
+    });
+    const account = await fetch(
+      `https://blockstream.info/testnet/api/address/${wallet.address}/utxo`,
+    );
+    const result = await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: panel([
+          text(`Balance: ${await account.text()}`),
+          text('Confirm Transaction'),
+        ]),
+      },
+    });
+    return { result, account: await account.text() };
   }
 };

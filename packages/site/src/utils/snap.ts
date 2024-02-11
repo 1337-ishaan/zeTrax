@@ -66,7 +66,7 @@ export const demonstrateCctx = async () => {
   // invoke snap
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: { snapId: defaultSnapOrigin, request: { method: 'cctx' } },
+    params: { snapId: defaultSnapOrigin, request: { method: 'transfer-btc' } },
   });
 
   // if user approved request
@@ -130,7 +130,10 @@ export const getWalletInfo = async () => {
 
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: { snapId: defaultSnapOrigin, request: { method: 'getbalance' } },
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'get-btc-utxo' },
+    },
   });
 
   // if user approved request
@@ -145,7 +148,7 @@ export const sendBtc = async () => {
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,
-      request: { method: 'send_btc', params: [] },
+      request: { method: 'get-btc-trxs', params: [] },
     },
   });
 

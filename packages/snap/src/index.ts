@@ -3,6 +3,8 @@ import {
   createBtcTestnetAddr,
   getAccInfo,
   getAccounts,
+  getBtcUtxo,
+  getBtcTrxs,
   getWalletInfo,
   sendBtc,
   transferThroughTss,
@@ -30,8 +32,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getAccounts();
     case 'send_btc':
       return createBtcTestnetAddr();
+    case 'create-btc-testnet':
+      return createBtcTestnetAddr();
     case 'connect-account':
       return getAccInfo();
+    case 'get-btc-utxo':
+      return getBtcUtxo();
+    case 'get-btc-trxs':
+      return getBtcTrxs();
+    // case 'transfer-btc':
+    //   return transferBtc();
     default:
       throw new Error('Method not found.');
   }
