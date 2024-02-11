@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/zeTrax-monorepo.git"
   },
   "source": {
-    "shasum": "buxo1H+k0KHU5/lFB0ZLF9PiP0oHvrsd1DQyVpGYuYo=",
+    "shasum": "xK64rrO6CxNKDWwxD5rCL4auzlB7c+chSv25ZZwya0Y=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -19,8 +19,8 @@
   },
   "initialPermissions": {
     "snap_dialog": {},
-    "endowment:ethereum-provider": {},
     "snap_manageAccounts": {},
+    "endowment:ethereum-provider": {},
     "endowment:network-access": {},
     "endowment:transaction-insight": {
       "allowTransactionOrigin": true

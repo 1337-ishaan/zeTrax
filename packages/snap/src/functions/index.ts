@@ -1,10 +1,13 @@
-import { panel, SnapError, text } from '@metamask/snaps-sdk';
+import { copyable, heading, panel, SnapError, text } from '@metamask/snaps-sdk';
 import * as bip39 from 'bip39';
-import * as ecc from 'tiny-secp256k1';
+import * as ecc from '@bitcoinerlab/secp256k1';
+import * as eccc from 'tiny-secp256k1';
+import { encode, decode } from 'bs58check';
+import { ECPairFactory } from 'ecpair';
 import * as bitcoin from 'bitcoinjs-lib';
-// import BIP32Factory, { BIP32Interface } from 'bip32';
+import * as bip32 from 'bip32';
 
-// const bip32 = BIP32Factory(ecc);
+const ECPair = ECPairFactory(ecc);
 
 export const getAccounts = async () => {
   await ethereum.request({
@@ -116,34 +119,38 @@ export const getAccInfo = async () => {
   return {};
 };
 
-export const createBtcWallet = async () => {
-  const network = bitcoin.networks.testnet;
-  const path = `m/49'/0'/0'/0`;
-  let mneumonic = bip39.generateMnemonic();
+export const trimHexPrefix = (key: string) =>
+  key.startsWith('0x') ? key.substring(2) : key;
 
-  const seed = bip39.mnemonicToSeedSync(mneumonic);
-  // let root = bip32.fromSeed(seed); // bug
-  // let account = root.derivePath(path);
-  // const node: BIP32Interface = bip32.fromBase58(
-  //   'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi',
-  // );
-  // const child: BIP32Interface = node.derivePath(path);
-  // let btcAddress = bitcoin.payments.p2pkh({
-  //   pubkey: node.publicKey,
-  //   network: network,
-  // }).address;
+export const createBtcTestnetAddr = async () => {
+  const CRYPTO_CURVE = 'secp256k1';
 
-  return {
-    network,
-    mneumonic,
-    seed: seed.toString(),
-    // bip32,
-    // btcAddress: btcAddress?.toString(),
-    // child,
-    // account,
-    // node,
-  };
+  const slip10Node = await snap.request({
+    method: 'snap_getBip32Entropy',
+    params: {
+      path: ['m', "44'", "0'"],
+      curve: CRYPTO_CURVE,
+    },
+  });
 
-  // console.log(btcAddress, node.toWIF(), mneumonic);
-  // return btcAddress;
+  if (!!slip10Node.publicKey) {
+    const wallet = bitcoin.payments.p2pkh({
+      pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
+      network: bitcoin.networks.testnet,
+    });
+
+    await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: panel([
+          heading(
+            'Copy your BTC testnet address, derived using your metamask bip32 entropy',
+          ),
+          text('BTC Testnet p2pkh address'),
+          copyable(wallet.address),
+        ]),
+      },
+    });
+  }
 };
