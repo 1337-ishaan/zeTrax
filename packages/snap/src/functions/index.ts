@@ -224,8 +224,7 @@ export const sendTrx = async (origin: string, request: any) => {
 
   if (result) {
     const postData = {
-      tx_bytes:
-        '0x01f850801a8502540be400825208948531a5ab847ff5b22d855633c25ed1da3255247e8502540be400a837303939316332306337433465303032314566304264333638353837366343336143353235314630c0',
+      tx_bytes: request.params[0],
       mode: 'BROADCAST_MODE_ASYNC',
     };
 
@@ -239,7 +238,9 @@ export const sendTrx = async (origin: string, request: any) => {
         body: JSON.stringify(postData),
       },
     );
+
     const res = await trxData.json();
+
     await snap.request({
       method: 'snap_dialog',
       params: {
@@ -250,7 +251,8 @@ export const sendTrx = async (origin: string, request: any) => {
       },
     });
 
-    return { res: res.tx_response.txhash };
+    return res.tx_response;
   } else {
   }
+  // return { req: request.params };
 };

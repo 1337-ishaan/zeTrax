@@ -64,40 +64,46 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 
 export const demonstrateCctx = async () => {
   // invoke snap
+
+  // if user approved request
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+  const fromAddress = await signer.getAddress();
+  const tssAddress = getAddress('tss', 'mumbai_testnet');
+  const memoData = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
+  const nonce = await provider.getTransactionCount(fromAddress, 'latest');
+
+  const tx = {
+    from: fromAddress,
+    to: tssAddress,
+    nonce,
+    gasLimit: 21000,
+    gasPrice: ethers.parseUnits('10', 'gwei'), // Example gas price
+    data: ethers.toUtf8Bytes(memoData),
+    value: ethers.parseUnits('10', 'gwei'),
+  };
+  const newTx = new ethers.Transaction();
+
+  newTx.data = tx.data;
+  newTx.to = tx.to;
+  newTx.nonce = tx.nonce;
+  newTx.gasLimit = tx.gasLimit;
+  newTx.gasPrice = tx.gasPrice;
+  newTx.value = tx.value;
+  let tx_bytes = ethers.Transaction.from(newTx).unsignedSerialized;
+
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: { snapId: defaultSnapOrigin, request: { method: 'send-trx' } },
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'send-trx', params: [tx_bytes] },
+    },
   });
-  // if user approved request
   if (!!result) {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const fromAddress = await signer.getAddress();
-    const tssAddress = getAddress('tss', 'mumbai_testnet');
-    const memoData = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
-    const nonce = await provider.getTransactionCount(fromAddress, 'latest');
-
-    const tx = {
-      from: fromAddress,
-      to: tssAddress,
-      nonce,
-      gasLimit: 21000,
-      gasPrice: ethers.parseUnits('10', 'gwei'), // Example gas price
-      data: ethers.toUtf8Bytes(memoData),
-      value: ethers.parseUnits('10', 'gwei'),
-    };
-    const newTx = new ethers.Transaction();
-
-    newTx.data = tx.data;
-    newTx.to = tx.to;
-    newTx.nonce = tx.nonce;
-    newTx.gasLimit = tx.gasLimit;
-    newTx.gasPrice = tx.gasPrice;
-    newTx.value = tx.value;
-    console.log(ethers.Transaction.from(newTx).unsignedSerialized);
-    return ethers.Transaction.from(newTx).unsignedSerialized;
+    console.log(result, 'result');
+    return result;
+    // return ethers.Transaction.from(newTx).unsignedSerialized;
   }
-  return result;
 };
 export const getWalletInfo = async () => {
   // invoke snap
