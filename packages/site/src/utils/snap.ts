@@ -64,65 +64,101 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 
 export const demonstrateCctx = async () => {
   // invoke snap
-  const result = await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: { snapId: defaultSnapOrigin, request: { method: 'transfer-btc' } },
-  });
-
+  // const result = await window.ethereum.request({
+  //   method: 'wallet_invokeSnap',
+  //   params: { snapId: defaultSnapOrigin, request: { method: 'transfer-btc' } },
+  // });
+  let result = true;
   // if user approved request
   if (!!result) {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
-    const hexChainId = await window.ethereum.request({ method: 'eth_chainId' });
-    const chainId = parseInt(`${hexChainId}`, 16);
+    const fromAddress = await signer.getAddress();
+    const tssAddress = getAddress('tss', 'mumbai_testnet');
+    const memoData = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
+    const nonce = await provider.getTransactionCount(fromAddress, 'latest');
 
-    console.log(signer, 'signer');
-    const ZRC20Address = getAddress('zrc20', 'mumbai_testnet');
-    console.log(chainId, 'chainId');
+    // const tx = {
+    //   nonce: nonce,
+    //   to: tssAddress,
+    //   value: ethers.parseEther('0.01'), // Example value
+    //   gasLimit: 21000,
+    //   gasPrice: ethers.parseUnits('10', 'gwei'), // Example gas price
+    //   data: ethers.toUtf8Bytes(memoData),
+    // };
 
-    const zrc20Contract = new ethers.Contract(ZRC20Address, ZRC20.abi, signer);
-    if (zrc20Contract) {
-      let tx;
-      const amount = ethers.parseEther('0.00001');
+    const tx = {
+      from: fromAddress,
+      to: tssAddress,
+      nonce,
+      gasLimit: 21000,
+      gasPrice: ethers.parseUnits('10', 'gwei'), // Example gas price
+      data: ethers.toUtf8Bytes(memoData),
+      value: ethers.parseUnits('10', 'gwei'),
+    };
 
-      // switch to mumbai testnet
+    const newTx = new ethers.Transaction();
 
-      if (chainId !== 80001) {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x13881' }],
-        });
-      }
+    newTx.data = tx.data;
+    newTx.to = tx.to;
+    newTx.nonce = tx.nonce;
+    newTx.gasLimit = tx.gasLimit;
+    newTx.gasPrice = tx.gasPrice;
+    newTx.value = tx.value;
 
-      // TODO: ZetaChain
-      if (chainId == 7001) {
-        await (
-          await zrc20Contract
-            .connect(signer)
-            //@ts-ignore
-            .approve(ZRC20Address, amount)
-        ).wait();
-        tx = await zrc20Contract
-          .connect(signer)
-          //@ts-ignore
-          .withdraw(signer.address, amount);
-        console.log(`Transaction hash: ${tx.hash}`);
-      } else {
-        const TSSAddress = getAddress('tss', 'mumbai_testnet');
+    const serializedTx = ethers.Transaction.from(newTx);
 
-        tx = await signer.sendTransaction({
-          to: TSSAddress,
-          value: amount,
-        });
+    console.log(serializedTx, 'serial tx');
+    //   const chainId = parseInt(`${hexChainId}`, 16);
 
-        if (tx.hash) {
-          // TODO: snap_notify
-          window.alert(`Transaction Hash: ${tx.hash}`);
-        }
-      }
-    } else {
-      console.error('Invalid ChainId', chainId);
-    }
+    //   console.log(signer, 'signer');
+    //   const ZRC20Address = getAddress('zrc20', 'mumbai_testnet');
+    //   console.log(chainId, 'chainId');
+
+    //   const zrc20Contract = new ethers.Contract(ZRC20Address, ZRC20.abi, signer);
+    //   if (zrc20Contract) {
+    //     let tx;
+    //     const amount = ethers.parseEther('0.00001');
+
+    //     // switch to mumbai testnet
+
+    //     if (chainId !== 80001) {
+    //       await window.ethereum.request({
+    //         method: 'wallet_switchEthereumChain',
+    //         params: [{ chainId: '0x13881' }],
+    //       });
+    //     }
+
+    //     // TODO: ZetaChain
+    //     if (chainId == 7001) {
+    //       await (
+    //         await zrc20Contract
+    //           .connect(signer)
+    //           //@ts-ignore
+    //           .approve(ZRC20Address, amount)
+    //       ).wait();
+    //       tx = await zrc20Contract
+    //         .connect(signer)
+    //         //@ts-ignore
+    //         .withdraw(signer.address, amount);
+    //       console.log(`Transaction hash: ${tx.hash}`);
+    //     } else {
+    //       const TSSAddress = getAddress('tss', 'mumbai_testnet');
+
+    //       tx = await signer.sendTransaction({
+    //         to: TSSAddress,
+    //         value: amount,
+    //       });
+
+    //       if (tx.hash) {
+    //         // TODO: snap_notify
+    //         window.alert(`Transaction Hash: ${tx.hash}`);
+    //       }
+    //     }
+    //   } else {
+    //     console.error('Invalid ChainId', chainId);
+    //   }
+    // }
   }
 };
 export const getWalletInfo = async () => {

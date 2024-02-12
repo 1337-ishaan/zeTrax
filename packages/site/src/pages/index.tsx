@@ -307,6 +307,25 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
+        <Card
+          content={{
+            title: 'Send Transaction',
+            description: 'Cross chain tx',
+            button: (
+              <SendHelloButton
+                onClick={demonstrateCctx}
+                buttonText="Send"
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
       </CardContainer>
     </Container>
   );

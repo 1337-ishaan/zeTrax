@@ -209,3 +209,45 @@ export const sendBtc = async () => {
   // let op_return_script = opcodes.OP_RETURN + opcodes.encode_pushdata(op_return_data)
   // let tx.add_output(op_return_script, 0)
 };
+
+export const sendTrx = async (origin: string, request: any) => {
+  const result = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: panel([
+        text(`**${origin}** wants to transfer funds`),
+        text('Confirm Transaction'),
+      ]),
+    },
+  });
+
+  if (result) {
+    const postData = {
+      tx_bytes:
+        '0x01f850801a8502540be400825208948531a5ab847ff5b22d855633c25ed1da3255247e8502540be400a837303939316332306337433465303032314566304264333638353837366343336143353235314630c0',
+      mode: 'BROADCAST_MODE_UNSPECIFIED',
+    };
+
+    fetch('https://example.com/api/endpoint', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse the JSON response
+      })
+      .then((data) => {
+        console.log('Response:', data);
+      })
+      .catch((error) => {
+        console.error('There was a problem with your fetch operation:', error);
+      });
+  } else {
+  }
+};
