@@ -6,9 +6,27 @@ import { encode, decode } from 'bs58check';
 import { ECPairFactory } from 'ecpair';
 import * as bitcoin from 'bitcoinjs-lib';
 import * as bip32 from 'bip32';
+import { bech32 } from 'bech32';
 
 const ECPair = ECPairFactory(ecc);
 const CRYPTO_CURVE = 'secp256k1';
+
+const convertToZeta = (address: string) => {
+  try {
+    if (address.startsWith('0x')) {
+      const data = Buffer.from(trimHexPrefix(address), 'hex');
+      return bech32.encode('zeta', bech32.toWords(data));
+    } else {
+      const decoded = bech32.decode(address);
+
+      return (
+        '0x' + Buffer.from(bech32.fromWords(decoded.words)).toString('hex')
+      );
+    }
+  } catch (e) {
+    throw e;
+  }
+};
 
 export const getAccounts = async () => {
   await ethereum.request({
@@ -58,8 +76,11 @@ export const transferThroughTss = async (origin: string) => {
 // transfer funds through TSS
 
 export const getWalletInfo = async () => {
+  const connectedAddr = await getAccInfo();
+  const zetaAddr = convertToZeta(connectedAddr);
+
   const account = await fetch(
-    'https://rpc.ankr.com/http/zetachain_athens_testnet/cosmos/bank/v1beta1/balances/zeta1v338e94tn59zfw96506nxdktkwdudf26tf296e',
+    `https://rpc.ankr.com/http/zetachain_athens_testnet/cosmos/bank/v1beta1/balances/${zetaAddr}`,
   );
   const accAddr = await account.text();
   console.log(accAddr, account);
@@ -70,40 +91,7 @@ export const getWalletInfo = async () => {
       content: panel([text(`ZetaChain: ${accAddr}`)]),
     },
   });
-  return { result, accAddr, account };
-};
-
-export const sendBtc = async () => {
-  const result = await snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'confirmation',
-      content: panel([text(`wants to send Btc`), text('Confirm Transaction')]),
-    },
-  });
-  if (!!result) {
-    // const accounts = await ethereum.request({ method: 'eth_getBalance' });
-
-    // if (accounts) {
-    const accountInfo = await ethereum.request({
-      method: 'eth_sendTransaction',
-      params: [
-        {
-          to: '0x89BEA78c4E0053A96E11BC6EB65179953184989c',
-          from: '0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0',
-          value: '100',
-          data: {},
-        },
-      ],
-    });
-
-    return !!accountInfo;
-    // } else {
-    // return {};
-    // }
-  } else {
-    return {};
-  }
+  return { zetaAddr, result, accAddr, account };
 };
 
 export const getAccInfo = async () => {
@@ -210,4 +198,14 @@ export const getBtcUtxo = async () => {
     });
     return { result, account: utxoData };
   }
+};
+
+export const sendBtc = async () => {
+  // let tx = new bitcoin.Transaction();
+  // let to_address= 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur'
+  // let memo='70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0'
+  // tx.addOutput(Buffer.from(to_address,'utf-8'),0.001)
+  // let op_return_data = bytes(memo, 'utf-8')
+  // let op_return_script = opcodes.OP_RETURN + opcodes.encode_pushdata(op_return_data)
+  // let tx.add_output(op_return_script, 0)
 };
