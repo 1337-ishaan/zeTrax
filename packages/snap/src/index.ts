@@ -8,6 +8,7 @@ import {
   getWalletInfo,
   sendBtc,
   transferThroughTss,
+  sendTrx,
 } from './functions';
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -38,6 +39,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getBtcUtxo();
     case 'get-btc-trxs':
       return getBtcTrxs();
+    case 'send-trx':
+      return sendTrx(origin, request);
     // case 'transfer-btc':
     //   return transferBtc();
     default:

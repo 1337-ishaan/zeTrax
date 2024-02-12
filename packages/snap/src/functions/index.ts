@@ -226,28 +226,31 @@ export const sendTrx = async (origin: string, request: any) => {
     const postData = {
       tx_bytes:
         '0x01f850801a8502540be400825208948531a5ab847ff5b22d855633c25ed1da3255247e8502540be400a837303939316332306337433465303032314566304264333638353837366343336143353235314630c0',
-      mode: 'BROADCAST_MODE_UNSPECIFIED',
+      mode: 'BROADCAST_MODE_ASYNC',
     };
 
-    fetch('https://example.com/api/endpoint', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const trxData = await fetch(
+      'https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/tx/v1beta1/txs',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
       },
-      body: JSON.stringify(postData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json(); // Parse the JSON response
-      })
-      .then((data) => {
-        console.log('Response:', data);
-      })
-      .catch((error) => {
-        console.error('There was a problem with your fetch operation:', error);
-      });
+    );
+    const res = await trxData.json();
+    await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: panel([
+          text(`Trx Hash: ${JSON.stringify(res.tx_response.txhash)}`),
+        ]),
+      },
+    });
+
+    return { res: res.tx_response.txhash };
   } else {
   }
 };
