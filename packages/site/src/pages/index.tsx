@@ -310,7 +310,7 @@ const Index = () => {
         <Card
           content={{
             title: 'Send Transaction',
-            description: 'Cross chain tx',
+            description: 'Send dummy transaction using ZetaChain HTTP API',
             button: (
               <SendHelloButton
                 onClick={demonstrateCctx}
