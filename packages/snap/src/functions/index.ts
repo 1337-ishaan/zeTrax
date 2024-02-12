@@ -67,10 +67,7 @@ export const getWalletInfo = async () => {
     method: 'snap_dialog',
     params: {
       type: 'alert',
-      content: panel([
-        text(`${accAddr} wants to fetch account`),
-        text('Confirm Transaction'),
-      ]),
+      content: panel([text(`ZetaChain: ${accAddr}`)]),
     },
   });
   return { result, accAddr, account };
@@ -113,7 +110,6 @@ export const getAccInfo = async () => {
   const result: any = await ethereum.request({
     method: 'eth_requestAccounts',
   });
-  console.log(result, 'result');
   if (result) {
     return result[0];
   }
@@ -155,7 +151,7 @@ export const createBtcTestnetAddr = async () => {
 };
 
 export const getBtcTrxs = async () => {
-  // get balance
+  // get activity
   const slip10Node = await snap.request({
     method: 'snap_getBip32Entropy',
     params: {
@@ -169,20 +165,21 @@ export const getBtcTrxs = async () => {
       pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
       network: bitcoin.networks.testnet,
     });
-    const account = await fetch(
+
+    const txs = await fetch(
       `https://blockstream.info/testnet/api/address/${wallet.address}/txs`,
     );
+
+    const txsData = await txs.text();
+
     const result = await snap.request({
       method: 'snap_dialog',
       params: {
         type: 'alert',
-        content: panel([
-          text(`Activity: ${await account.text()} `),
-          text('Confirm Transaction'),
-        ]),
+        content: panel([text(`Activity: ${txsData} `)]),
       },
     });
-    return { result, account: await account.text() };
+    return { result, account: txsData };
   }
 };
 export const getBtcUtxo = async () => {
@@ -200,19 +197,17 @@ export const getBtcUtxo = async () => {
       pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
       network: bitcoin.networks.testnet,
     });
-    const account = await fetch(
+    const utxo = await fetch(
       `https://blockstream.info/testnet/api/address/${wallet.address}/utxo`,
     );
+    const utxoData = await utxo.text();
     const result = await snap.request({
       method: 'snap_dialog',
       params: {
         type: 'alert',
-        content: panel([
-          text(`Balance: ${await account.text()}`),
-          text('Confirm Transaction'),
-        ]),
+        content: panel([text(`Balance: ${utxoData}`)]),
       },
     });
-    return { result, account: await account.text() };
+    return { result, account: utxoData };
   }
 };

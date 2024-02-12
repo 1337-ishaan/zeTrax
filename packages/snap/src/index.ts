@@ -26,12 +26,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   switch (request.method) {
     case 'cctx':
       return transferThroughTss(origin);
-    case 'getbalance':
+    case 'get-zeta-balance':
       return getWalletInfo();
-    case 'getaccounts':
+    case 'get-zeta-acc':
       return getAccounts();
-    case 'send_btc':
-      return createBtcTestnetAddr();
     case 'create-btc-testnet':
       return createBtcTestnetAddr();
     case 'connect-account':

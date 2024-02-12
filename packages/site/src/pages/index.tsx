@@ -17,7 +17,9 @@ import {
   demonstrateCctx,
   shouldDisplayReconnectButton,
   getWalletInfo,
-  sendBtc,
+  createBtcWallet,
+  getBtcUtxo,
+  getBtcActivity,
 } from '../utils';
 
 const Container = styled.div`
@@ -60,8 +62,11 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
-  max-width: 64.8rem;
+  column-gap: 20px;
+  justify-content: center;
+  /* justify-content: space-between; */
+  /* max-width: 64.8rem; */
+  padding: 0 40px;
   width: 100%;
   height: 100%;
   margin-top: 1.5rem;
@@ -126,14 +131,14 @@ const Index = () => {
     }
   };
 
-  const handleDemonstrateCctxClick = async () => {
-    try {
-      await demonstrateCctx();
-    } catch (error) {
-      console.error(error);
-      dispatch({ type: MetamaskActions.SetError, payload: error });
-    }
-  };
+  // const handleDemonstrateCctxClick = async () => {
+  //   try {
+  //     await demonstrateCctx();
+  //   } catch (error) {
+  //     console.error(error);
+  //     dispatch({ type: MetamaskActions.SetError, payload: error });
+  //   }
+  // };
 
   const onFetchAccounts = async () => {
     try {
@@ -144,9 +149,26 @@ const Index = () => {
     }
   };
 
-  const onSendBtc = async () => {
+  const createTestnetBtcWallet = async () => {
     try {
-      await sendBtc();
+      await createBtcWallet();
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
+    }
+  };
+
+  const onBtcBalance = async () => {
+    try {
+      await getBtcUtxo();
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
+    }
+  };
+  const onBtcActivity = async () => {
+    try {
+      await getBtcActivity();
     } catch (error) {
       console.error(error);
       dispatch({ type: MetamaskActions.SetError, payload: error });
@@ -160,12 +182,12 @@ const Index = () => {
         Enabling users to send & receive assets along with memo operating
         currenty for (Bitcoin, Ethereum, Binance Smart Chain(BSC), Polygon)
       </Subtitle>
+      {state.error && (
+        <ErrorMessage>
+          <b>An error happened:</b> {state.error.message}
+        </ErrorMessage>
+      )}
       <CardContainer>
-        {state.error && (
-          <ErrorMessage>
-            <b>An error happened:</b> {state.error.message}
-          </ErrorMessage>
-        )}
         {!isMetaMaskReady && (
           <Card
             content={{
@@ -210,30 +232,14 @@ const Index = () => {
         )}
         <Card
           content={{
-            title: 'Demonstrate CCTX',
-            description: 'Send 0.001 MATIC to ZetaChain',
-            button: (
-              <SendHelloButton
-                onClick={handleDemonstrateCctxClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            isMetaMaskReady &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
             title: 'Fetch account',
-            description: 'fetch users account',
+            description:
+              'Fetch ZetaChain assets with denom of connected address',
             button: (
               <SendHelloButton
                 onClick={onFetchAccounts}
                 disabled={!state.installedSnap}
+                buttonText="Get ZetaChain Balance"
               />
             ),
           }}
@@ -246,11 +252,50 @@ const Index = () => {
         />
         <Card
           content={{
-            title: 'Send btc',
-            description: 'send bitcoin',
+            title: 'Create BTC Wallet',
+            description: 'Creates BTC wallet using BIP32Entropy',
             button: (
               <SendHelloButton
-                onClick={onSendBtc}
+                onClick={createTestnetBtcWallet}
+                buttonText="Create BTC Wallet"
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Get BTC Activity',
+            description: 'Returns balance of the HD BTC activity',
+            button: (
+              <SendHelloButton
+                onClick={onBtcActivity}
+                disabled={!state.installedSnap}
+                buttonText="Get BTC Activity"
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Get BTC Balance',
+            description: 'Returns balance of the HD BTC wallet',
+            button: (
+              <SendHelloButton
+                onClick={onBtcBalance}
+                buttonText="Get BTC Balance (UTXO)"
                 disabled={!state.installedSnap}
               />
             ),

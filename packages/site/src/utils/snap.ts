@@ -127,12 +127,11 @@ export const demonstrateCctx = async () => {
 };
 export const getWalletInfo = async () => {
   // invoke snap
-
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,
-      request: { method: 'get-btc-utxo' },
+      request: { method: 'get-zeta-balance' },
     },
   });
 
@@ -141,7 +140,35 @@ export const getWalletInfo = async () => {
 
   return result;
 };
-export const sendBtc = async () => {
+export const createBtcWallet = async () => {
+  // invoke snap
+  console.log('send btc');
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'create-btc-testnet', params: [] },
+    },
+  });
+  // if user approved request
+  console.log(result);
+  return result;
+};
+export const getBtcUtxo = async () => {
+  // invoke snap
+  console.log('send btc');
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'get-btc-utxo', params: [] },
+    },
+  });
+  // if user approved request
+  console.log(result);
+  return result;
+};
+export const getBtcActivity = async () => {
   // invoke snap
   console.log('send btc');
   const result = await window.ethereum.request({
@@ -151,10 +178,8 @@ export const sendBtc = async () => {
       request: { method: 'get-btc-trxs', params: [] },
     },
   });
-
   // if user approved request
   console.log(result);
-
   return result;
 };
 

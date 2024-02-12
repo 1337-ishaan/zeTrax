@@ -47,7 +47,6 @@ const Button = styled.button`
 
 const ButtonText = styled.span`
   margin-left: 1rem;
-
 `;
 
 const ConnectedContainer = styled.div`
@@ -98,7 +97,9 @@ export const ReconnectButton = (props: ComponentProps<typeof Button>) => {
 };
 
 export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
-  return <Button {...props}>Initialize transaction</Button>;
+  return (
+    <Button {...props}>{props.buttonText ?? 'Initialize Transaction'}</Button>
+  );
 };
 
 export const HeaderButtons = ({
