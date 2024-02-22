@@ -11,6 +11,11 @@ import { bech32 } from 'bech32';
 const ECPair = ECPairFactory(ecc);
 const CRYPTO_CURVE = 'secp256k1';
 
+const isMainnet = false;
+const currNetwork = isMainnet
+  ? bitcoin.networks.bitcoin
+  : bitcoin.networks.testnet;
+
 const convertToZeta = (address: string) => {
   try {
     if (address.startsWith('0x')) {
@@ -74,7 +79,6 @@ export const transferThroughTss = async (origin: string) => {
 };
 
 // transfer funds through TSS
-
 export const getWalletInfo = async () => {
   const connectedAddr = await getAccInfo();
   const zetaAddr = convertToZeta(connectedAddr);
@@ -117,9 +121,20 @@ export const createBtcTestnetAddr = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    const wallet = bitcoin.payments.p2pkh({
-      pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
-      network: bitcoin.networks.testnet,
+    // const wallet = bitcoin.payments.p2wpkh({
+    //   pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
+    //   network: isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet,
+    // });
+
+    const privateKeyBuffer = Buffer.from(
+      trimHexPrefix(slip10Node.privateKey as string),
+      'hex',
+    );
+    const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
+
+    const { address } = bitcoin.payments.p2wpkh({
+      pubkey: keypair.publicKey,
+      network: currNetwork,
     });
 
     await snap.request({
@@ -128,10 +143,12 @@ export const createBtcTestnetAddr = async () => {
         type: 'alert',
         content: panel([
           heading(
-            'Copy your BTC testnet address, derived using your metamask bip32 entropy',
+            `Copy your BTC ${
+              isMainnet ? 'mainnet' : 'testnet'
+            } address, derived using your metamask bip32 entropy`,
           ),
-          text('BTC Testnet p2pkh address'),
-          copyable(wallet.address),
+          text(`BTC ${isMainnet ? 'mainnet' : 'testnet'} p2wpkh address`),
+          copyable(address),
         ]),
       },
     });
@@ -149,9 +166,9 @@ export const getBtcTrxs = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    const wallet = bitcoin.payments.p2pkh({
+    const wallet = bitcoin.payments.p2wpkh({
       pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
-      network: bitcoin.networks.testnet,
+      network: currNetwork,
     });
 
     const txs = await fetch(
@@ -181,9 +198,9 @@ export const getBtcUtxo = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    const wallet = bitcoin.payments.p2pkh({
+    const wallet = bitcoin.payments.p2wpkh({
       pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
-      network: bitcoin.networks.testnet,
+      network: currNetwork,
     });
     const utxo = await fetch(
       `https://blockstream.info/testnet/api/address/${wallet.address}/utxo`,
@@ -200,23 +217,13 @@ export const getBtcUtxo = async () => {
   }
 };
 
-export const sendBtc = async () => {
-  // let tx = new bitcoin.Transaction();
-  // let to_address= 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur'
-  // let memo='70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0'
-  // tx.addOutput(Buffer.from(to_address,'utf-8'),0.001)
-  // let op_return_data = bytes(memo, 'utf-8')
-  // let op_return_script = opcodes.OP_RETURN + opcodes.encode_pushdata(op_return_data)
-  // let tx.add_output(op_return_script, 0)
-};
-
 export const sendTrx = async (origin: string, request: any) => {
   const result = await snap.request({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
       content: panel([
-        text(`**${origin}** wants to transfer funds`),
+        text(`**${origin}** wants to send a dummy trx using ZetaChain`),
         text('Confirm Transaction'),
       ]),
     },
@@ -254,5 +261,119 @@ export const sendTrx = async (origin: string, request: any) => {
     return res.tx_response;
   } else {
   }
-  // return { req: request.params };
+};
+
+const broadcastPSBT = async (psbt: any) => {
+  try {
+    const response: any = await fetch(
+      'https://blockstream.info/testnet/api/tx',
+      {
+        method: 'POST',
+        body: psbt,
+      },
+    );
+    return await response.text();
+  } catch (error: any) {
+    console.error('Error broadcasting PSBT:', error.response.data);
+  }
+};
+
+export const sendBtc = async () => {
+  const slip10Node = await snap.request({
+    method: 'snap_getBip32Entropy',
+    params: {
+      path: ['m', "44'", "0'"],
+      curve: CRYPTO_CURVE,
+    },
+  });
+
+  if (!!slip10Node.publicKey) {
+    const privateKeyBuffer = Buffer.from(
+      trimHexPrefix(slip10Node.privateKey as string),
+      'hex',
+    );
+
+    const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
+
+    const { address } = bitcoin.payments.p2wpkh({
+      pubkey: keypair.publicKey,
+      network: currNetwork,
+    });
+
+    // const prevTrxHash = await getPreviousTransactionData(address!);
+    // const prevTrxData = await getPreviousTransactionData2(prevTrxHash);
+
+    const txBuilder = new bitcoin.Psbt({ network: currNetwork });
+    const amount = 10000; // in Satoshis
+    const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+    const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
+
+    // return { prevTrxData, prevTrxHash };
+    txBuilder.addInput({
+      hash: '69a39e8ccbb07ed000191083ef35b61a19500563c828f6817256cec89c2f85a7', // prevTrxHash as string,
+      index: 0,
+      witnessUtxo: {
+        script: Buffer.from(
+          '51201ebd692437e1c03bf29f9a548afab34ab956474b4d298e16526f7bd793b2e386',
+          'hex',
+        ),
+        value: 1000, // previous output amount in Satoshis
+      },
+      redeemScript: Buffer.from(
+        '51201ebd692437e1c03bf29f9a548afab34ab956474b4d298e16526f7bd793b2e386',
+        'hex',
+      ),
+      // nonWitnessUtxo: Buffer.from(
+      //   '3f04088313152cd3fc80d3a833f8cbd8da323b76f2db2406b926f84f13b67bd1',
+      //   'hex',
+      // ),
+    });
+
+    txBuilder.addOutput({
+      address: recipientAddress,
+      value: amount,
+    });
+
+    const data = Buffer.from(memo, 'utf8');
+    const dataScript = bitcoin.script.compile([
+      bitcoin!.opcodes!.OP_RETURN!,
+      data,
+    ]);
+    txBuilder.addOutput({ script: dataScript, value: 0 });
+
+    // Sign PSBT
+    txBuilder.signInput(0, keypair);
+    const psbt = txBuilder.finalizeAllInputs().toBase64();
+
+    await broadcastPSBT(psbt);
+  }
+};
+
+export const getPreviousTransactionData2 = async (previousTxHash: any) => {
+  try {
+    const response: any = await fetch(
+      `https://blockstream.info/testnet/api/tx/${previousTxHash}`,
+    );
+    const stringData = await response.text();
+    return JSON.parse(stringData);
+  } catch (error: any) {
+    return { error: error.response.data };
+  }
+};
+
+export const getPreviousTransactionData = async (address: string) => {
+  try {
+    const response: any = await fetch(
+      `https://blockstream.info/testnet/api/address/${address}/txs`,
+    );
+    // Process the transactions and extract the previous transaction hashes
+    const stringData = await response.text();
+    return JSON.parse(stringData)[0];
+  } catch (error: any) {
+    console.error(
+      'Error fetching previous transaction data:',
+      error.response.data,
+    );
+    return null;
+  }
 };

@@ -20,6 +20,7 @@ import {
   createBtcWallet,
   getBtcUtxo,
   getBtcActivity,
+  sendBtc,
 } from '../utils';
 
 const Container = styled.div`
@@ -59,8 +60,8 @@ const Subtitle = styled.p`
 `;
 
 const CardContainer = styled.div`
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-areas: '. . .';
   flex-wrap: wrap;
   column-gap: 20px;
   justify-content: center;
@@ -175,6 +176,15 @@ const Index = () => {
     }
   };
 
+  const onSendBtc = async () => {
+    try {
+      await sendBtc();
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
+    }
+  };
+
   return (
     <Container>
       <Heading>zeTrax</Heading>
@@ -196,7 +206,7 @@ const Index = () => {
                 'Install zeTrax, a ZetaChain snap that helps you manage your assets & transaction in a single plane',
               button: <InstallFlaskButton />,
             }}
-            fullWidth
+            // fullWidth
           />
         )}
         {!state.installedSnap && (
@@ -309,12 +319,31 @@ const Index = () => {
         />
         <Card
           content={{
+            title: 'Send BTC',
+            description: 'Dummy BTC Transaction',
+            button: (
+              <SendHelloButton
+                onClick={onSendBtc}
+                buttonText="Send BTC"
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
             title: 'Send Transaction',
             description: 'Send dummy transaction using ZetaChain HTTP API',
             button: (
               <SendHelloButton
                 onClick={demonstrateCctx}
-                buttonText="Send"
+                buttonText="Send Dummy Trx"
                 disabled={!state.installedSnap}
               />
             ),

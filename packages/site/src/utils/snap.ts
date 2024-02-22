@@ -162,5 +162,19 @@ export const getBtcActivity = async () => {
   console.log(result);
   return result;
 };
+export const sendBtc = async () => {
+  // invoke snap
+  console.log('send btc');
+  const result = await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'send-btc', params: [] },
+    },
+  });
+  // if user approved request
+  console.log(result);
+  return result;
+};
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
