@@ -7,7 +7,6 @@ import { ECPairFactory } from 'ecpair';
 import * as bitcoin from 'bitcoinjs-lib';
 import * as bip32 from 'bip32';
 import { bech32 } from 'bech32';
-import { p2pkh } from 'bitcoinjs-lib/src/payments';
 
 const ECPair = ECPairFactory(ecc);
 const CRYPTO_CURVE = 'secp256k1';
@@ -16,6 +15,10 @@ const isMainnet = false;
 const currNetwork = isMainnet
   ? bitcoin.networks.bitcoin
   : bitcoin.networks.testnet;
+
+const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
+const data = Buffer.from(memo, 'utf8');
 
 const convertToZeta = (address: string) => {
   try {
@@ -173,7 +176,8 @@ export const getBtcTrxs = async () => {
     });
 
     const txs = await fetch(
-      `https://blockstream.info/testnet/api/address/${wallet.address}/txs`,
+      `https://api.blockcypher.com/v1/btc/test3/addrs/${wallet.address}?unspentOnly=true`,
+      // `https://blockstream.info/testnet/api/address/${wallet.address}/txs`,
     );
 
     const txsData = await txs.text();
@@ -298,18 +302,17 @@ export const sendBtc = async () => {
 
       const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
 
-      const { address } = bitcoin.payments.p2pkh({
+      const { address, redeem } = bitcoin.payments.p2pkh({
         pubkey: keypair.publicKey,
         network: currNetwork,
       });
 
+      // return { redeem };
       const prevTrx = await getTrxsByAddress(address as string);
-      const getRawTrx = await getTrxByHash(prevTrx[0].vin[0].txid);
+      const getRawTrx = await getTrxByHash(prevTrx.txrefs[0].tx_hash);
+      const txHex = await getTrxHex(prevTrx.txrefs[0].tx_hash);
 
       const amount = 1; // in Satoshis
-      const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
-      const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
-      const data = Buffer.from(memo, 'utf8');
 
       const embed = bitcoin.payments.embed({ data: [data] });
 
@@ -319,20 +322,20 @@ export const sendBtc = async () => {
       // psbt.addInput({
       //   hash: prevTrx[0].vin[0].txid,
       //   index: 0,
-      //   nonWitnessUtxo: Buffer.from(getRawTrx.txid, 'hex'), // Add the raw transaction data
       // });
 
       // // Add outputs
 
-      prevTrx.forEach((utxo: any) => {
-        psbt.addInput({
-          hash: getRawTrx.vin[0].txid,
-          index: getRawTrx.vin[0].vout,
-          witnessUtxo: {
-            script: Buffer.from(getRawTrx.vout[0].scriptpubkey, 'hex'),
-            value: getRawTrx.vout[0].value,
-          },
-        });
+      psbt.addInput({
+        hash: prevTrx.txrefs[0].tx_hash,
+        index: 0,
+        // witnessUtxo: {
+        //   script: Buffer.from(getRawTrx.vout[0].scriptpubkey, 'hex'),
+        //   value: getRawTrx.vout[0].value,
+        // },
+        nonWitnessUtxo: Buffer.from(txHex, 'hex'), // Add the raw transaction data
+
+        // redeemScript: redeem?.output!,
       });
       psbt.addOutput({
         script: embed.output!, // Create OP_RETURN output with memo data
@@ -341,6 +344,10 @@ export const sendBtc = async () => {
 
       psbt.addOutput({
         address: recipientAddress, // Recipient address
+        value: amount, // Value in satoshis
+      });
+      psbt.addOutput({
+        address: address!, // Recipient address
         value: amount, // Value in satoshis
       });
 
@@ -353,7 +360,8 @@ export const sendBtc = async () => {
       // Get the finalized transaction
       const transaction = psbt.extractTransaction();
 
-      return { transaction: transaction.toHex() };
+      // return { transaction: transaction.toHex() };
+      return await broadcastTransaction(transaction.toHex());
     }
   } catch (error) {
     console.error('Error sending BTC:', error);
@@ -361,10 +369,11 @@ export const sendBtc = async () => {
   }
 };
 
+// trx info
 export const getTrxByHash = async (previousTxHash: any) => {
   try {
     const response: any = await fetch(
-      `https://blockstream.info/testnet/api/tx/${previousTxHash}`,
+      `https://api.blockcypher.com/v1/btc/test3/txs/${previousTxHash}`,
     );
     const stringData = await response.text();
     return JSON.parse(stringData);
@@ -373,10 +382,22 @@ export const getTrxByHash = async (previousTxHash: any) => {
   }
 };
 
+export const getTrxHex = async (previousTxHash: any) => {
+  try {
+    const response: any = await fetch(
+      `https://blockstream.info/testnet/api/tx/${previousTxHash}/hex`,
+    );
+    const stringData = await response.text();
+    return stringData;
+  } catch (error: any) {
+    return { error: error.response.data };
+  }
+};
+
 export const getTrxsByAddress = async (address: string) => {
   try {
     const response: any = await fetch(
-      `https://blockstream.info/testnet/api/address/${address}/txs`,
+      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}?unspentOnly=true`,
     );
     // Process the transactions and extract the previous transaction hashes
     const stringData = await response.text();

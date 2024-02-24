@@ -11,6 +11,7 @@ import {
   sendTrx,
   getTrxsByAddress,
   getTrxByHash,
+  getTrxHex,
 } from './functions';
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
