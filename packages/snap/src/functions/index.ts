@@ -7,6 +7,7 @@ import { ECPairFactory } from 'ecpair';
 import * as bitcoin from 'bitcoinjs-lib';
 import * as bip32 from 'bip32';
 import { bech32 } from 'bech32';
+import { p2pkh } from 'bitcoinjs-lib/src/payments';
 
 const ECPair = ECPairFactory(ecc);
 const CRYPTO_CURVE = 'secp256k1';
@@ -121,7 +122,7 @@ export const createBtcTestnetAddr = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    // const wallet = bitcoin.payments.p2wpkh({
+    // const wallet = bitcoin.payments.p2pkh({
     //   pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
     //   network: isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet,
     // });
@@ -132,7 +133,7 @@ export const createBtcTestnetAddr = async () => {
     );
     const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
 
-    const { address } = bitcoin.payments.p2wpkh({
+    const { address } = bitcoin.payments.p2pkh({
       pubkey: keypair.publicKey,
       network: currNetwork,
     });
@@ -147,7 +148,7 @@ export const createBtcTestnetAddr = async () => {
               isMainnet ? 'mainnet' : 'testnet'
             } address, derived using your metamask bip32 entropy`,
           ),
-          text(`BTC ${isMainnet ? 'mainnet' : 'testnet'} p2wpkh address`),
+          text(`BTC ${isMainnet ? 'mainnet' : 'testnet'} p2pkh address`),
           copyable(address),
         ]),
       },
@@ -166,7 +167,7 @@ export const getBtcTrxs = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    const wallet = bitcoin.payments.p2wpkh({
+    const wallet = bitcoin.payments.p2pkh({
       pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
       network: currNetwork,
     });
@@ -198,7 +199,7 @@ export const getBtcUtxo = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    const wallet = bitcoin.payments.p2wpkh({
+    const wallet = bitcoin.payments.p2pkh({
       pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
       network: currNetwork,
     });
@@ -263,93 +264,104 @@ export const sendTrx = async (origin: string, request: any) => {
   }
 };
 
-const broadcastPSBT = async (psbt: any) => {
+const broadcastTransaction = async (hex: string) => {
   try {
     const response: any = await fetch(
-      'https://blockstream.info/testnet/api/tx',
+      `https://blockstream.info/testnet/api/tx`,
       {
         method: 'POST',
-        body: psbt,
+        body: hex,
       },
     );
-    return await response.text();
+    const txData = await response.text();
+    return txData;
   } catch (error: any) {
-    console.error('Error broadcasting PSBT:', error.response.data);
+    console.error('Error broadcasting transaction:', error.response.data);
   }
 };
 
 export const sendBtc = async () => {
-  const slip10Node = await snap.request({
-    method: 'snap_getBip32Entropy',
-    params: {
-      path: ['m', "44'", "0'"],
-      curve: CRYPTO_CURVE,
-    },
-  });
-
-  if (!!slip10Node.publicKey) {
-    const privateKeyBuffer = Buffer.from(
-      trimHexPrefix(slip10Node.privateKey as string),
-      'hex',
-    );
-
-    const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
-
-    const { address } = bitcoin.payments.p2wpkh({
-      pubkey: keypair.publicKey,
-      network: currNetwork,
-    });
-
-    // const prevTrxHash = await getPreviousTransactionData(address!);
-    // const prevTrxData = await getPreviousTransactionData2(prevTrxHash);
-
-    const txBuilder = new bitcoin.Psbt({ network: currNetwork });
-    const amount = 10000; // in Satoshis
-    const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
-    const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
-
-    // return { prevTrxData, prevTrxHash };
-    txBuilder.addInput({
-      hash: '69a39e8ccbb07ed000191083ef35b61a19500563c828f6817256cec89c2f85a7', // prevTrxHash as string,
-      index: 0,
-      witnessUtxo: {
-        script: Buffer.from(
-          '51201ebd692437e1c03bf29f9a548afab34ab956474b4d298e16526f7bd793b2e386',
-          'hex',
-        ),
-        value: 1000, // previous output amount in Satoshis
+  try {
+    const slip10Node = await snap.request({
+      method: 'snap_getBip32Entropy',
+      params: {
+        path: ['m', "44'", "0'"],
+        curve: CRYPTO_CURVE,
       },
-      redeemScript: Buffer.from(
-        '51201ebd692437e1c03bf29f9a548afab34ab956474b4d298e16526f7bd793b2e386',
+    });
+
+    if (!!slip10Node.publicKey) {
+      const privateKeyBuffer = Buffer.from(
+        trimHexPrefix(slip10Node.privateKey as string),
         'hex',
-      ),
-      // nonWitnessUtxo: Buffer.from(
-      //   '3f04088313152cd3fc80d3a833f8cbd8da323b76f2db2406b926f84f13b67bd1',
-      //   'hex',
-      // ),
-    });
+      );
 
-    txBuilder.addOutput({
-      address: recipientAddress,
-      value: amount,
-    });
+      const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
 
-    const data = Buffer.from(memo, 'utf8');
-    const dataScript = bitcoin.script.compile([
-      bitcoin!.opcodes!.OP_RETURN!,
-      data,
-    ]);
-    txBuilder.addOutput({ script: dataScript, value: 0 });
+      const { address } = bitcoin.payments.p2pkh({
+        pubkey: keypair.publicKey,
+        network: currNetwork,
+      });
 
-    // Sign PSBT
-    txBuilder.signInput(0, keypair);
-    const psbt = txBuilder.finalizeAllInputs().toBase64();
+      const prevTrx = await getTrxsByAddress(address as string);
+      const getRawTrx = await getTrxByHash(prevTrx[0].vin[0].txid);
 
-    await broadcastPSBT(psbt);
+      const amount = 1; // in Satoshis
+      const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+      const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
+      const data = Buffer.from(memo, 'utf8');
+
+      const embed = bitcoin.payments.embed({ data: [data] });
+
+      const psbt = new bitcoin.Psbt({ network: currNetwork });
+      // return { getRawTrx };
+      // Add the input (UTXO) - assuming you have an existing unspent transaction output (UTXO)
+      // psbt.addInput({
+      //   hash: prevTrx[0].vin[0].txid,
+      //   index: 0,
+      //   nonWitnessUtxo: Buffer.from(getRawTrx.txid, 'hex'), // Add the raw transaction data
+      // });
+
+      // // Add outputs
+
+      prevTrx.forEach((utxo: any) => {
+        psbt.addInput({
+          hash: getRawTrx.vin[0].txid,
+          index: getRawTrx.vin[0].vout,
+          witnessUtxo: {
+            script: Buffer.from(getRawTrx.vout[0].scriptpubkey, 'hex'),
+            value: getRawTrx.vout[0].value,
+          },
+        });
+      });
+      psbt.addOutput({
+        script: embed.output!, // Create OP_RETURN output with memo data
+        value: 0, // Set value to 0 for OP_RETURN output
+      });
+
+      psbt.addOutput({
+        address: recipientAddress, // Recipient address
+        value: amount, // Value in satoshis
+      });
+
+      // Sign the input
+      psbt.signInput(0, keypair);
+
+      // Finalize the transaction
+      psbt.finalizeAllInputs();
+
+      // Get the finalized transaction
+      const transaction = psbt.extractTransaction();
+
+      return { transaction: transaction.toHex() };
+    }
+  } catch (error) {
+    console.error('Error sending BTC:', error);
+    throw error; // Throw the error to be caught by the caller
   }
 };
 
-export const getPreviousTransactionData2 = async (previousTxHash: any) => {
+export const getTrxByHash = async (previousTxHash: any) => {
   try {
     const response: any = await fetch(
       `https://blockstream.info/testnet/api/tx/${previousTxHash}`,
@@ -361,14 +373,14 @@ export const getPreviousTransactionData2 = async (previousTxHash: any) => {
   }
 };
 
-export const getPreviousTransactionData = async (address: string) => {
+export const getTrxsByAddress = async (address: string) => {
   try {
     const response: any = await fetch(
       `https://blockstream.info/testnet/api/address/${address}/txs`,
     );
     // Process the transactions and extract the previous transaction hashes
     const stringData = await response.text();
-    return JSON.parse(stringData)[0];
+    return JSON.parse(stringData);
   } catch (error: any) {
     console.error(
       'Error fetching previous transaction data:',
