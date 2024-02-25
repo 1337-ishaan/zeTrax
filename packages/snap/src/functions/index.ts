@@ -170,13 +170,19 @@ export const getBtcTrxs = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    const wallet = bitcoin.payments.p2pkh({
-      pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
+    const privateKeyBuffer = Buffer.from(
+      trimHexPrefix(slip10Node.privateKey as string),
+      'hex',
+    );
+
+    const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
+    const { address } = bitcoin.payments.p2pkh({
+      pubkey: keypair.publicKey,
       network: currNetwork,
     });
 
     const txs = await fetch(
-      `https://api.blockcypher.com/v1/btc/test3/addrs/${wallet.address}?unspentOnly=true`,
+      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}?unspentOnly=true`,
       // `https://blockstream.info/testnet/api/address/${wallet.address}/txs`,
     );
 
@@ -203,12 +209,18 @@ export const getBtcUtxo = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    const wallet = bitcoin.payments.p2pkh({
-      pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
+    const privateKeyBuffer = Buffer.from(
+      trimHexPrefix(slip10Node.privateKey as string),
+      'hex',
+    );
+
+    const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
+    const { address } = bitcoin.payments.p2pkh({
+      pubkey: keypair.publicKey,
       network: currNetwork,
     });
     const utxo = await fetch(
-      `https://blockstream.info/testnet/api/address/${wallet.address}/utxo`,
+      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`,
     );
     const utxoData = await utxo.text();
     const result = await snap.request({
@@ -234,7 +246,7 @@ export const sendTrx = async (origin: string, request: any) => {
     params: {
       type: 'confirmation',
       content: panel([
-        text(`**${origin}** wants to send a dummy trx using ZetaChain`),
+        text(`**zeTrax** wants to send a dummy trx using ZetaChain`),
         text('Confirm Transaction'),
       ]),
     },
