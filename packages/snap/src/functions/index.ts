@@ -221,6 +221,12 @@ export const getBtcUtxo = async () => {
     return { result, account: utxoData };
   }
 };
+export const getFees = async () => {
+  const utxo = await fetch(`https://api.blockcypher.com/v1/btc/test3`);
+  const utxoData = await utxo.text();
+
+  return JSON.parse(utxoData);
+};
 
 export const sendTrx = async (origin: string, request: any) => {
   const result = await snap.request({
@@ -278,6 +284,18 @@ const broadcastTransaction = async (hex: string) => {
       },
     );
     const txData = await response.text();
+
+    await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: panel([
+          copyable(`https://live.blockcypher.com/btc-testnet/tx/${txData}`),
+          text('See Transaction'),
+        ]),
+      },
+    });
+
     return txData;
   } catch (error: any) {
     console.error('Error broadcasting transaction:', error.response.data);
@@ -285,91 +303,101 @@ const broadcastTransaction = async (hex: string) => {
 };
 
 export const sendBtc = async () => {
-  try {
-    const slip10Node = await snap.request({
-      method: 'snap_getBip32Entropy',
-      params: {
-        path: ['m', "44'", "0'"],
-        curve: CRYPTO_CURVE,
-      },
-    });
+  const result = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: panel([
+        text(`**${origin}** wants to send a Bitcoin`),
+        text('Confirm Transaction'),
+      ]),
+    },
+  });
 
-    if (!!slip10Node.publicKey) {
-      const privateKeyBuffer = Buffer.from(
-        trimHexPrefix(slip10Node.privateKey as string),
-        'hex',
-      );
-
-      const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
-
-      const { address, redeem } = bitcoin.payments.p2pkh({
-        pubkey: keypair.publicKey,
-        network: currNetwork,
+  if (result) {
+    try {
+      const slip10Node = await snap.request({
+        method: 'snap_getBip32Entropy',
+        params: {
+          path: ['m', "44'", "0'"],
+          curve: CRYPTO_CURVE,
+        },
       });
 
-      // return { redeem };
-      const prevTrx = await getTrxsByAddress(address as string);
-      const getRawTrx = await getTrxByHash(prevTrx.txrefs[0].tx_hash);
-      const txHex = await getTrxHex(prevTrx.txrefs[0].tx_hash);
+      if (!!slip10Node.publicKey) {
+        const privateKeyBuffer = Buffer.from(
+          trimHexPrefix(slip10Node.privateKey as string),
+          'hex',
+        );
 
-      const amount = 1; // in Satoshis
+        const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
 
-      const embed = bitcoin.payments.embed({ data: [data] });
+        const { address } = bitcoin.payments.p2pkh({
+          pubkey: keypair.publicKey,
+          network: currNetwork,
+        });
 
-      const psbt = new bitcoin.Psbt({ network: currNetwork });
-      // return { getRawTrx };
-      // Add the input (UTXO) - assuming you have an existing unspent transaction output (UTXO)
-      // psbt.addInput({
-      //   hash: prevTrx[0].vin[0].txid,
-      //   index: 0,
-      // });
+        // return { redeem };
+        const prevTrx = await getTrxsByAddress(address as string);
+        // const getRawTrx = await getTrxByHash(prevTrx.txrefs[0].tx_hash);
+        const txHex = await getTrxHex(prevTrx.txrefs[0].tx_hash);
+        const amount = 1; // in Satoshis
+        const embed = bitcoin.payments.embed({ data: [data] });
+        const psbt = new bitcoin.Psbt({ network: currNetwork });
 
-      // // Add outputs
+        const feePerKb = await getFees();
 
-      psbt.addInput({
-        hash: prevTrx.txrefs[0].tx_hash,
-        index: 0,
-        // witnessUtxo: {
-        //   script: Buffer.from(getRawTrx.vout[0].scriptpubkey, 'hex'),
-        //   value: getRawTrx.vout[0].value,
-        // },
-        nonWitnessUtxo: Buffer.from(txHex, 'hex'), // Add the raw transaction data
+        const totalInputAmount = prevTrx.txrefs.reduce(
+          (acc: any, curr: any) => acc + curr.value,
+          0,
+        );
 
-        // redeemScript: redeem?.output!,
-      });
-      psbt.addOutput({
-        script: embed.output!, // Create OP_RETURN output with memo data
-        value: 0, // Set value to 0 for OP_RETURN output
-      });
+        const fee = Math.ceil((226 * feePerKb.medium_fee_per_kb) / 1000); // Assuming typical transaction size of 226 bytes
 
-      psbt.addOutput({
-        address: recipientAddress, // Recipient address
-        value: amount, // Value in satoshis
-      });
-      psbt.addOutput({
-        address: address!, // Recipient address
-        value: amount, // Value in satoshis
-      });
+        const changeAmount = totalInputAmount - amount - fee;
 
-      // Sign the input
-      psbt.signInput(0, keypair);
+        psbt.addInput({
+          hash: prevTrx.txrefs[0].tx_hash,
+          index: 0,
+          // witnessUtxo: {
+          //   script: Buffer.from(getRawTrx.vout[0].scriptpubkey, 'hex'),
+          //   value: getRawTrx.vout[0].value,
+          // },
+          // redeemScript: redeem?.output!,
+          nonWitnessUtxo: Buffer.from(txHex, 'hex'), // Add the raw transaction data
+        });
 
-      // Finalize the transaction
-      psbt.finalizeAllInputs();
+        // OP_RETURN
+        psbt.addOutput({
+          script: embed.output!,
+          value: 0,
+        });
 
-      // Get the finalized transaction
-      const transaction = psbt.extractTransaction();
+        psbt.addOutput({
+          address: recipientAddress,
+          value: amount,
+        });
 
-      // return { transaction: transaction.toHex() };
-      return await broadcastTransaction(transaction.toHex());
+        psbt.addOutput({
+          address: address!,
+          value: changeAmount,
+        });
+        psbt.signInput(0, keypair);
+        psbt.finalizeAllInputs();
+
+        const transaction = psbt.extractTransaction();
+
+        return await broadcastTransaction(transaction.toHex());
+      }
+    } catch (error) {
+      console.error('Error sending BTC:', error);
+      throw error; // Throw the error to be caught by the caller
     }
-  } catch (error) {
-    console.error('Error sending BTC:', error);
-    throw error; // Throw the error to be caught by the caller
+  } else {
+    return { error: 'User Rejected' };
   }
 };
 
-// trx info
 export const getTrxByHash = async (previousTxHash: any) => {
   try {
     const response: any = await fetch(
