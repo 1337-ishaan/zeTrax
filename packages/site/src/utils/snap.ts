@@ -4,7 +4,6 @@ import { defaultSnapOrigin } from '../config';
 import type { GetSnapsResponse, Snap } from '../types';
 import * as ethers from 'ethers';
 import { getAddress } from '@zetachain/protocol-contracts';
-import { Wallet } from 'ethers';
 
 /**
  * Get the installed snaps in MetaMask.

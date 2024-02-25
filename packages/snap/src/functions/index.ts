@@ -236,7 +236,6 @@ export const getBtcUtxo = async () => {
 export const getFees = async () => {
   const utxo = await fetch(`https://api.blockcypher.com/v1/btc/test3`);
   const utxoData = await utxo.text();
-
   return JSON.parse(utxoData);
 };
 
@@ -255,7 +254,7 @@ export const sendTrx = async (origin: string, request: any) => {
   if (result) {
     const postData = {
       tx_bytes: request.params[0],
-      mode: 'BROADCAST_MODE_ASYNC',
+      mode: 'BROADCAST_MODE_BLOCK',
     };
 
     const trxData = await fetch(
@@ -352,48 +351,53 @@ export const sendBtc = async () => {
         // return { redeem };
         const prevTrx = await getTrxsByAddress(address as string);
         // const getRawTrx = await getTrxByHash(prevTrx.txrefs[0].tx_hash);
-        const txHex = await getTrxHex(prevTrx.txrefs[0].tx_hash);
-        const amount = 1; // in Satoshis
-        const embed = bitcoin.payments.embed({ data: [data] });
+        const prevHash = prevTrx.txrefs[0].tx_hash;
+
+        const txHex = await getTrxHex(prevHash);
+        const amount = 10; // in Satoshis
+        // const embed = bitcoin.payments.embed({ data: [data] });
+        const embed = bitcoin.script.compile([
+          bitcoin.opcodes.OP_RETURN!,
+          data,
+        ]);
+
         const psbt = new bitcoin.Psbt({ network: currNetwork });
 
         const feePerKb = await getFees();
 
-        const totalInputAmount = prevTrx.txrefs.reduce(
-          (acc: any, curr: any) => acc + curr.value,
-          0,
-        );
+        const totalInputAmount = prevTrx.balance;
 
         const fee = Math.ceil((226 * feePerKb.medium_fee_per_kb) / 1000); // Assuming typical transaction size of 226 bytes
 
         const changeAmount = totalInputAmount - amount - fee;
 
         psbt.addInput({
-          hash: prevTrx.txrefs[0].tx_hash,
-          index: 0,
+          hash: prevHash,
+          index: prevTrx.txrefs[0].tx_output_n,
           // witnessUtxo: {
-          //   script: Buffer.from(getRawTrx.vout[0].scriptpubkey, 'hex'),
-          //   value: getRawTrx.vout[0].value,
+          //   script: Buffer.from(getRawTrx.outputs[2].script, 'hex'),
+          //   value: getRawTrx.outputs[2].value,
           // },
           // redeemScript: redeem?.output!,
           nonWitnessUtxo: Buffer.from(txHex, 'hex'), // Add the raw transaction data
-        });
-
-        // OP_RETURN
-        psbt.addOutput({
-          script: embed.output!,
-          value: 0,
         });
 
         psbt.addOutput({
           address: recipientAddress,
           value: amount,
         });
-
+        // OP_RETURN
         psbt.addOutput({
-          address: address!,
-          value: changeAmount,
+          script: embed,
+          value: 0,
         });
+
+        if (changeAmount > 0) {
+          psbt.addOutput({
+            value: changeAmount,
+            address: address!,
+          });
+        }
         psbt.signInput(0, keypair);
         psbt.finalizeAllInputs();
 
