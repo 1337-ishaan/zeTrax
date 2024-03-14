@@ -1,5 +1,4 @@
 import type { MetaMaskInpageProvider } from '@metamask/providers';
-import ZRC20 from '@zetachain/protocol-contracts/abi/zevm/ZRC20.sol/ZRC20.json';
 import { defaultSnapOrigin } from '../config';
 import type { GetSnapsResponse, Snap } from '../types';
 import * as ethers from 'ethers';
@@ -62,48 +61,58 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
  */
 
 export const demonstrateCctx = async () => {
-  // invoke snap
+  // Check if MetaMask is installed and enabled
 
-  // if user approved request
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const signer = await provider.getSigner();
-  const fromAddress = await signer.getAddress();
-  const tssAddress = getAddress('tss', 'mumbai_testnet');
-  const memoData = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
-  const nonce = await provider.getTransactionCount(fromAddress, 'latest');
+  if (window.ethereum) {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
 
-  const tx = {
-    from: fromAddress,
-    to: tssAddress,
-    nonce,
-    gasLimit: 21000,
-    gasPrice: ethers.parseUnits('10', 'gwei'), // Example gas price
-    data: ethers.toUtf8Bytes(memoData),
-    value: ethers.parseUnits('10', 'gwei'),
-  };
-  const newTx = new ethers.Transaction();
+      // Request account access
+      await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      });
 
-  newTx.data = tx.data;
-  newTx.to = tx.to;
-  newTx.nonce = tx.nonce;
-  newTx.gasLimit = tx.gasLimit;
-  newTx.gasPrice = tx.gasPrice;
-  newTx.value = tx.value;
-  let tx_bytes = ethers.Transaction.from(newTx).unsignedSerialized;
+      const signer = await provider.getSigner();
+      const fromAddress = await signer.getAddress();
+      const tssAddress = getAddress('tss', 'mumbai_testnet');
+      const nonce = await provider.getTransactionCount(fromAddress, 'latest');
+      const transaction = {
+        nonce: nonce, // Nonce value
+        gasLimit: 21000, //ethers.toBigInt(21000), // Gas limit
+        gasPrice: '20000000000', //ethers.parseEther('0.0000001'), // Gas price (1 gwei)
+        to: '0x89BEA78c4E0053A96E11BC6EB65179953184989c', //tssAddress, // Receiver address
+        value: ethers.parseEther('0.0001'),
+      };
 
-  const result = await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: { method: 'send-trx', params: [tx_bytes] },
-    },
-  });
-  if (!!result) {
-    console.log(result, 'result');
-    return result;
-    // return ethers.Transaction.from(newTx).unsignedSerialized;
+      const tx = new ethers.Transaction();
+      tx.nonce = transaction.nonce;
+      tx.gasLimit = transaction.gasLimit;
+      tx.gasPrice = transaction.gasPrice;
+      tx.to = transaction.to;
+      tx.value = transaction.value;
+
+      const serializedTx = ethers.Transaction.from(tx).unsignedSerialized;
+      const rawSig = await signer.sendTransaction(transaction);
+      console.log('serialized trx', serializedTx);
+
+      // const result = await window.ethereum.request({
+      //   method: 'wallet_invokeSnap',
+      //   params: {
+      //     snapId: defaultSnapOrigin,
+      //     request: { method: 'send-trx', params: [serializedTx] },
+      //   },
+      // });
+      // if (result) {
+      //   return serializedTx;
+      // }
+    } catch (error) {
+      return { error };
+    }
+  } else {
+    return { error: 'Error' };
   }
 };
+
 export const getWalletInfo = async () => {
   // invoke snap
   const result = await window.ethereum.request({
@@ -121,7 +130,6 @@ export const getWalletInfo = async () => {
 };
 export const createBtcWallet = async () => {
   // invoke snap
-  console.log('send btc');
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
@@ -129,13 +137,11 @@ export const createBtcWallet = async () => {
       request: { method: 'create-btc-testnet', params: [] },
     },
   });
-  // if user approved request
-  console.log(result);
+  console.log(result, 'result');
   return result;
 };
 export const getBtcUtxo = async () => {
   // invoke snap
-  console.log('send btc');
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
@@ -143,13 +149,10 @@ export const getBtcUtxo = async () => {
       request: { method: 'get-btc-utxo', params: [] },
     },
   });
-  // if user approved request
-  console.log(result);
   return result;
 };
 export const getBtcActivity = async () => {
   // invoke snap
-  console.log('send btc');
   const result = await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
@@ -157,13 +160,11 @@ export const getBtcActivity = async () => {
       request: { method: 'get-btc-trxs', params: [] },
     },
   });
-  // if user approved request
   console.log(result);
   return result;
 };
 export const sendBtc = async () => {
   // invoke snap
-  console.log('send btc');
   const result = await window.ethereum.request({
     method: 'wallet_snap',
     params: {
@@ -171,8 +172,6 @@ export const sendBtc = async () => {
       request: { method: 'send-btc', params: [] },
     },
   });
-  // if user approved request
-  console.log(result);
   return result;
 };
 

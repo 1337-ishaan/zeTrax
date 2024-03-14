@@ -13,6 +13,8 @@ import {
   getTrxByHash,
   getTrxHex,
   getFees,
+  egTrx,
+  sendTransaction,
 } from './functions';
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -47,7 +49,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return sendTrx(origin, request);
     case 'send-btc':
       // return getTrxsByAddress('n1FCNLxVnh7BafVSzWj5aBokjTWfaD2tuu');
-      return sendBtc();
+      return sendTransaction();
+    // return egTrx();
 
     default:
       throw new Error('Method not found.');

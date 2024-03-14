@@ -1,12 +1,9 @@
-import { copyable, heading, panel, SnapError, text } from '@metamask/snaps-sdk';
-import * as bip39 from 'bip39';
 import * as ecc from '@bitcoinerlab/secp256k1';
-import * as eccc from 'tiny-secp256k1';
-import { encode, decode } from 'bs58check';
-import { ECPairFactory } from 'ecpair';
-import * as bitcoin from 'bitcoinjs-lib';
-import * as bip32 from 'bip32';
+import { copyable, heading, panel, text } from '@metamask/snaps-sdk';
 import { bech32 } from 'bech32';
+import * as bitcoin from 'bitcoinjs-lib';
+import { ECPairFactory } from 'ecpair';
+import { ethers } from 'ethers';
 
 const ECPair = ECPairFactory(ecc);
 const CRYPTO_CURVE = 'secp256k1';
@@ -16,8 +13,8 @@ const currNetwork = isMainnet
   ? bitcoin.networks.bitcoin
   : bitcoin.networks.testnet;
 
-const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
-const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
+const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur'; //rss
+const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0'; //memo
 const data = Buffer.from(memo, 'utf8');
 
 const convertToZeta = (address: string) => {
@@ -125,7 +122,7 @@ export const createBtcTestnetAddr = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    // const wallet = bitcoin.payments.p2pkh({
+    // const wallet = bitcoin.payments.p2wpkh({
     //   pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
     //   network: isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet,
     // });
@@ -136,26 +133,27 @@ export const createBtcTestnetAddr = async () => {
     );
     const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
 
-    const { address } = bitcoin.payments.p2pkh({
+    const { address } = bitcoin.payments.p2wpkh({
       pubkey: keypair.publicKey,
       network: currNetwork,
     });
+    return address;
 
-    await snap.request({
-      method: 'snap_dialog',
-      params: {
-        type: 'alert',
-        content: panel([
-          heading(
-            `Copy your BTC ${
-              isMainnet ? 'mainnet' : 'testnet'
-            } address, derived using your metamask bip32 entropy`,
-          ),
-          text(`BTC ${isMainnet ? 'mainnet' : 'testnet'} p2pkh address`),
-          copyable(address),
-        ]),
-      },
-    });
+    // await snap.request({
+    //   method: 'snap_dialog',
+    //   params: {
+    //     type: 'alert',
+    //     content: panel([
+    //       heading(
+    //         `Copy your BTC ${
+    //           isMainnet ? 'mainnet' : 'testnet'
+    //         } address, derived using your metamask bip32 entropy`,
+    //       ),
+    //       text(`BTC ${isMainnet ? 'mainnet' : 'testnet'} p2wpkh address`),
+    //       copyable(address),
+    //     ]),
+    //   },
+    // });
   }
 };
 
@@ -176,7 +174,7 @@ export const getBtcTrxs = async () => {
     );
 
     const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
-    const { address } = bitcoin.payments.p2pkh({
+    const { address } = bitcoin.payments.p2wpkh({
       pubkey: keypair.publicKey,
       network: currNetwork,
     });
@@ -215,7 +213,7 @@ export const getBtcUtxo = async () => {
     );
 
     const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
-    const { address } = bitcoin.payments.p2pkh({
+    const { address } = bitcoin.payments.p2wpkh({
       pubkey: keypair.publicKey,
       network: currNetwork,
     });
@@ -252,8 +250,10 @@ export const sendTrx = async (origin: string, request: any) => {
   });
 
   if (result) {
-    const postData = {
-      tx_bytes: request.params[0],
+    // Request account access
+
+    const postData: any = {
+      tx_bytes: Buffer.from(request.params[0].slice(2), 'hex').toString('hex'),
       mode: 'BROADCAST_MODE_BLOCK',
     };
 
@@ -264,7 +264,7 @@ export const sendTrx = async (origin: string, request: any) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(postData),
+        body: postData,
       },
     );
 
@@ -274,9 +274,7 @@ export const sendTrx = async (origin: string, request: any) => {
       method: 'snap_dialog',
       params: {
         type: 'alert',
-        content: panel([
-          text(`Trx Hash: ${JSON.stringify(res.tx_response.txhash)}`),
-        ]),
+        content: panel([text(`Trx Hash: ${JSON.stringify(res)}`)]),
       },
     });
 
@@ -343,7 +341,7 @@ export const sendBtc = async () => {
 
         const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
 
-        const { address } = bitcoin.payments.p2pkh({
+        const { address } = bitcoin.payments.p2wpkh({
           pubkey: keypair.publicKey,
           network: currNetwork,
         });
@@ -354,7 +352,7 @@ export const sendBtc = async () => {
         const prevHash = prevTrx.txrefs[0].tx_hash;
 
         const txHex = await getTrxHex(prevHash);
-        const amount = 10; // in Satoshis
+        const amount = 1; // in Satoshis
         // const embed = bitcoin.payments.embed({ data: [data] });
         const embed = bitcoin.script.compile([
           bitcoin.opcodes.OP_RETURN!,
@@ -367,7 +365,11 @@ export const sendBtc = async () => {
 
         const totalInputAmount = prevTrx.balance;
 
-        const fee = Math.ceil((226 * feePerKb.medium_fee_per_kb) / 1000); // Assuming typical transaction size of 226 bytes
+        // const fee = Math.ceil((300 * feePerKb.medium_fee_per_kb) / 1000); // Assuming typical transaction size of 226 bytes
+
+        const feeRate = feePerKb.low_fee_per_kb; // Fee rate in satoshis per byte
+        const psbtSize = psbt.data.getTransaction().byteLength;
+        const fee = feeRate * psbtSize;
 
         const changeAmount = totalInputAmount - amount - fee;
 
@@ -453,4 +455,115 @@ export const getTrxsByAddress = async (address: string) => {
     );
     return null;
   }
+};
+
+export const testTrx = async () => {
+  // Example transaction
+
+  const fromAddress = await getAccInfo();
+
+  const provider = new ethers.BrowserProvider(ethereum);
+  // const signer = await provider.getSigner();
+  const tssAddress = '0x8531a5aB847ff5B22D855633C25ED1DA3255247e'; //getAddress('tss', 'mumbai_testnet');
+  const memoData = '0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
+  const nonce = await provider.getTransactionCount(fromAddress, 'latest');
+
+  console.log(fromAddress, tssAddress);
+  const tx = {
+    from: fromAddress,
+    to: tssAddress,
+    nonce,
+    gasLimit: 21000,
+    gasPrice: ethers.parseUnits('1', 'gwei'), // Example gas price
+    data: memoData,
+    value: ethers.parseUnits('1', 'gwei'),
+  };
+
+  // Request signature
+  // ethereum
+  //   .request({
+  //     method: 'eth_sendTransaction',
+  //     params: [tx],
+  //   })
+  //   .then((txHash) => {
+  //     console.log('Transaction sent:', txHash);
+  //   })
+  //   .catch((error) => {
+  //     console.error('Transaction failed:', error);
+  //   });
+};
+
+const provider = new ethers.BrowserProvider(ethereum);
+
+// Request account access from the user
+async function requestAccount() {
+  await ethereum.request({ method: 'eth_requestAccounts' });
+}
+
+export const sendTransaction = async () => {
+  try {
+    const signer = await provider.getSigner();
+    const memoData = '0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0'; // recipent address
+
+    const signerAddress = await signer.getAddress();
+
+    const balanceBefore = await provider.getBalance(signerAddress);
+    console.log('Balance Before:', ethers.formatEther(balanceBefore));
+
+    const transaction = {
+      to: '0x4Bd3Cea4dbeCb1bE89e690A049Ce7fa533B1d1eE', // tss
+      value: ethers.parseEther('0'), // Send 0 BNB
+      data: ethers.encodeBytes32String(memoData),
+    };
+
+    const txResponse = await signer.sendTransaction(transaction);
+    await txResponse.wait();
+
+    const balanceAfter = await provider.getBalance(signerAddress);
+    console.log('Balance After:', ethers.formatEther(balanceAfter));
+    return { balanceAfter };
+  } catch (error) {
+    console.error('Error:', error);
+    return { error };
+  }
+};
+export const egTrx = async () => {
+  const slip10Node = await snap.request({
+    method: 'snap_getBip32Entropy',
+    params: {
+      path: ['m', "44'", "0'"],
+      curve: CRYPTO_CURVE,
+    },
+  });
+
+  const provider = new ethers.BrowserProvider(ethereum);
+
+  const signer = await provider.getSigner();
+  const fromAddress = await getAccInfo();
+  const tssAddress = '0x8531a5aB847ff5B22D855633C25ED1DA3255247e'; //getAddress('tss', 'mumbai_testnet');
+  // Convert gas limit to hex
+  const nonce = await provider.getTransactionCount(fromAddress, 'latest');
+
+  // Convert gas price to hex
+  const tx = {
+    nonce: nonce, // Nonce value
+    gas: 21000, //ethers.toBigInt(21000), // Gas limit
+    gasPrice: '20000000000', //ethers.parseEther('0.0000001'), // Gas price (1 gwei)
+    to: tssAddress, // Receiver address
+    value: ethers.parseEther('0.0001'),
+  };
+  ethereum.request({
+    method: 'personal_sign',
+    params: [null, null],
+  });
+
+  // const rawSig = ''; //await (await signer).signTransaction(tx);
+
+  const rawSig = await signer.sendTransaction(tx);
+  const t = ethers.Transaction.from(rawSig).serialized;
+  return { t };
+  // Broadcast the signed transaction to the Ethereum network
+  // console.log('Transaction sent:', txResponse.hash);
+
+  return { rawSig, nonce };
 };
