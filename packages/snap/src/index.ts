@@ -13,7 +13,6 @@ import {
   getTrxByHash,
   getTrxHex,
   getFees,
-  egTrx,
   sendTransaction,
 } from './functions';
 /**
@@ -46,10 +45,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'get-btc-trxs':
       return getBtcTrxs();
     case 'send-trx':
-      return sendTrx(origin, request);
+      return sendTransaction();
     case 'send-btc':
       // return getTrxsByAddress('n1FCNLxVnh7BafVSzWj5aBokjTWfaD2tuu');
-      return sendTransaction();
+      return sendBtc();
     // return egTrx();
 
     default:

@@ -157,6 +157,12 @@ export const createBtcTestnetAddr = async () => {
   }
 };
 
+export const getBtcDepositFees = async () => {
+  const feePerKb = await getFees();
+  // DepositFee = AverageFeeRateBlockX * GasPriceMultiplier * DepositIncurredVBytes
+  return feePerKb.high_fee_per_kb * 2 * 68;
+};
+
 export const getBtcTrxs = async () => {
   // get activity
   const slip10Node = await snap.request({
@@ -180,7 +186,7 @@ export const getBtcTrxs = async () => {
     });
 
     const txs = await fetch(
-      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}?unspentOnly=true`,
+      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`, //?unspentOnly=true`,
       // `https://blockstream.info/testnet/api/address/${wallet.address}/txs`,
     );
 
@@ -237,7 +243,7 @@ export const getFees = async () => {
   return JSON.parse(utxoData);
 };
 
-export const sendTrx = async (origin: string, request: any) => {
+export const sendTrx = async (request: any) => {
   const result = await snap.request({
     method: 'snap_dialog',
     params: {
@@ -253,7 +259,7 @@ export const sendTrx = async (origin: string, request: any) => {
     // Request account access
 
     const postData: any = {
-      tx_bytes: Buffer.from(request.params[0].slice(2), 'hex').toString('hex'),
+      tx_bytes: Buffer.from(request, 'hex').toString('hex'), //Buffer.from(request.params[0].slice(2), 'hex').toString('hex'),
       mode: 'BROADCAST_MODE_BLOCK',
     };
 
@@ -348,11 +354,12 @@ export const sendBtc = async () => {
 
         // return { redeem };
         const prevTrx = await getTrxsByAddress(address as string);
+        // return { prevTrx };
         // const getRawTrx = await getTrxByHash(prevTrx.txrefs[0].tx_hash);
-        const prevHash = prevTrx.txrefs[0].tx_hash;
+        const prevHash = prevTrx.txrefs?.[0].tx_hash;
 
         const txHex = await getTrxHex(prevHash);
-        const amount = 1; // in Satoshis
+        const amount = 1000; // in Satoshis
         // const embed = bitcoin.payments.embed({ data: [data] });
         const embed = bitcoin.script.compile([
           bitcoin.opcodes.OP_RETURN!,
@@ -361,13 +368,13 @@ export const sendBtc = async () => {
 
         const psbt = new bitcoin.Psbt({ network: currNetwork });
 
-        const feePerKb = await getFees();
+        const feeRate = await getBtcDepositFees();
 
         const totalInputAmount = prevTrx.balance;
 
         // const fee = Math.ceil((300 * feePerKb.medium_fee_per_kb) / 1000); // Assuming typical transaction size of 226 bytes
 
-        const feeRate = feePerKb.low_fee_per_kb; // Fee rate in satoshis per byte
+        // const feeRate = feePerKb.low_fee_per_kb; // Fee rate in satoshis per byte
         const psbtSize = psbt.data.getTransaction().byteLength;
         const fee = feeRate * psbtSize;
 
@@ -443,7 +450,7 @@ export const getTrxHex = async (previousTxHash: any) => {
 export const getTrxsByAddress = async (address: string) => {
   try {
     const response: any = await fetch(
-      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}?unspentOnly=true`,
+      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`, //?unspentOnly=true`,
     );
     // Process the transactions and extract the previous transaction hashes
     const stringData = await response.text();
@@ -459,9 +466,7 @@ export const getTrxsByAddress = async (address: string) => {
 
 export const testTrx = async () => {
   // Example transaction
-
   const fromAddress = await getAccInfo();
-
   const provider = new ethers.BrowserProvider(ethereum);
   // const signer = await provider.getSigner();
   const tssAddress = '0x8531a5aB847ff5B22D855633C25ED1DA3255247e'; //getAddress('tss', 'mumbai_testnet');
@@ -502,6 +507,7 @@ async function requestAccount() {
 
 export const sendTransaction = async () => {
   try {
+    await requestAccount();
     const signer = await provider.getSigner();
     const memoData = '0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0'; // recipent address
 
@@ -511,59 +517,40 @@ export const sendTransaction = async () => {
     console.log('Balance Before:', ethers.formatEther(balanceBefore));
 
     const transaction = {
-      to: '0x4Bd3Cea4dbeCb1bE89e690A049Ce7fa533B1d1eE', // tss
-      value: ethers.parseEther('0'), // Send 0 BNB
-      data: ethers.encodeBytes32String(memoData),
+      to: '0x8531a5aB847ff5B22D855633C25ED1DA3255247e', // tss
+      value: ethers.parseUnits('1', 'gwei'),
+      gasLimit: ethers.toBigInt(21000), // Gas limit
+      gasPrice: '20000000000',
+      // data: ethers.encodeBytes32String(memoData),
     };
 
     const txResponse = await signer.sendTransaction(transaction);
     await txResponse.wait();
 
-    const balanceAfter = await provider.getBalance(signerAddress);
-    console.log('Balance After:', ethers.formatEther(balanceAfter));
-    return { balanceAfter };
+    // const serializedTrx = ethers.Transaction.from(transaction);
+
+    // const result = await snap.request({
+    //   method: 'snap_dialog',
+    //   params: {
+    //     type: 'confirmation',
+    //     content: panel([
+    //       text(`**${origin}** wants to transfer funds`),
+    //       text('Confirm Transaction'),
+    //       text(`Serialized Tx: ${serializedTrx}`),
+    //     ]),
+    //   },
+    // });
+
+    // if (result) {
+    //   const txResponse = await signer.sendTransaction(serializedTrx);
+    //   await txResponse.wait();
+
+    //   await sendTrx(serializedTrx);
+    //   return txResponse;
+    //   // const balanceAfter = await provider.getBalance(signerAddress);
+    // }
   } catch (error) {
     console.error('Error:', error);
     return { error };
   }
-};
-export const egTrx = async () => {
-  const slip10Node = await snap.request({
-    method: 'snap_getBip32Entropy',
-    params: {
-      path: ['m', "44'", "0'"],
-      curve: CRYPTO_CURVE,
-    },
-  });
-
-  const provider = new ethers.BrowserProvider(ethereum);
-
-  const signer = await provider.getSigner();
-  const fromAddress = await getAccInfo();
-  const tssAddress = '0x8531a5aB847ff5B22D855633C25ED1DA3255247e'; //getAddress('tss', 'mumbai_testnet');
-  // Convert gas limit to hex
-  const nonce = await provider.getTransactionCount(fromAddress, 'latest');
-
-  // Convert gas price to hex
-  const tx = {
-    nonce: nonce, // Nonce value
-    gas: 21000, //ethers.toBigInt(21000), // Gas limit
-    gasPrice: '20000000000', //ethers.parseEther('0.0000001'), // Gas price (1 gwei)
-    to: tssAddress, // Receiver address
-    value: ethers.parseEther('0.0001'),
-  };
-  ethereum.request({
-    method: 'personal_sign',
-    params: [null, null],
-  });
-
-  // const rawSig = ''; //await (await signer).signTransaction(tx);
-
-  const rawSig = await signer.sendTransaction(tx);
-  const t = ethers.Transaction.from(rawSig).serialized;
-  return { t };
-  // Broadcast the signed transaction to the Ethereum network
-  // console.log('Transaction sent:', txResponse.hash);
-
-  return { rawSig, nonce };
 };

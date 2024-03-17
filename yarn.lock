@@ -9323,7 +9323,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zetachain/toolkit@npm:latest":
+"@zetachain/toolkit@npm:^5.0.0, @zetachain/toolkit@npm:latest":
   version: 5.0.0
   resolution: "@zetachain/toolkit@npm:5.0.0"
   dependencies:
@@ -23854,6 +23854,7 @@ __metadata:
     "@metamask/eslint-config-typescript": ^12.0.0
     "@typescript-eslint/eslint-plugin": ^5.42.1
     "@typescript-eslint/parser": ^5.42.1
+    "@zetachain/toolkit": ^5.0.0
     eslint: ^8.45.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-import: ~2.26.0

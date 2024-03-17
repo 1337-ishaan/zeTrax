@@ -4,6 +4,7 @@ import Dropdown from 'react-dropdown';
 import Typography from '../utils/Typography';
 import { useState } from 'react';
 import StyledButton from '../utils/StyledButton';
+import { demonstrateCctx, sendBtc } from '../../utils/snap';
 //@ts-ignore
 
 const SendWrapper = styled.div`
@@ -23,7 +24,11 @@ const SendWrapper = styled.div`
 interface SendProps {}
 
 const Send = ({}: SendProps): JSX.Element => {
-  const getBalance = async () => {};
+  const getBalance = async () => {
+    // await demonstrateCctx();
+    await sendBtc();
+    // console.log('get balance');
+  };
   const [currentActive, setCurrentActive] = useState('deposit');
 
   return (
@@ -33,19 +38,19 @@ const Send = ({}: SendProps): JSX.Element => {
           onClick={() => setCurrentActive('deposit')}
           color={currentActive === 'deposit' ? 'fff' : '#b1cfc1'}
         >
-          Deposit
+          Transfer
         </Typography>
         <Typography
           onClick={() => setCurrentActive('withdraw')}
           color={currentActive === 'withdraw' ? 'fff' : '#b1cfc1'}
         >
-          Withdraw
+          Withdraw BTC
         </Typography>
       </div>
       <Dropdown
-        options={['1', '2', '3', '4']}
+        options={['ZetaChain', 'Ethereum', 'Polygon', 'BNB']}
         onChange={() => console.log('change')}
-        value={'1'}
+        value={'ZetaChain'}
         placeholder="Select an option"
       />
       <div className="flex1">

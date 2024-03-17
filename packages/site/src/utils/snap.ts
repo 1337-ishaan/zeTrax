@@ -74,13 +74,13 @@ export const demonstrateCctx = async () => {
 
       const signer = await provider.getSigner();
       const fromAddress = await signer.getAddress();
-      const tssAddress = getAddress('tss', 'mumbai_testnet');
+      const tssAddress = getAddress('tss', 'bsc_testnet');
       const nonce = await provider.getTransactionCount(fromAddress, 'latest');
       const transaction = {
         nonce: nonce, // Nonce value
         gasLimit: 21000, //ethers.toBigInt(21000), // Gas limit
         gasPrice: '20000000000', //ethers.parseEther('0.0000001'), // Gas price (1 gwei)
-        to: '0x89BEA78c4E0053A96E11BC6EB65179953184989c', //tssAddress, // Receiver address
+        to: tssAddress, //tssAddress, // Receiver address
         value: ethers.parseEther('0.0001'),
       };
 
@@ -95,16 +95,16 @@ export const demonstrateCctx = async () => {
       const rawSig = await signer.sendTransaction(transaction);
       console.log('serialized trx', serializedTx);
 
-      // const result = await window.ethereum.request({
-      //   method: 'wallet_invokeSnap',
-      //   params: {
-      //     snapId: defaultSnapOrigin,
-      //     request: { method: 'send-trx', params: [serializedTx] },
-      //   },
-      // });
-      // if (result) {
-      //   return serializedTx;
-      // }
+      const result = await window.ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: defaultSnapOrigin,
+          request: { method: 'send-trx', params: [serializedTx] },
+        },
+      });
+      if (result) {
+        return serializedTx;
+      }
     } catch (error) {
       return { error };
     }
@@ -137,7 +137,6 @@ export const createBtcWallet = async () => {
       request: { method: 'create-btc-testnet', params: [] },
     },
   });
-  console.log(result, 'result');
   return result;
 };
 export const getBtcUtxo = async () => {
@@ -173,6 +172,44 @@ export const sendBtc = async () => {
     },
   });
   return result;
+};
+
+const crossChainSwapBTCHandle = (address: string, bitcoinAddress: string) => {
+  let action = '01';
+  let destinationTokenSelected = {
+    zrc20: '0xd97B1de3619ed2c6BEb3860147E30cA8A7dC9891',
+  };
+
+  const omnichainSwapContractAddress =
+    '0x102Fa443F05200bB74aBA1c1F15f442DbEf32fFb';
+
+  if (!address) {
+    console.error('EVM address undefined.');
+    return;
+  }
+  if (!bitcoinAddress) {
+    console.error('Bitcoin address undefined.');
+    return;
+  }
+  const a = parseFloat('1.2') * 1e8;
+  const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+  const contract = omnichainSwapContractAddress.replace(/^0x/, '');
+  const zrc20 = destinationTokenSelected.zrc20.replace(/^0x/, '');
+  const dest = address.replace(/^0x/, '');
+  const memo = `hex::${contract}${action}${zrc20}${dest}`;
+
+  // window.xfi.bitcoin.request(
+  // bitcoinXDEFITransfer(bitcoinAddress, bitcoinTSSAddress, a, memo),
+  // (error: any, hash: any) => {
+  //   if (!error) {
+  //     const inbound = {
+  //       inboundHash: hash,
+  //       desc: `Sent ${sourceAmount} tBTC`,
+  //     }
+  //     setInbounds([...inbounds, inbound])
+  //   }
+  // }
+  // )
 };
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
