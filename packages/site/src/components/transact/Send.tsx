@@ -4,7 +4,13 @@ import Dropdown from 'react-dropdown';
 import Typography from '../utils/Typography';
 import { useState } from 'react';
 import StyledButton from '../utils/StyledButton';
-import { demonstrateCctx, sendBtc } from '../../utils/snap';
+import {
+  crossChainSwapBTCHandle,
+  demonstrateCctx,
+  sendBtc,
+} from '../../utils/snap';
+import useAccount from '../../hooks/useAccount';
+
 //@ts-ignore
 
 const SendWrapper = styled.div`
@@ -24,9 +30,10 @@ const SendWrapper = styled.div`
 interface SendProps {}
 
 const Send = ({}: SendProps): JSX.Element => {
+  const { address, btcAddress } = useAccount();
   const getBalance = async () => {
     // await demonstrateCctx();
-    await sendBtc();
+    await crossChainSwapBTCHandle(address!, btcAddress!);
     // console.log('get balance');
   };
   const [currentActive, setCurrentActive] = useState('deposit');
@@ -38,13 +45,19 @@ const Send = ({}: SendProps): JSX.Element => {
           onClick={() => setCurrentActive('deposit')}
           color={currentActive === 'deposit' ? 'fff' : '#b1cfc1'}
         >
-          Transfer
+          Deposit BTC
         </Typography>
         <Typography
           onClick={() => setCurrentActive('withdraw')}
           color={currentActive === 'withdraw' ? 'fff' : '#b1cfc1'}
         >
           Withdraw BTC
+        </Typography>
+        <Typography
+          onClick={() => setCurrentActive('withdraw')}
+          color={currentActive === 'withdraw' ? 'fff' : '#b1cfc1'}
+        >
+          Swap
         </Typography>
       </div>
       <Dropdown

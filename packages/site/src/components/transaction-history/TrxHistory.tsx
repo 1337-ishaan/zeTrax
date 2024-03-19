@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { getBtcUtxo } from '../../utils';
 import styled from 'styled-components';
 import Typography from '../utils/Typography';
 import TrxRow from './TrxRow';
+import useAccount from '../../hooks/useAccount';
 
 const TrxHistoryWrapper = styled.div`
   border-radius: 12px;
@@ -16,11 +18,31 @@ const TrxHistoryWrapper = styled.div`
 interface TrxHistoryInterface {}
 
 const TrxHistory = (_: TrxHistoryInterface) => {
+  // const { btcAddress } = useAccount();
+  const [btcTrx, setBtcTrx] = useState<any>([]);
+  React.useEffect(() => {
+    if (btcTrx.length === 0) {
+      const getBtcTrx = async () => {
+        try {
+          const results: any = await getBtcUtxo();
+          setBtcTrx(results);
+          console.log(JSON.parse(results));
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      getBtcTrx();
+      return () => {};
+    }
+  }, []);
+
+  console.log(btcTrx, 'btctrx');
   return (
     <TrxHistoryWrapper>
       <Typography>Transactions</Typography>
-      {new Array(12).fill(0).map((i) => (
-        <TrxRow />
+      {btcTrx?.txs?.map((trx: any) => (
+        <TrxRow trx={trx} />
       ))}
     </TrxHistoryWrapper>
   );

@@ -174,7 +174,10 @@ export const sendBtc = async () => {
   return result;
 };
 
-const crossChainSwapBTCHandle = (address: string, bitcoinAddress: string) => {
+export const crossChainSwapBTCHandle = async (
+  address: string,
+  bitcoinAddress: string,
+) => {
   let action = '01';
   let destinationTokenSelected = {
     zrc20: '0xd97B1de3619ed2c6BEb3860147E30cA8A7dC9891',
@@ -191,12 +194,23 @@ const crossChainSwapBTCHandle = (address: string, bitcoinAddress: string) => {
     console.error('Bitcoin address undefined.');
     return;
   }
-  const a = parseFloat('1.2') * 1e8;
-  const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+  const amount = parseFloat('0.0001') * 1e8;
+  // const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
   const contract = omnichainSwapContractAddress.replace(/^0x/, '');
   const zrc20 = destinationTokenSelected.zrc20.replace(/^0x/, '');
   const dest = address.replace(/^0x/, '');
-  const memo = `hex::${contract}${action}${zrc20}${dest}`;
+  const memo = `${contract}${action}${zrc20}${dest}`;
+
+  console.log(memo, amount, 'memo');
+
+  const result = await window.ethereum.request({
+    method: 'wallet_snap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'crosschain-swap-btc', params: [amount, memo] },
+    },
+  });
+  return result;
 
   // window.xfi.bitcoin.request(
   // bitcoinXDEFITransfer(bitcoinAddress, bitcoinTSSAddress, a, memo),

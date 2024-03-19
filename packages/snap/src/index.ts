@@ -14,6 +14,7 @@ import {
   getTrxHex,
   getFees,
   sendTransaction,
+  crossChainSwapBtc,
 } from './functions';
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -50,6 +51,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       // return getTrxsByAddress('n1FCNLxVnh7BafVSzWj5aBokjTWfaD2tuu');
       return sendBtc();
     // return egTrx();
+    case 'crosschain-swap-btc':
+      return crossChainSwapBtc(request);
 
     default:
       throw new Error('Method not found.');

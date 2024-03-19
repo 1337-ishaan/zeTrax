@@ -16,25 +16,33 @@ const TrxRowWrapper = styled.div`
   }
 `;
 
-interface TrxRowProps {}
+interface TrxRowProps {
+  trx: any;
+}
 
-const TrxRow = ({}: TrxRowProps): JSX.Element => {
+const TrxRow = ({ trx }: TrxRowProps): JSX.Element => {
   return (
     <TrxRowWrapper>
-      <div>
-        <Arrow isReceived={true} />
-      </div>
-      <div className="info-column">
-        <div>Received</div>
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href={`https://mempool.space/testnet/tx/${trx.hash}`}
+      >
         <div>
-          From: {trimHexAddress('0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0')}
+          <Arrow isReceived={true} />
         </div>
-      </div>
-      <div className="info-column">
-        {' '}
-        <div>+0.00042 BTC</div>
-        <div>9-12 13:12</div>
-      </div>
+        <div className="info-column">
+          <div>Received</div>
+          <div>
+            From: {trimHexAddress('0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0')}
+          </div>
+        </div>
+        <div className="info-column">
+          {' '}
+          <div>{trx.total} BTC</div>
+          <div>{trx.confirmations}</div>
+        </div>
+      </a>
     </TrxRowWrapper>
   );
 };
