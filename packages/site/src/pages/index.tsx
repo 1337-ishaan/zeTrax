@@ -72,7 +72,7 @@ const Index = () => {
 
   return (
     <AppWrapper>
-      <Header />
+      {isMetaMaskReady ? <Header /> : <></>}
       {state.installedSnap ? (
         <div className="flex">
           <Send />

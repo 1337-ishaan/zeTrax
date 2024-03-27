@@ -13,6 +13,7 @@ import {
 } from 'react-accessible-accordion';
 import CctxItem from './CctxItem';
 import { useEffect, useState } from 'react';
+import Typography from '../utils/Typography';
 
 const TrxRowWrapper = styled.div`
   display: flex;
@@ -34,14 +35,16 @@ interface TrxRowProps {
 const TrxRow = ({ trx, isSent }: TrxRowProps): JSX.Element => {
   const [cctx, setCctx] = useState<any>({});
   const [trxHash, setTrxHash] = useState('');
-
+  console.log(isSent, 'is sent ');
   useEffect(() => {
     const fetchCctx = async () => {
       if (trxHash) {
         console.log(trxHash);
         let cctxData: any = await trackCctx(trxHash);
         console.log(cctxData);
-        setCctx(cctxData.CrossChainTxs[0]);
+        if (cctxData?.code !== 5) {
+          setCctx(cctxData.CrossChainTxs?.[0]);
+        }
         console.log(cctx, 'cc');
       }
     };
@@ -49,7 +52,6 @@ const TrxRow = ({ trx, isSent }: TrxRowProps): JSX.Element => {
     return () => {};
   }, [trxHash]);
 
-  console.log(trx.hash);
   return (
     <Accordion allowZeroExpanded={true}>
       <AccordionItem>
@@ -93,9 +95,23 @@ const TrxRow = ({ trx, isSent }: TrxRowProps): JSX.Element => {
           <AccordionItemState>
             {({ expanded }) => {
               if (expanded) {
-                setTrxHash(trx.hash);
-                if (cctx.index) {
+                setTrxHash(trx?.hash);
+                if (cctx?.index && cctx?.code !== 5) {
                   return <CctxItem cctx={cctx} />;
+                } else if (!!cctx && trx.confirmations >= 6 && !isSent) {
+                  return (
+                    <Typography size={16} color={'#45afec'}>
+                      Direct BTC transaction - RECEIVED
+                    </Typography>
+                  );
+                } else if (trx.confirmations >= 6 && isSent) {
+                  return <div>Loading...</div>;
+                } else if (trx.confirmations < 6) {
+                  return (
+                    <Typography size={16} color={'yellow'}>
+                      6+ confirmations required
+                    </Typography>
+                  );
                 }
               } else {
               }

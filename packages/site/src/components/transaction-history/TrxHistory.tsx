@@ -31,8 +31,8 @@ interface TrxHistoryInterface {}
 
 const TrxHistory = (_: TrxHistoryInterface) => {
   const [btcTrx, setBtcTrx] = useState<any>([]);
-  const { btcAddress } = useAccount();
-
+  const { btcAddress } = useAccount(true);
+  console.log(btcAddress);
   React.useEffect(() => {
     const getBtcTrx = async () => {
       if (btcTrx.length === 0) {
@@ -48,34 +48,15 @@ const TrxHistory = (_: TrxHistoryInterface) => {
     getBtcTrx();
     return () => {};
   }, [btcTrx.length === 0]);
-  console.log(btcTrx, 'btctrx');
-  // React.useEffect(() => {
-  //   if (cctx.length === 0 && btcTrx.length > 0) {
-  //     const fetchCctx = async () => {
-  //       try {
-  //         const results: any = await trackCctx(btcTrx?.txs?.[0]?.hash);
-  //         console.log(results, 'results');
-  //         setCctx(results);
-  //       } catch (error) {
-  //         console.error(error);
-  //       }
-  //     };
-  //     fetchCctx();
-  //     return () => {};
-  //   }
-  // }, []);
 
+  console.log(btcAddress, 'btcaddr');
   return (
     <TrxHistoryWrapper>
       <Typography>Transactions</Typography>
       {btcTrx?.txs?.map((trx: any) => (
         <TrxRow
           trx={trx}
-          isSent={
-            trx.inputs[0].addresses.includes(btcAddress)
-            // ? true
-            // : false
-          }
+          isSent={trx.inputs[0].addresses?.[0] === btcAddress}
         />
       ))}
     </TrxHistoryWrapper>

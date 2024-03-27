@@ -53,6 +53,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
   // };
   const onConnectSnap = async () => {
     await connectSnap();
+    await createBtcWallet();
   };
 
   useEffect(() => {
@@ -78,14 +79,6 @@ const Header = ({}: HeaderProps): JSX.Element => {
       };
       getZetaBalance();
     }
-
-    // if (address) {
-    //   const getBalance = async () => {
-    //     let results: any = await getZetaBalance(address as string);
-    //     setZetaBalance(results);
-    //   };
-    //   getBalance();
-    // }
   }, [state.installedSnap || address]);
 
   return (
