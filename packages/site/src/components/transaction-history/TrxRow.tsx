@@ -30,12 +30,12 @@ const TrxRowWrapper = styled.div`
 interface TrxRowProps {
   trx: any;
   isSent: boolean;
+  amount: number;
 }
 
-const TrxRow = ({ trx, isSent }: TrxRowProps): JSX.Element => {
+const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
   const [cctx, setCctx] = useState<any>({});
   const [trxHash, setTrxHash] = useState('');
-  console.log(isSent, 'is sent ');
   useEffect(() => {
     const fetchCctx = async () => {
       if (trxHash) {
@@ -84,7 +84,7 @@ const TrxRow = ({ trx, isSent }: TrxRowProps): JSX.Element => {
               </div>
               <div className="info-column">
                 {' '}
-                <div>{(trx.total / 1e8).toFixed(5)} BTC</div>
+                <div>{(amount / 1e8).toFixed(5)} BTC</div>
                 <div>Confirmations: {trx.confirmations}</div>
               </div>
               {/* </a> */}

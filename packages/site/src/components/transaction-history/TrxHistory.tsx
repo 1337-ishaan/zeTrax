@@ -32,7 +32,7 @@ interface TrxHistoryInterface {}
 const TrxHistory = (_: TrxHistoryInterface) => {
   const [btcTrx, setBtcTrx] = useState<any>([]);
   const { btcAddress } = useAccount(true);
-  console.log(btcAddress);
+  console.log(btcTrx);
   React.useEffect(() => {
     const getBtcTrx = async () => {
       if (btcTrx.length === 0) {
@@ -48,7 +48,10 @@ const TrxHistory = (_: TrxHistoryInterface) => {
     getBtcTrx();
     return () => {};
   }, [btcTrx.length === 0]);
-
+  const getAmount = (trx: any) => {
+    return trx.outputs.filter((t: any) => t.addresses?.[0] === btcAddress)[0]
+      .value;
+  };
   console.log(btcAddress, 'btcaddr');
   return (
     <TrxHistoryWrapper>
@@ -57,6 +60,7 @@ const TrxHistory = (_: TrxHistoryInterface) => {
         <TrxRow
           trx={trx}
           isSent={trx.inputs[0].addresses?.[0] === btcAddress}
+          amount={getAmount(trx)}
         />
       ))}
     </TrxHistoryWrapper>
