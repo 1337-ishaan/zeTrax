@@ -3,8 +3,9 @@ import styled from 'styled-components/macro';
 const TypographyWrapper = styled.div<{ color: string }>`
   font-weight: bold;
   font-size: 24px;
-  margin: 16px 0;
+  margin-bottom: 16px;
   color: ${(props) => props.color};
+  cursor: pointer;
 `;
 
 interface TypographyProps {

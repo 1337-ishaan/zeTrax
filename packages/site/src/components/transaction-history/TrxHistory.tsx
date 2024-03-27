@@ -1,28 +1,41 @@
 import React, { useState } from 'react';
-import { getBtcUtxo } from '../../utils';
+import { getBtcUtxo, trackCctx } from '../../utils';
 import styled from 'styled-components';
 import Typography from '../utils/Typography';
 import TrxRow from './TrxRow';
 import useAccount from '../../hooks/useAccount';
 
 const TrxHistoryWrapper = styled.div`
+  a {
+    color: white;
+  }
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  width: fit-content;
+  background: rgba(255, 255, 255, 0.1);
+  width: 40%;
   color: #dadada;
-  padding: 20px 40px;
-  max-height: 70vh;
+  padding: 32px;
+  max-height: 55vh;
   overflow-y: auto;
+  .accordion__button {
+    background-color: transparent !important;
+    color: white;
+    display: flex;
+    align-items: center;
+  }
+  .accordion {
+    border: none;
+  }
 `;
 
 interface TrxHistoryInterface {}
 
 const TrxHistory = (_: TrxHistoryInterface) => {
-  // const { btcAddress } = useAccount();
   const [btcTrx, setBtcTrx] = useState<any>([]);
+  const { btcAddress } = useAccount();
+
   React.useEffect(() => {
-    if (btcTrx.length === 0) {
-      const getBtcTrx = async () => {
+    const getBtcTrx = async () => {
+      if (btcTrx.length === 0) {
         try {
           const results: any = await getBtcUtxo();
           setBtcTrx(results);
@@ -30,19 +43,40 @@ const TrxHistory = (_: TrxHistoryInterface) => {
         } catch (error) {
           console.error(error);
         }
-      };
-
-      getBtcTrx();
-      return () => {};
-    }
-  }, []);
-
+      }
+    };
+    getBtcTrx();
+    return () => {};
+  }, [btcTrx.length === 0]);
   console.log(btcTrx, 'btctrx');
+  // React.useEffect(() => {
+  //   if (cctx.length === 0 && btcTrx.length > 0) {
+  //     const fetchCctx = async () => {
+  //       try {
+  //         const results: any = await trackCctx(btcTrx?.txs?.[0]?.hash);
+  //         console.log(results, 'results');
+  //         setCctx(results);
+  //       } catch (error) {
+  //         console.error(error);
+  //       }
+  //     };
+  //     fetchCctx();
+  //     return () => {};
+  //   }
+  // }, []);
+
   return (
     <TrxHistoryWrapper>
       <Typography>Transactions</Typography>
       {btcTrx?.txs?.map((trx: any) => (
-        <TrxRow trx={trx} />
+        <TrxRow
+          trx={trx}
+          isSent={
+            trx.inputs[0].addresses.includes(btcAddress)
+            // ? true
+            // : false
+          }
+        />
       ))}
     </TrxHistoryWrapper>
   );

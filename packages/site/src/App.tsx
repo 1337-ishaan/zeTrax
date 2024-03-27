@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { GlobalStyle } from './config/theme';
 import { ToggleThemeContext } from './Root';
 import 'react-dropdown/style.css';
+import 'react-accessible-accordion/dist/fancy-example.css';
 
 const Wrapper = styled.div`
   display: flex;
@@ -19,8 +20,6 @@ export type AppProps = {
 };
 
 export const App: FunctionComponent<AppProps> = ({ children }) => {
-  const toggleTheme = useContext(ToggleThemeContext);
-
   return (
     <>
       <GlobalStyle />

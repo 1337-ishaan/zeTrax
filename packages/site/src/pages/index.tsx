@@ -19,12 +19,12 @@ import {
 } from '../utils';
 import TrxHistory from '../components/transaction-history/TrxHistory';
 import Send from '../components/transact/Send';
-import Receive from '../components/transact/Receive';
+// import Receive from '../components/transact/Receive';
 
 const AppWrapper = styled.div`
+  padding: 0 200px;
   .flex {
     display: flex;
-    padding: 40px;
 
     justify-content: space-between;
   }
@@ -66,19 +66,21 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
-
   const isMetaMaskReady = isLocalSnap(defaultSnapOrigin)
     ? state.isFlask
     : state.snapsDetected;
 
   return (
     <AppWrapper>
-      {/* <button onClick={async () => await sendBtc()}>send btc</button> */}
       <Header />
-      <div className="flex">
-        <Send />
-        <TrxHistory />
-      </div>
+      {state.installedSnap ? (
+        <div className="flex">
+          <Send />
+          <TrxHistory />
+        </div>
+      ) : (
+        'Loading'
+      )}
     </AppWrapper>
   );
 };

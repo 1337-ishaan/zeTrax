@@ -3088,6 +3088,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@emotion/react@npm:11.11.0":
+  version: 11.11.0
+  resolution: "@emotion/react@npm:11.11.0"
+  dependencies:
+    "@babel/runtime": ^7.18.3
+    "@emotion/babel-plugin": ^11.11.0
+    "@emotion/cache": ^11.11.0
+    "@emotion/serialize": ^1.1.2
+    "@emotion/use-insertion-effect-with-fallbacks": ^1.0.1
+    "@emotion/utils": ^1.2.1
+    "@emotion/weak-memoize": ^0.3.1
+    hoist-non-react-statics: ^3.3.1
+  peerDependencies:
+    react: ">=16.8.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 2653e7c3de7b6fd5b0e18dea15621a9886104cc7c8cd5522ca69e52bd547ef6f13644193f8e0a906eea1e29a4f1d8167cdfa4667572fb7fafe0c62ab30fbaab6
+  languageName: node
+  linkType: hard
+
 "@emotion/react@npm:^11.10.8":
   version: 11.11.1
   resolution: "@emotion/react@npm:11.11.1"
@@ -3129,7 +3150,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/styled@npm:^11.10.8":
+"@emotion/styled@npm:11.11.0, @emotion/styled@npm:^11.10.8":
   version: 11.11.0
   resolution: "@emotion/styled@npm:11.11.0"
   dependencies:
@@ -9302,13 +9323,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zetachain/protocol-contracts@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "@zetachain/protocol-contracts@npm:3.0.1"
-  checksum: 5a833dc9f59b69b83654754f4587aad57f4c9859908bc3fd9b5f3f6329cf803bf68e66aff4f355a99fb7e23726526196610e43987d15ec60208cc5564bc94259
-  languageName: node
-  linkType: hard
-
 "@zetachain/protocol-contracts@npm:^3.0.2":
   version: 3.0.2
   resolution: "@zetachain/protocol-contracts@npm:3.0.2"
@@ -10095,6 +10109,17 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: 87d4d429927d09942771f3b3a6c13580c183e31d7be0ee12f09be6d5655304996bb033d85e54be81606f4e89684df43be7bf52d14becb73a12727bf33298a082
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.6.8":
+  version: 1.6.8
+  resolution: "axios@npm:1.6.8"
+  dependencies:
+    follow-redirects: ^1.15.6
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: bf007fa4b207d102459300698620b3b0873503c6d47bf5a8f6e43c0c64c90035a4f698b55027ca1958f61ab43723df2781c38a99711848d232cad7accbcdfcdd
   languageName: node
   linkType: hard
 
@@ -15150,6 +15175,16 @@ __metadata:
     debug:
       optional: true
   checksum: 584da22ec5420c837bd096559ebfb8fe69d82512d5585004e36a3b4a6ef6d5905780e0c74508c7b72f907d1fa2b7bd339e613859e9c304d0dc96af2027fd0231
+  languageName: node
+  linkType: hard
+
+"follow-redirects@npm:^1.15.6":
+  version: 1.15.6
+  resolution: "follow-redirects@npm:1.15.6"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: a62c378dfc8c00f60b9c80cab158ba54e99ba0239a5dd7c81245e5a5b39d10f0c35e249c3379eae719ff0285fff88c365dd446fab19dee771f1d76252df1bbf5
   languageName: node
   linkType: hard
 
@@ -22856,6 +22891,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-accessible-accordion@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "react-accessible-accordion@npm:5.0.0"
+  peerDependencies:
+    react: ^16.3.2 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.3.3 || ^17.0.0 || ^18.0.0
+  checksum: a9b63abc72f7b2e868801bba09f80417c69aca9a55bfb0cc447e5e0725b3bac4ce32c1f86c94f5184781fd6fbf941f7e7093b1cc362cc9f234b1c42e2f5acf0e
+  languageName: node
+  linkType: hard
+
 "react-clientside-effect@npm:^1.2.6":
   version: 1.2.6
   resolution: "react-clientside-effect@npm:1.2.6"
@@ -22952,6 +22997,20 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
   checksum: 7d323310bea3a91be2965f9468d552f201b1c27891e45ddc2d6b8f717680c95a75ae0bc1e3f5cf41472446a2589a75aed4483aee8169287909fcd59ad149e8cc
+  languageName: node
+  linkType: hard
+
+"react-dropdown-select@npm:^4.11.2":
+  version: 4.11.2
+  resolution: "react-dropdown-select@npm:4.11.2"
+  dependencies:
+    "@emotion/react": 11.11.0
+    "@emotion/styled": 11.11.0
+  peerDependencies:
+    prop-types: ">=15.7.2"
+    react: ">=16.x"
+    react-dom: ">=16.x"
+  checksum: 78e52b1e2fcb7ec482438d61d1d0df84ad03f61b8fa46bd008fb2f07811993952f0ab181853ba24aa4875603cbedd9c585ad98b38aa754babc92ad52554c88c6
   languageName: node
   linkType: hard
 
@@ -23855,6 +23914,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.42.1
     "@typescript-eslint/parser": ^5.42.1
     "@zetachain/toolkit": ^5.0.0
+    axios: ^1.6.8
     eslint: ^8.45.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-import: ~2.26.0
@@ -23868,6 +23928,7 @@ __metadata:
     npm: ^10.2.5
     prettier: ^2.7.1
     prettier-plugin-packagejson: ^2.2.18
+    react-dropdown-select: ^4.11.2
     sharp: ^0.30.7
     spinnies: ^0.5.1
     typescript: ^4.7.4
@@ -24437,6 +24498,7 @@ __metadata:
     prettier: ^2.7.1
     prettier-plugin-packagejson: ^2.2.18
     react: ^18.2.0
+    react-accessible-accordion: ^5.0.0
     react-dom: ^18.2.0
     react-dropdown: ^1.11.0
     react-is: ^18.2.0
@@ -24512,7 +24574,6 @@ __metadata:
     "@metamask/snaps-sdk": ^1.2.0
     "@typescript-eslint/eslint-plugin": ^5.42.1
     "@typescript-eslint/parser": ^5.42.1
-    "@zetachain/protocol-contracts": ^3.0.1
     bech32: ^2.0.0
     bip32: ^2.0.6
     bip39: ^3.1.0

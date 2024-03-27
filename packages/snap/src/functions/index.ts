@@ -3,8 +3,6 @@ import { copyable, heading, panel, text } from '@metamask/snaps-sdk';
 import { bech32 } from 'bech32';
 import * as bitcoin from 'bitcoinjs-lib';
 import { ECPairFactory } from 'ecpair';
-import { ethers } from 'ethers';
-import { mergeWithCustomize } from 'webpack-merge';
 
 const ECPair = ECPairFactory(ecc);
 const CRYPTO_CURVE = 'secp256k1';
@@ -14,10 +12,9 @@ const currNetwork = isMainnet
   ? bitcoin.networks.bitcoin
   : bitcoin.networks.testnet;
 
-const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur'; //rss
-const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0'; //memo
+const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
 
-const data = Buffer.from(memo, 'utf8');
 let API = 'https://blockstream.info/testnet/api';
 
 const convertToZeta = (address: string) => {
@@ -54,35 +51,8 @@ export const getAccounts = async () => {
   });
 
   return { response };
-
-  // const accounts = await ethereum.request({ method: 'eth_signTransaction' });
-  // if (accounts) {
-  //   const accountInfo = await ethereum.request({
-  //     method: 'eth_getBalance',
-  //     params: [accounts, 'latest'],
-  //   });
-  //   return { accounts: accountInfo };
-  // } else {
-  //   return SnapError.toString();
-  // }
 };
 
-// transfer funds through TSS
-export const transferThroughTss = async (origin: string) => {
-  const result = await snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'confirmation',
-      content: panel([
-        text(`**${origin}** wants to transfer funds`),
-        text('Confirm Transaction'),
-      ]),
-    },
-  });
-  return result;
-};
-
-// transfer funds through TSS
 export const getWalletInfo = async () => {
   const connectedAddr = await getAccInfo();
   const zetaAddr = convertToZeta(connectedAddr);
@@ -125,11 +95,6 @@ export const createBtcTestnetAddr = async () => {
   });
 
   if (!!slip10Node.publicKey) {
-    // const wallet = bitcoin.payments.p2wpkh({
-    //   pubkey: Buffer.from(trimHexPrefix(slip10Node.publicKey as string), 'hex'),
-    //   network: isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet,
-    // });
-
     const privateKeyBuffer = Buffer.from(
       trimHexPrefix(slip10Node.privateKey as string),
       'hex',
@@ -141,33 +106,15 @@ export const createBtcTestnetAddr = async () => {
       network: currNetwork,
     });
     return address;
-
-    // await snap.request({
-    //   method: 'snap_dialog',
-    //   params: {
-    //     type: 'alert',
-    //     content: panel([
-    //       heading(
-    //         `Copy your BTC ${
-    //           isMainnet ? 'mainnet' : 'testnet'
-    //         } address, derived using your metamask bip32 entropy`,
-    //       ),
-    //       text(`BTC ${isMainnet ? 'mainnet' : 'testnet'} p2wpkh address`),
-    //       copyable(address),
-    //     ]),
-    //   },
-    // });
   }
 };
 
 export const getBtcDepositFees = async () => {
   const feePerKb = await getFees();
-  // DepositFee = AverageFeeRateBlockX * GasPriceMultiplier * DepositIncurredVBytes
   return feePerKb.high_fee_per_kb * 2 * 68;
 };
 
 export const getBtcTrxs = async () => {
-  // get activity
   const slip10Node = await snap.request({
     method: 'snap_getBip32Entropy',
     params: {
@@ -189,24 +136,14 @@ export const getBtcTrxs = async () => {
     });
 
     const txs = await fetch(
-      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`, //?unspentOnly=true`,
-      // `https://blockstream.info/testnet/api/address/${wallet.address}/txs`,
+      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`,
     );
 
     const txsData = await txs.text();
-
-    // const result = await snap.request({
-    //   method: 'snap_dialog',
-    //   params: {
-    //     type: 'alert',
-    //     content: panel([text(`Activity: ${txsData} `)]),
-    //   },
-    // });
     return txsData ? JSON.parse(txsData) : '{ txrefs: [] }';
   }
 };
 export const getBtcUtxo = async () => {
-  // get balance
   const slip10Node = await snap.request({
     method: 'snap_getBip32Entropy',
     params: {
@@ -230,13 +167,6 @@ export const getBtcUtxo = async () => {
       `https://api.blockcypher.com/v1/btc/test3/addrs/${address}/full`,
     );
     const utxoData = await utxo.text();
-    // const result = await snap.request({
-    //   method: 'snap_dialog',
-    //   params: {
-    //     type: 'alert',
-    //     content: panel([text(`Balance: ${utxoData}`)]),
-    //   },
-    // });
     return utxoData ? JSON.parse(utxoData) : '{ txs: [] }';
   }
 };
@@ -259,10 +189,8 @@ export const sendTrx = async (request: any) => {
   });
 
   if (result) {
-    // Request account access
-
     const postData: any = {
-      tx_bytes: Buffer.from(request, 'hex').toString('hex'), //Buffer.from(request.params[0].slice(2), 'hex').toString('hex'),
+      tx_bytes: Buffer.from(request, 'hex').toString('hex'),
       mode: 'BROADCAST_MODE_BLOCK',
     };
 
@@ -322,112 +250,6 @@ const broadcastTransaction = async (hex: string) => {
   }
 };
 
-export const sendBtc = async () => {
-  const result = await snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'confirmation',
-      content: panel([
-        text(`**${origin}** wants to send a Bitcoin`),
-        text('Confirm Transaction'),
-      ]),
-    },
-  });
-
-  if (result) {
-    try {
-      const slip10Node = await snap.request({
-        method: 'snap_getBip32Entropy',
-        params: {
-          path: ['m', "44'", "0'"],
-          curve: CRYPTO_CURVE,
-        },
-      });
-
-      if (!!slip10Node.publicKey) {
-        const privateKeyBuffer = Buffer.from(
-          trimHexPrefix(slip10Node.privateKey as string),
-          'hex',
-        );
-
-        const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
-
-        const { address } = bitcoin.payments.p2wpkh({
-          pubkey: keypair.publicKey,
-          network: currNetwork,
-        });
-
-        // return { redeem };
-        const prevTrx = await getTrxsByAddress(address as string);
-        // return { prevTrx };
-        // const getRawTrx = await getTrxByHash(prevTrx.txrefs[0].tx_hash);
-        const prevHash = prevTrx.txrefs?.[0].tx_hash;
-
-        const txHex = await getTrxHex(prevHash);
-        const amount = 100; // in Satoshis
-        // const embed = bitcoin.payments.embed({ data: [data] });
-        const embed = bitcoin.script.compile([
-          bitcoin.opcodes.OP_RETURN!,
-          data,
-        ]);
-
-        const psbt = new bitcoin.Psbt({ network: currNetwork });
-
-        const feeRate = await getFees();
-
-        const totalInputAmount = prevTrx.balance;
-
-        // const fee = Math.ceil((300 * feePerKb.medium_fee_per_kb) / 1000); // Assuming typical transaction size of 226 bytes
-
-        // const feeRate = feePerKb.low_fee_per_kb; // Fee rate in satoshis per byte
-        // const psbtSize = psbt.data.getTransaction().byteLength;
-        const fee = feeRate;
-
-        const changeAmount = totalInputAmount - amount - fee;
-
-        psbt.addInput({
-          hash: prevHash,
-          index: prevTrx.txrefs?.[0].tx_output_n,
-          // witnessUtxo: {
-          //   script: Buffer.from(getRawTrx.outputs[2].script, 'hex'),
-          //   value: getRawTrx.outputs[2].value,
-          // },
-          // redeemScript: redeem?.output!,
-          nonWitnessUtxo: Buffer.from(txHex, 'hex'), // Add the raw transaction data
-        });
-
-        psbt.addOutput({
-          address: recipientAddress,
-          value: amount,
-        });
-        // OP_RETURN
-        psbt.addOutput({
-          script: embed,
-          value: 0,
-        });
-
-        if (changeAmount > 0) {
-          psbt.addOutput({
-            value: changeAmount,
-            address: address!,
-          });
-        }
-        psbt.signInput(0, keypair);
-        psbt.finalizeAllInputs();
-
-        const transaction = psbt.extractTransaction();
-
-        return await broadcastTransaction(transaction.toHex());
-      }
-    } catch (error) {
-      console.error('Error sending BTC:', error);
-      throw error; // Throw the error to be caught by the caller
-    }
-  } else {
-    return { error: 'User Rejected' };
-  }
-};
-
 export const getTrxByHash = async (previousTxHash: any) => {
   try {
     const response: any = await fetch(
@@ -457,7 +279,6 @@ export const getTrxsByAddress = async (address: string) => {
     const response: any = await fetch(
       `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`, //?unspentOnly=true`,
     );
-    // Process the transactions and extract the previous transaction hashes
     const stringData = await response.text();
     return JSON.parse(stringData);
   } catch (error: any) {
@@ -469,102 +290,9 @@ export const getTrxsByAddress = async (address: string) => {
   }
 };
 
-export const testTrx = async () => {
-  // Example transaction
-  const fromAddress = await getAccInfo();
-  const provider = new ethers.BrowserProvider(ethereum);
-  // const signer = await provider.getSigner();
-  const tssAddress = '0x8531a5aB847ff5B22D855633C25ED1DA3255247e'; //getAddress('tss', 'mumbai_testnet');
-  const memoData = '0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
-  const nonce = await provider.getTransactionCount(fromAddress, 'latest');
-
-  console.log(fromAddress, tssAddress);
-  const tx = {
-    from: fromAddress,
-    to: tssAddress,
-    nonce,
-    gasLimit: 21000,
-    gasPrice: ethers.parseUnits('1', 'gwei'), // Example gas price
-    data: memoData,
-    value: ethers.parseUnits('1', 'gwei'),
-  };
-
-  // Request signature
-  // ethereum
-  //   .request({
-  //     method: 'eth_sendTransaction',
-  //     params: [tx],
-  //   })
-  //   .then((txHash) => {
-  //     console.log('Transaction sent:', txHash);
-  //   })
-  //   .catch((error) => {
-  //     console.error('Transaction failed:', error);
-  //   });
-};
-
-const provider = new ethers.BrowserProvider(ethereum);
-
-// Request account access from the user
-async function requestAccount() {
-  await ethereum.request({ method: 'eth_requestAccounts' });
-}
-
-export const sendTransaction = async () => {
-  try {
-    await requestAccount();
-    const signer = await provider.getSigner();
-    const memoData = '0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0'; // recipent address
-
-    const signerAddress = await signer.getAddress();
-
-    const balanceBefore = await provider.getBalance(signerAddress);
-    console.log('Balance Before:', ethers.formatEther(balanceBefore));
-
-    const transaction = {
-      to: '0x8531a5aB847ff5B22D855633C25ED1DA3255247e', // tss
-      value: ethers.parseUnits('1', 'gwei'),
-      gasLimit: ethers.toBigInt(21000), // Gas limit
-      gasPrice: '20000000000',
-      // data: ethers.encodeBytes32String(memoData),
-    };
-
-    const txResponse = await signer.sendTransaction(transaction);
-    await txResponse.wait();
-
-    // const serializedTrx = ethers.Transaction.from(transaction);
-
-    // const result = await snap.request({
-    //   method: 'snap_dialog',
-    //   params: {
-    //     type: 'confirmation',
-    //     content: panel([
-    //       text(`**${origin}** wants to transfer funds`),
-    //       text('Confirm Transaction'),
-    //       text(`Serialized Tx: ${serializedTrx}`),
-    //     ]),
-    //   },
-    // });
-
-    // if (result) {
-    //   const txResponse = await signer.sendTransaction(serializedTrx);
-    //   await txResponse.wait();
-
-    //   await sendTrx(serializedTrx);
-    //   return txResponse;
-    //   // const balanceAfter = await provider.getBalance(signerAddress);
-    // }
-  } catch (error) {
-    console.error('Error:', error);
-    return { error };
-  }
-};
-
 const fetchUtxo = async (btcAddress: string) => {
   const utxo = await fetch(`${API}/address/${btcAddress}/utxo`);
-
   const utxoData = await utxo.text();
-
   return JSON.parse(utxoData);
 };
 
@@ -604,16 +332,12 @@ export const crossChainSwapBtc = async (request: any) => {
 
         const utxos = await fetchUtxo(address as string);
         const amount = request.params[0]; // in Satoshis
-        // const embed = bitcoin.payments.embed({ data: [data] });
 
-        const memo = Buffer.from(
-          request.params[1], //'70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0',
-          'hex',
-        );
+        const memo = Buffer.from(request.params[1], 'hex');
 
         if (memo.length >= 78) throw new Error('Memo too long');
 
-        utxos.sort((a: any, b: any) => a.value - b.value); // sort by value, ascending
+        utxos.sort((a: any, b: any) => a.value - b.value);
         const fee = 10000;
         const total = amount + fee;
         let sum = 0;
@@ -626,7 +350,7 @@ export const crossChainSwapBtc = async (request: any) => {
         }
         if (sum < total) throw new Error('Not enough funds');
         const change = sum - total;
-        const txs = []; // txs corresponding to the utxos
+        const txs = [];
         for (let i = 0; i < pickUtxos.length; i++) {
           const utxo = pickUtxos[i];
           const p1 = await fetch(`${API}/tx/${utxo.txid}`);
@@ -663,42 +387,29 @@ export const crossChainSwapBtc = async (request: any) => {
         psbt.finalizeAllInputs();
         let tx = psbt.extractTransaction().toHex();
         return await broadcastTransaction(tx);
-
-        await snap.request({
-          method: 'snap_dialog',
-          params: {
-            type: 'confirmation',
-            content: panel([
-              text(`**${JSON.stringify(tx)}** `),
-              text('Confirm Transaction'),
-            ]),
-          },
-        });
-
-        // const p1 = await fetch(`${API}/txs/push`, {
-        //   body: JSON.stringify({ tx }),
-        //   method: 'POST',
-        // });
-        // const data = await p1.json();
-        // const txhash = data?.tx?.hash;
-
-        // await snap.request({
-        //   method: 'snap_dialog',
-        //   params: {
-        //     type: 'confirmation',
-        //     content: panel([
-        //       copyable(`https://mempool.space/testnet/tx/${txhash}`),
-
-        //       text('Confirm Transaction'),
-        //     ]),
-        //   },
-        // });
       }
     } catch (error) {
       console.error('Error sending BTC:', error);
-      throw error; // Throw the error to be caught by the caller
+      throw error;
     }
   } else {
     return { error: 'User Rejected' };
   }
+};
+
+export const trackCctxTx = async (request: any) => {
+  const utxo = await fetch(
+    `https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/in_tx_hash_to_cctx_data/${request.params[0]}`,
+  );
+  const utxoData = await utxo.text();
+  return JSON.parse(utxoData);
+};
+
+export const getZetaBalance = async (request: any) => {
+  let addr = convertToZeta(request.params[0]);
+  const zeta = await fetch(
+    `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${addr}`,
+  );
+  const zetaData = await zeta.text();
+  return JSON.parse(zetaData);
 };

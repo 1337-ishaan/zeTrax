@@ -29,9 +29,11 @@
   "dependencies": {
     "@lavamoat/allow-scripts": "^3.0.0",
     "@lavamoat/preinstall-always-fail": "^2.0.0",
+    "axios": "^1.6.8",
     "ethers": "^6.9.0",
     "install": "^0.13.0",
     "npm": "^10.2.5",
+    "react-dropdown-select": "^4.11.2",
     "sharp": "^0.30.7",
     "spinnies": "^0.5.1",
     "webpack": "^5.89.0",

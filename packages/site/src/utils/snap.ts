@@ -3,6 +3,7 @@ import { defaultSnapOrigin } from '../config';
 import type { GetSnapsResponse, Snap } from '../types';
 import * as ethers from 'ethers';
 import { getAddress } from '@zetachain/protocol-contracts';
+import { OMNICHAIN_SWAP_CONTRACT_ADDRESS } from '../constants/contracts';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -174,56 +175,65 @@ export const sendBtc = async () => {
   return result;
 };
 
-export const crossChainSwapBTCHandle = async (
+export const transferBtc = async (
+  recipentAddress: string,
+  zrc20: string,
+  amount: string | number,
   address: string,
-  bitcoinAddress: string,
 ) => {
   let action = '01';
-  let destinationTokenSelected = {
-    zrc20: '0xd97B1de3619ed2c6BEb3860147E30cA8A7dC9891',
-  };
-
-  const omnichainSwapContractAddress =
-    '0x102Fa443F05200bB74aBA1c1F15f442DbEf32fFb';
-
-  if (!address) {
+  if (!recipentAddress && !address) {
     console.error('EVM address undefined.');
     return;
   }
-  if (!bitcoinAddress) {
-    console.error('Bitcoin address undefined.');
-    return;
-  }
-  const amount = parseFloat('0.0001') * 1e8;
-  // const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
-  const contract = omnichainSwapContractAddress.replace(/^0x/, '');
-  const zrc20 = destinationTokenSelected.zrc20.replace(/^0x/, '');
-  const dest = address.replace(/^0x/, '');
-  const memo = `${contract}${action}${zrc20}${dest}`;
 
-  console.log(memo, amount, 'memo');
+  const decAmount = parseFloat('' + amount) * 1e8;
+  // const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+  let memo;
+
+  const dest = recipentAddress.replace(/^0x/, '');
+
+  if (!!zrc20) {
+    const contract = OMNICHAIN_SWAP_CONTRACT_ADDRESS.replace(/^0x/, '');
+    const zrc = zrc20.replace(/^0x/, '');
+    memo = `${contract}${action}${zrc}${dest}`;
+  } else {
+    console.log(address, 'add');
+    memo = `${address.replace(/^0x/, '')}`;
+  }
 
   const result = await window.ethereum.request({
     method: 'wallet_snap',
     params: {
       snapId: defaultSnapOrigin,
-      request: { method: 'crosschain-swap-btc', params: [amount, memo] },
+      request: { method: 'crosschain-swap-btc', params: [decAmount, memo] },
     },
   });
   return result;
+};
 
-  // window.xfi.bitcoin.request(
-  // bitcoinXDEFITransfer(bitcoinAddress, bitcoinTSSAddress, a, memo),
-  // (error: any, hash: any) => {
-  //   if (!error) {
-  //     const inbound = {
-  //       inboundHash: hash,
-  //       desc: `Sent ${sourceAmount} tBTC`,
-  //     }
-  //     setInbounds([...inbounds, inbound])
-  //   }
-  // }
-  // )
+export const trackCctx = async (txHash: string) => {
+  // invoke snap
+
+  const result = await window.ethereum.request({
+    method: 'wallet_snap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'track-cctx', params: [txHash] },
+    },
+  });
+  return result;
+};
+export const getZetaBalance = async (addr: string) => {
+  // invoke snap
+  const result = await window.ethereum.request({
+    method: 'wallet_snap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'get-zeta-balance', params: [addr] },
+    },
+  });
+  return result;
 };
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

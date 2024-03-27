@@ -6,15 +6,9 @@ import {
   getBtcUtxo,
   getBtcTrxs,
   getWalletInfo,
-  sendBtc,
-  transferThroughTss,
-  sendTrx,
-  getTrxsByAddress,
-  getTrxByHash,
-  getTrxHex,
-  getFees,
-  sendTransaction,
   crossChainSwapBtc,
+  trackCctxTx,
+  getZetaBalance,
 } from './functions';
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -31,8 +25,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }: any) => {
   switch (request.method) {
-    case 'cctx':
-      return transferThroughTss(origin);
     case 'get-zeta-balance':
       return getWalletInfo();
     case 'get-zeta-acc':
@@ -45,14 +37,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getBtcUtxo();
     case 'get-btc-trxs':
       return getBtcTrxs();
-    case 'send-trx':
-      return sendTransaction();
-    case 'send-btc':
-      // return getTrxsByAddress('n1FCNLxVnh7BafVSzWj5aBokjTWfaD2tuu');
-      return sendBtc();
-    // return egTrx();
+    case 'get-zeta-balance':
+      return getZetaBalance(request);
     case 'crosschain-swap-btc':
       return crossChainSwapBtc(request);
+    case 'track-cctx':
+      return trackCctxTx(request);
 
     default:
       throw new Error('Method not found.');

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 const StyledInputWrapper = styled.input`
   border: none;
   padding: 16px;
+  width: 100%;
   border-radius: 12px;
   &:focus {
     outline: none;
