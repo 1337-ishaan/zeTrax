@@ -1,16 +1,13 @@
 import styled from 'styled-components/macro';
 import StyledInput from '../utils/StyledInput';
-import Dropdown from 'react-dropdown';
 import Typography from '../utils/Typography';
 import { useEffect, useState } from 'react';
 import StyledButton from '../utils/StyledButton';
 import { transferBtc } from '../../utils/snap';
 import useAccount from '../../hooks/useAccount';
 import Select from 'react-dropdown-select';
-import { options } from '../../constants/dropdownOptions';
 import axios from 'axios';
 import { getChainIcon } from '../../constants/getChainIcon';
-//@ts-ignore
 
 const SendWrapper = styled.div`
   display: flex;
@@ -22,13 +19,13 @@ const SendWrapper = styled.div`
   overflow-y: auto;
   height: fit-content;
   flex-direction: column;
-  gap: 12px;
+  gap: 24px;
   .flex1 {
     display: flex;
     color: white;
     flex-direction: row;
     justify-content: flex-start;
-    column-gap: 8px;
+    column-gap: 24px;
   }
   .dropdown-item {
     padding: 10px;
@@ -51,9 +48,6 @@ const SendWrapper = styled.div`
   .css-1uslfsx-DropDown {
     border: none !important;
   }
-  /* .css-wmy1p7-ReactDropdownSelect {
-    border: none !important;
-  } */
 `;
 
 interface SendProps {}
@@ -76,14 +70,6 @@ const Send = ({}: SendProps): JSX.Element => {
     );
   };
 
-  // const getSupportedChains = async () => {
-  //   let assets = await axios.get(
-  //     'https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/fungible/foreign_coins',
-  //   );
-  //   setZrc20Assets(assets.data.foreignCoins);
-  //   return assets;
-  // };
-
   const getZrc20Assets = async () => {
     let assets = await axios.get(
       'https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/fungible/foreign_coins',
@@ -95,8 +81,6 @@ const Send = ({}: SendProps): JSX.Element => {
   useEffect(() => {
     getZrc20Assets();
   }, []);
-
-  console.log(trxInput, zrc20Assets, 'trx input');
 
   const CustomItemRenderer = ({ option }: any) => (
     <div className="dropdown-item">
@@ -112,7 +96,6 @@ const Send = ({}: SendProps): JSX.Element => {
     </div>
   );
 
-  console.log(zrc20Assets, 'recipent addre');
   return (
     <SendWrapper>
       <div className="flex1">
@@ -129,22 +112,6 @@ const Send = ({}: SendProps): JSX.Element => {
           Cross Chain
         </Typography>
       </div>
-      {/* <Select
-        options={options}
-        contentRenderer={({ props, state }) => (
-          <div key={trxInput.key}>
-            <CustomItemRenderer option={trxInput} />
-          </div>
-        )}
-        itemRenderer={({ item, itemIndex, props, state, methods }) => (
-          <div key={itemIndex} onClick={() => methods.addItem(item)}>
-            <CustomItemRenderer option={item} />
-          </div>
-        )}
-        values={[]}
-        onChange={(e) => setSelectedZrc20(e)}
-        placeholder="Select an option"
-      /> */}
       {currentActive === 'cctx' && (
         <Select
           options={zrc20Assets}
@@ -156,7 +123,6 @@ const Send = ({}: SendProps): JSX.Element => {
           valueField="symbol"
           itemRenderer={({ item, itemIndex, props, state, methods }: any) => (
             <div key={itemIndex} onClick={() => methods.addItem(item)}>
-              {/* <div>{item.symbol}</div> */}
               <CustomItemRenderer option={item} />
             </div>
           )}

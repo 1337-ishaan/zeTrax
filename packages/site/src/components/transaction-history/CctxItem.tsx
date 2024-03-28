@@ -98,6 +98,7 @@ const CctxItem = ({ cctx }: CctxItemProps): JSX.Element => {
               </>
             </Typography>
           </div>
+
           <div className="flex-row">
             <Typography size={14} color="#fff">
               <>

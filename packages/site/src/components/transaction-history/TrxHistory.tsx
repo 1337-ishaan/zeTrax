@@ -48,18 +48,19 @@ const TrxHistory = (_: TrxHistoryInterface) => {
     getBtcTrx();
     return () => {};
   }, [btcTrx.length === 0]);
+
   const getAmount = (trx: any) => {
     return trx.outputs.filter((t: any) => t.addresses?.[0] === btcAddress)[0]
       .value;
   };
-  console.log(btcAddress, 'btcaddr');
+
   return (
     <TrxHistoryWrapper>
       <Typography>Transactions</Typography>
       {btcTrx?.txs?.map((trx: any) => (
         <TrxRow
           trx={trx}
-          isSent={trx.inputs[0].addresses?.[0] === btcAddress}
+          isSent={trx.inputs[0].addresses?.includes(btcAddress)}
           amount={getAmount(trx)}
         />
       ))}

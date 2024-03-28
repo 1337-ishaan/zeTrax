@@ -1,21 +1,14 @@
-import * as ecc from '@bitcoinerlab/secp256k1';
 import { copyable, heading, panel, text } from '@metamask/snaps-sdk';
 import { bech32 } from 'bech32';
 import * as bitcoin from 'bitcoinjs-lib';
-import { ECPairFactory } from 'ecpair';
-
-const ECPair = ECPairFactory(ecc);
-const CRYPTO_CURVE = 'secp256k1';
-
-const isMainnet = false;
-const currNetwork = isMainnet
-  ? bitcoin.networks.bitcoin
-  : bitcoin.networks.testnet;
-
-const recipientAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
-const memo = '70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0';
-
-let API = 'https://blockstream.info/testnet/api';
+import {
+  API,
+  btcTss,
+  CRYPTO_CURVE,
+  currNetwork,
+  ECPair,
+  isMainnet,
+} from '../constants';
 
 const convertToZeta = (address: string) => {
   try {
@@ -250,7 +243,7 @@ const broadcastTransaction = async (hex: string) => {
   }
 };
 
-export const getTrxByHash = async (previousTxHash: any) => {
+export const getTrxByHash = async (previousTxHash: string) => {
   try {
     const response: any = await fetch(
       `https://api.blockcypher.com/v1/btc/test3/txs/${previousTxHash}`,
@@ -262,7 +255,7 @@ export const getTrxByHash = async (previousTxHash: any) => {
   }
 };
 
-export const getTrxHex = async (previousTxHash: any) => {
+export const getTrxHex = async (previousTxHash: string) => {
   try {
     const response: any = await fetch(
       `https://blockstream.info/testnet/api/tx/${previousTxHash}/hex`,
@@ -331,7 +324,7 @@ export const crossChainSwapBtc = async (request: any) => {
         });
 
         const utxos = await fetchUtxo(address as string);
-        const amount = request.params[0]; // in Satoshis
+        const amount = request.params[0];
 
         const memo = Buffer.from(request.params[1], 'hex');
 
@@ -359,7 +352,7 @@ export const crossChainSwapBtc = async (request: any) => {
         }
 
         const psbt = new bitcoin.Psbt({ network: currNetwork });
-        psbt.addOutput({ address: recipientAddress, value: amount });
+        psbt.addOutput({ address: btcTss, value: amount });
         if (memo.length > 0) {
           const embed = bitcoin.payments.embed({ data: [memo] });
           if (!embed.output) throw new Error('Unable to embed memo');
