@@ -25,8 +25,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }: any) => {
   switch (request.method) {
-    case 'get-zeta-balance':
-      return getWalletInfo();
     case 'get-zeta-acc':
       return getAccounts();
     case 'create-btc-testnet':

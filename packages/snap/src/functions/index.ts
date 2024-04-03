@@ -399,10 +399,12 @@ export const trackCctxTx = async (request: any) => {
 };
 
 export const getZetaBalance = async (request: any) => {
-  let addr = convertToZeta(request.params[0]);
-  const zeta = await fetch(
-    `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${addr}`,
-  );
-  const zetaData = await zeta.text();
-  return JSON.parse(zetaData);
+  if (!!request.params[0]) {
+    let addr = convertToZeta(request.params[0]);
+    const zeta = await fetch(
+      `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${addr}`,
+    );
+    const zetaData = await zeta.text();
+    return JSON.parse(zetaData);
+  }
 };

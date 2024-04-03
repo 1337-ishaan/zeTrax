@@ -32,14 +32,14 @@ interface TrxHistoryInterface {}
 const TrxHistory = (_: TrxHistoryInterface) => {
   const [btcTrx, setBtcTrx] = useState<any>([]);
   const { btcAddress } = useAccount(true);
-  console.log(btcTrx);
+
   React.useEffect(() => {
     const getBtcTrx = async () => {
       if (btcTrx.length === 0) {
         try {
           const results: any = await getBtcUtxo();
           setBtcTrx(results);
-          console.log(JSON.parse(results));
+          console.log(results);
         } catch (error) {
           console.error(error);
         }

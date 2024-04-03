@@ -1,6 +1,6 @@
 import styled from 'styled-components/macro';
 import StyledButton from '../utils/StyledButton';
-import { ReactComponent as Logo } from '../../assets/zetachain.svg';
+import { ReactComponent as Logo } from '../../assets/logo.svg';
 import {
   connectSnap,
   createBtcWallet,
@@ -36,6 +36,10 @@ const HeaderWrapper = styled.header`
     font-size: 16px;
     padding: 12px 12px 12px 0;
   }
+  .logo {
+    height: 40px;
+    width: 40px;
+  }
 `;
 
 interface HeaderProps {}
@@ -57,7 +61,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
   };
 
   useEffect(() => {
-    if (state.installedSnap || address) {
+    if (state.installedSnap || btcAddress) {
       const getBalance = async () => {
         let results: any = await getBtcUtxo();
         setBalance(results);
@@ -65,30 +69,26 @@ const Header = ({}: HeaderProps): JSX.Element => {
 
       getBalance();
     }
-  }, [state.installedSnap, address]);
+  }, [state.installedSnap || btcAddress]);
 
   useEffect(() => {
-    if (state.installedSnap || address) {
-      const getZetaBalance = async () => {
-        // await getWalletInfo();
-        let zetaAddr = 'zeta1wzv3cgx8cnsqy8hsh5mgtpmvcwk9y50seg8g8t';
-        let result = await axios.get(
-          `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${zetaAddr}`,
-        );
-        setZetaBalance(result.data.balances[0]);
+    if (state.installedSnap && address) {
+      const getZetaBal = async () => {
+        let result: any = await getZetaBalance(address as string);
+        setZetaBalance(result.balances[0]);
       };
-      getZetaBalance();
+      getZetaBal();
     }
-  }, [state.installedSnap || address]);
+  }, [state.installedSnap, address]);
 
   return (
     <HeaderWrapper>
-      <Logo />
+      <Logo className="logo" />
       <div className="connect-wallet-wrapper">
         {state.installedSnap || address ? (
           <>
             <div>
-              <div className="addr-type">BTC</div>
+              <div className="addr-type">BTC</div>z
               <div className="address-text">
                 {btcAddress ? (
                   <>
@@ -108,8 +108,8 @@ const Header = ({}: HeaderProps): JSX.Element => {
                 {address ? <Copyable>{address}</Copyable> : 'Connect Snap'}
               </div>
               <div className="balance-text">
-                Zeta: {(zetaBalance?.amount / 1e18).toFixed(8)}
-                {zetaBalance?.denom}
+                Zeta: {(zetaBalance?.amount / 1e18).toFixed(8)}{' '}
+                {zetaBalance?.denom.toUpperCase()}
               </div>
             </div>
           </>
