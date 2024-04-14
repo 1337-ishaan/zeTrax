@@ -4,7 +4,9 @@ const StyledInputWrapper = styled.input`
   border: none;
   padding: 16px;
   width: 100%;
+  background: #0d1c0d;
   border-radius: 12px;
+
   &:focus {
     outline: none;
   }

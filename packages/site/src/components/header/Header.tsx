@@ -13,14 +13,16 @@ import Copyable from '../utils/Copyable';
 import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { MetaMaskContext } from '../../hooks';
+import Typography from '../utils/Typography';
 
 const HeaderWrapper = styled.header`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 40px;
   .connect-wallet-wrapper {
     display: flex;
-    /* flex-direction: column; */
+    flex-direction: column;
     row-gap: 12px;
     column-gap: 8px;
     color: #fff;
@@ -30,7 +32,7 @@ const HeaderWrapper = styled.header`
     /* font-family: 'Sans'; */
   }
   .addr-type {
-    font-size: 20px;
+    font-size: 16px;
   }
   .balance-text {
     font-size: 16px;
@@ -84,18 +86,18 @@ const Header = ({}: HeaderProps): JSX.Element => {
   return (
     <HeaderWrapper>
       <Logo className="logo" />
+      <Typography color="#eee" size={16}>
+        Current fees: 12 Zeta
+      </Typography>
       <div className="connect-wallet-wrapper">
         {state.installedSnap || address ? (
           <>
             <div>
-              <div className="addr-type">BTC</div>z
+              <div className="addr-type">BTC: {balance?.balance / 1e8} BTC</div>
               <div className="address-text">
                 {btcAddress ? (
                   <>
                     <Copyable>{btcAddress}</Copyable>
-                    <div className="balance-text">
-                      Balance: {balance?.balance / 1e8} BTC
-                    </div>
                   </>
                 ) : (
                   'Derive BTC address'
@@ -103,13 +105,14 @@ const Header = ({}: HeaderProps): JSX.Element => {
               </div>
             </div>
             <div>
-              <div className="addr-type">EVM</div>
+              <div className="addr-type">
+                EVM: {/* <div className="balance-text"> */}
+                {(zetaBalance?.amount / 1e18).toFixed(8)}{' '}
+                {zetaBalance?.denom?.toUpperCase()}
+                {/* </div> */}
+              </div>
               <div className="address-text">
                 {address ? <Copyable>{address}</Copyable> : 'Connect Snap'}
-              </div>
-              <div className="balance-text">
-                Zeta: {(zetaBalance?.amount / 1e18).toFixed(8)}{' '}
-                {zetaBalance?.denom.toUpperCase()}
               </div>
             </div>
           </>

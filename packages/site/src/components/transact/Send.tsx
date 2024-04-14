@@ -8,6 +8,7 @@ import useAccount from '../../hooks/useAccount';
 import Select from 'react-dropdown-select';
 import axios from 'axios';
 import { getChainIcon } from '../../constants/getChainIcon';
+import { ReactComponent as GasIcon } from '../../assets/gas.svg';
 
 const SendWrapper = styled.div`
   display: flex;
@@ -15,7 +16,8 @@ const SendWrapper = styled.div`
   background: rgba(255, 255, 255, 0.05);
   width: 40%;
   color: #dadada;
-  padding: 40px 80px 80px 40px;
+  box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
+  padding: 40px;
   overflow-y: auto;
   height: fit-content;
   flex-direction: column;
@@ -33,8 +35,7 @@ const SendWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #2c2c2e;
-
+    background-color: #0d241e;
     .icon-symbol-wrapper {
       display: flex;
       align-items: center;
@@ -47,6 +48,17 @@ const SendWrapper = styled.div`
   }
   .css-1uslfsx-DropDown {
     border: none !important;
+  }
+  .gas-wrapper {
+    display: flex;
+    column-gap: 8px;
+    justify-content: end;
+    .icon {
+      width: 16px;
+    }
+    .amount {
+      font-size: 16px;
+    }
   }
 `;
 
@@ -144,6 +156,10 @@ const Send = ({}: SendProps): JSX.Element => {
           min={0.1}
           placeholder="Amount"
         />
+      </div>
+      <div className="gas-wrapper">
+        <GasIcon className="icon" />
+        <span className="amount">12 zeta</span>
       </div>
       <StyledButton onClick={sendTrx}>Send</StyledButton>
     </SendWrapper>
