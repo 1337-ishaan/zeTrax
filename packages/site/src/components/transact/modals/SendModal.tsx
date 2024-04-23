@@ -15,6 +15,7 @@ interface SendModalProps {
 const customStyles = {
   content: {
     top: '50%',
+    maxWidth: '40%',
     left: '50%',
     right: 'auto',
     bottom: 'auto',
@@ -39,9 +40,9 @@ const SendModal = ({
             cursor: 'pointer',
             color: '#eeeeeecc',
             position: 'absolute',
-            top: 15,
+            top: 20,
             height: '16px',
-            left: 50,
+            left: 140,
           }}
         />
         <Send />

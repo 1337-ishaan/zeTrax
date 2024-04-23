@@ -62,7 +62,7 @@ const CctxItem = ({ cctx }: CctxItemProps): JSX.Element => {
           <div className="flex-row trx-row-text">
             <Typography size={14}>
               <>
-                ZetaScan:{' '}
+                Trx Hash:{' '}
                 <a
                   href={`https://athens.explorer.zetachain.com/cc/tx/${cctx.index}`}
                   target="_blank"

@@ -52,9 +52,6 @@ const Header = ({}: HeaderProps): JSX.Element => {
 
   const { address } = useAccount(!!state.installedSnap);
 
-  // const onCreateBtcAddr = async () => {
-  //   await createBtcWallet();
-  // };
   const onConnectSnap = async () => {
     await connectSnap();
     await createBtcWallet();

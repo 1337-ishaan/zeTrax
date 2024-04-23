@@ -182,24 +182,26 @@ export const transferBtc = async (
   address: string,
 ) => {
   let action = '01';
+  let addressToSend;
   if (!recipentAddress && !address) {
     console.error('EVM address undefined.');
     return;
   }
 
+  addressToSend = recipentAddress ? recipentAddress : address;
+
   const decAmount = parseFloat('' + amount) * 1e8;
   // const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
   let memo;
 
-  const dest = recipentAddress.replace(/^0x/, '');
+  const dest = addressToSend.replace(/^0x/, '');
 
   if (!!zrc20) {
     const contract = OMNICHAIN_SWAP_CONTRACT_ADDRESS.replace(/^0x/, '');
     const zrc = zrc20.replace(/^0x/, '');
     memo = `${contract}${action}${zrc}${dest}`;
   } else {
-    console.log(address, 'add');
-    memo = `${address.replace(/^0x/, '')}`;
+    memo = `${addressToSend.replace(/^0x/, '')}`;
   }
 
   const result = await window.ethereum.request({

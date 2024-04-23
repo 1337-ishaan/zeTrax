@@ -10,6 +10,10 @@ import axios from 'axios';
 import { getChainIcon } from '../../constants/getChainIcon';
 import { ReactComponent as GasIcon } from '../../assets/gas.svg';
 
+import InfoBox from '../utils/InfoBox';
+import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
+import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+
 const SendWrapper = styled.div`
   display: flex;
   border-radius: 12px;
@@ -20,12 +24,9 @@ const SendWrapper = styled.div`
   flex-direction: column;
   gap: 24px;
   background: #000;
-  .flex1 {
-    display: flex;
+  .inputs-wrapper {
     color: white;
-    flex-direction: row;
-    justify-content: flex-start;
-    column-gap: 24px;
+    row-gap: 12px;
   }
   .dropdown-item {
     padding: 10px;
@@ -33,7 +34,7 @@ const SendWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #0d241e;
+    background-color: rgba(0, 0, 0, 1);
     .icon-symbol-wrapper {
       display: flex;
       align-items: center;
@@ -43,6 +44,9 @@ const SendWrapper = styled.div`
       width: 24px;
       height: 24px;
     }
+  }
+  .transfer-types-wrapper {
+    column-gap: 24px;
   }
   .css-1uslfsx-DropDown {
     border: none !important;
@@ -101,14 +105,14 @@ const Send = ({}: SendProps): JSX.Element => {
           alt={option.symbol}
           className="dropdown-image"
         />
-        <span>{option.symbol}</span> - <span>{option.coin_type}</span>
+        <span>{option.symbol}</span>
       </div>
     </div>
   );
 
   return (
     <SendWrapper>
-      <div className="flex1">
+      <FlexRowWrapper className="transfer-types-wrapper">
         <Typography
           onClick={() => setCurrentActive('zeta')}
           color={currentActive === 'zeta' ? 'fff' : '#b1cfc1'}
@@ -121,7 +125,7 @@ const Send = ({}: SendProps): JSX.Element => {
         >
           Cross Chain
         </Typography>
-      </div>
+      </FlexRowWrapper>
       {currentActive === 'cctx' && (
         <Select
           options={zrc20Assets}
@@ -141,22 +145,26 @@ const Send = ({}: SendProps): JSX.Element => {
           placeholder="Select an option"
         />
       )}
-      <div className="flex1">
-        {currentActive === 'cctx' && (
-          <StyledInput
-            placeholder="Wallet address"
-            onChange={(e: any) => setRecipentAddress(e.target.value)}
-          />
-        )}
+      <FlexColumnWrapper className="inputs-wrapper">
+        <StyledInput
+          placeholder="Recipent Address (Optional)"
+          onChange={(e: any) => setRecipentAddress(e.target.value)}
+        />
         <StyledInput
           onChange={(e: any) => setAmount(e.target.value)}
           type="number"
-          min={0.1}
+          min={0.00000000001}
           placeholder="Amount"
         />
-      </div>
+      </FlexColumnWrapper>
+      <InfoBox>
+        {currentActive === 'zeta'
+          ? 'Deposit BTC to ZetaChain either to specified recipent address, if recipent address is not mentioned the assets will be transferred to connected wallet address'
+          : 'Cross chain transfer BTC to ZetaChain either to specified recipent address, if recipent address is not mentioned the assets will be transferred to connected wallet address'}
+      </InfoBox>
+
       <div className="gas-wrapper">
-        <GasIcon className="icon" />
+        <GasIcon className="icon" /> Fees :
         <span className="amount">12 zeta</span>
       </div>
       <StyledButton onClick={sendTrx}>Send</StyledButton>
