@@ -50,10 +50,7 @@ interface HeaderProps {}
 const Header = ({}: HeaderProps): JSX.Element => {
   const [state] = useContext(MetaMaskContext);
 
-  const { btcAddress, address } = useAccount(!!state.installedSnap);
-
-  const [balance, setBalance] = useState<any>({});
-  const [zetaBalance, setZetaBalance] = useState<any>({});
+  const { address } = useAccount(!!state.installedSnap);
 
   // const onCreateBtcAddr = async () => {
   //   await createBtcWallet();
@@ -63,39 +60,14 @@ const Header = ({}: HeaderProps): JSX.Element => {
     await createBtcWallet();
   };
 
-  useEffect(() => {
-    if (state.installedSnap || btcAddress) {
-      const getBalance = async () => {
-        let results: any = await getBtcUtxo();
-        setBalance(results);
-      };
-
-      getBalance();
-    }
-  }, [state.installedSnap || btcAddress]);
-
-  useEffect(() => {
-    if (state.installedSnap && address) {
-      const getZetaBal = async () => {
-        let result: any = await getZetaBalance(address as string);
-        setZetaBalance(result.balances[0]);
-      };
-      getZetaBal();
-    }
-  }, [state.installedSnap, address]);
-
   return (
     <HeaderWrapper>
       <Logo className="logo" />
       <div className="connect-wallet-wrapper">
         {state.installedSnap || address ? (
-          <>
-            <Balances />
-          </>
+          <StyledButton onClick={onConnectSnap}>Disconnect</StyledButton> // TODO: Add disconnection logic
         ) : (
-          <>
-            <StyledButton onClick={onConnectSnap}>Install zeTrax</StyledButton>
-          </>
+          <StyledButton onClick={onConnectSnap}>Install zeTrax</StyledButton>
         )}
       </div>
     </HeaderWrapper>

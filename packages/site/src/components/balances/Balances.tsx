@@ -4,6 +4,7 @@ import { MetaMaskContext } from '../../hooks';
 import useAccount from '../../hooks/useAccount';
 import { getBtcUtxo, getZetaBalance } from '../../utils';
 import Copyable from '../utils/Copyable';
+import Typography from '../utils/Typography';
 
 const BalancesWrapper = styled.div``;
 
@@ -38,24 +39,32 @@ const Balances = ({}: BalancesProps): JSX.Element => {
 
   return (
     <BalancesWrapper>
+      <Typography>Balances</Typography>
+      <br />
       <div>
-        <div className="addr-type">BTC: {balance?.balance / 1e8} BTC</div>
-        <div className="address-text">
-          {btcAddress ? (
-            <>
-              <Copyable>{btcAddress}</Copyable>
-            </>
-          ) : (
-            'Derive BTC address'
-          )}
+        <div>
+          <Typography className="addr-type">
+            BTC: {balance?.balance / 1e8} BTC
+          </Typography>
+          <div className="address-text">
+            {btcAddress ? (
+              <>
+                <Copyable>{btcAddress}</Copyable>
+              </>
+            ) : (
+              'Derive BTC address'
+            )}
+          </div>
         </div>
-      </div>
-      <div>
-        <div className="addr-type">
-          EVM: {/* <div className="balance-text"> */}
-          {(zetaBalance?.amount / 1e18).toFixed(8)}{' '}
-          {zetaBalance?.denom?.toUpperCase()}
-          {/* </div> */}
+        <br />
+        <div>
+          <Typography className="addr-type">
+            <>
+              EVM: {/* <Typography className="balance-text"> */}
+              {(zetaBalance?.amount / 1e18).toFixed(8)}{' '}
+              {zetaBalance?.denom?.toUpperCase()}
+            </>
+          </Typography>
         </div>
         <div className="address-text">
           {address ? <Copyable>{address}</Copyable> : 'Connect Snap'}

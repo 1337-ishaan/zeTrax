@@ -10,9 +10,11 @@ import { MetaMaskContext } from '../hooks';
 import { isLocalSnap } from '../utils';
 import Transact from '../components/transact';
 import { ReactComponent as Logo } from '../assets/logo.svg';
+import Balances from '../components/balances/Balances';
+import FlexColumnWrapper from '../components/utils/wrappers/FlexColumnWrapper';
 
 const AppWrapper = styled.div`
-  padding: 24px;
+  padding: 24px 48px;
   .flex {
     display: flex;
     justify-content: space-between;
@@ -24,6 +26,9 @@ const AppWrapper = styled.div`
     left: 0;
     opacity: 0.1;
     z-index: -1;
+  }
+  .balances-transact-wrapper {
+    gap: 64px;
   }
 `;
 
@@ -39,8 +44,10 @@ const Index = () => {
       {isMetaMaskReady ? <Header /> : <></>}
       {state.installedSnap ? (
         <div className="flex">
-          <Transact />
-          {/* <Send /> */}
+          <FlexColumnWrapper className="balances-transact-wrapper">
+            <Balances />
+            <Transact />
+          </FlexColumnWrapper>
           <TrxHistory />
         </div>
       ) : (

@@ -7,8 +7,8 @@ import 'react-accessible-accordion/dist/fancy-example.css';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 40px 160px;
-  box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
+  margin: 5% 160px;
+  box-shadow: 0px 0px 40px 5px rgba(0, 0, 0, 1);
 `;
 
 export type AppProps = {
