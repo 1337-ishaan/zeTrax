@@ -5,6 +5,7 @@ import Typography from '../utils/Typography';
 import TrxRow from './TrxRow';
 import useAccount from '../../hooks/useAccount';
 import { ReactComponent as RefreshIcon } from '../../assets/refresh.svg';
+import Loader from '../utils/Loader';
 
 const TrxHistoryWrapper = styled.div`
   a {
@@ -17,7 +18,7 @@ const TrxHistoryWrapper = styled.div`
   width: 100%;
   color: #dadada;
   padding: 32px;
-  max-height: 55vh;
+  height: 55vh;
   overflow-y: auto;
   .accordion__button {
     background-color: transparent !important;
@@ -77,7 +78,9 @@ const TrxHistory = (_: TrxHistoryInterface) => {
       </div>
 
       {isRefetched ? (
-        <div>Loader</div>
+        <div>
+          <Loader />
+        </div>
       ) : (
         btcTrx?.txs?.map((trx: any) => (
           <TrxRow
