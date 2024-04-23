@@ -81,7 +81,7 @@ export const light: DefaultTheme = {
 export const dark: DefaultTheme = {
   colors: {
     background: {
-      default: '#011711',
+      default: '#141417',
       alternative: '#141618',
       inverse: '#1c3b6aFFF',
     },

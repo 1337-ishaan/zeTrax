@@ -14,7 +14,7 @@ const TrxHistoryWrapper = styled.div`
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
 
-  width: 40%;
+  width: 100%;
   color: #dadada;
   padding: 32px;
   max-height: 55vh;

@@ -8,10 +8,10 @@ import TrxHistory from '../components/transaction-history/TrxHistory';
 import { defaultSnapOrigin } from '../config';
 import { MetaMaskContext } from '../hooks';
 import { isLocalSnap } from '../utils';
-// import Receive from '../components/transact/Receive';
+import Transact from '../components/transact';
 
 const AppWrapper = styled.div`
-  padding: 0 200px;
+  padding: 20px;
   .flex {
     display: flex;
     justify-content: space-between;
@@ -29,7 +29,8 @@ const Index = () => {
       {isMetaMaskReady ? <Header /> : <></>}
       {state.installedSnap ? (
         <div className="flex">
-          <Send />
+          <Transact />
+          {/* <Send /> */}
           <TrxHistory />
         </div>
       ) : (

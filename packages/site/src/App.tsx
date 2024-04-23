@@ -1,5 +1,4 @@
 import type { FunctionComponent, ReactNode } from 'react';
-import { useContext } from 'react';
 import styled from 'styled-components';
 
 import { GlobalStyle } from './config/theme';
@@ -9,9 +8,8 @@ import 'react-accessible-accordion/dist/fancy-example.css';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
-  min-height: 100vh;
-  max-width: 100vw;
+  margin: 40px 160px;
+  box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
 `;
 
 export type AppProps = {

@@ -14,6 +14,7 @@ import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { MetaMaskContext } from '../../hooks';
 import Typography from '../utils/Typography';
+import Balances from '../balances/Balances';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -86,35 +87,10 @@ const Header = ({}: HeaderProps): JSX.Element => {
   return (
     <HeaderWrapper>
       <Logo className="logo" />
-      <Typography color="#eee" size={16}>
-        Current fees: 12 Zeta
-      </Typography>
       <div className="connect-wallet-wrapper">
         {state.installedSnap || address ? (
           <>
-            <div>
-              <div className="addr-type">BTC: {balance?.balance / 1e8} BTC</div>
-              <div className="address-text">
-                {btcAddress ? (
-                  <>
-                    <Copyable>{btcAddress}</Copyable>
-                  </>
-                ) : (
-                  'Derive BTC address'
-                )}
-              </div>
-            </div>
-            <div>
-              <div className="addr-type">
-                EVM: {/* <div className="balance-text"> */}
-                {(zetaBalance?.amount / 1e18).toFixed(8)}{' '}
-                {zetaBalance?.denom?.toUpperCase()}
-                {/* </div> */}
-              </div>
-              <div className="address-text">
-                {address ? <Copyable>{address}</Copyable> : 'Connect Snap'}
-              </div>
-            </div>
+            <Balances />
           </>
         ) : (
           <>

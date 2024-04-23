@@ -13,15 +13,13 @@ import { ReactComponent as GasIcon } from '../../assets/gas.svg';
 const SendWrapper = styled.div`
   display: flex;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  width: 40%;
-  color: #dadada;
-  box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
   padding: 40px;
   overflow-y: auto;
+  color: #fff;
   height: fit-content;
   flex-direction: column;
   gap: 24px;
+  background: #000;
   .flex1 {
     display: flex;
     color: white;
