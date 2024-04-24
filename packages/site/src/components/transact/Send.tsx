@@ -23,7 +23,7 @@ const SendWrapper = styled.div`
   height: fit-content;
   flex-direction: column;
   gap: 24px;
-  background: #000;
+  background: ${(props) => props.theme.colors.background!.default};
   .inputs-wrapper {
     color: white;
     row-gap: 12px;
@@ -105,11 +105,12 @@ const Send = ({}: SendProps): JSX.Element => {
           alt={option.symbol}
           className="dropdown-image"
         />
-        <span>{option.symbol}</span>
+        <span>{option.symbol ?? 'Select Asset'}</span>
       </div>
     </div>
   );
 
+  console.log(selectedZrc20, 'selected');
   return (
     <SendWrapper>
       <FlexRowWrapper className="transfer-types-wrapper">
@@ -129,9 +130,11 @@ const Send = ({}: SendProps): JSX.Element => {
       {currentActive === 'cctx' && (
         <Select
           options={zrc20Assets}
-          contentRenderer={({ props, state }) => (
+          contentRenderer={({ props, state }: any) => (
             <div key={trxInput.key}>
-              <CustomItemRenderer option={selectedZrc20} />
+              <>
+                <CustomItemRenderer option={selectedZrc20} />
+              </>
             </div>
           )}
           valueField="symbol"
@@ -140,7 +143,7 @@ const Send = ({}: SendProps): JSX.Element => {
               <CustomItemRenderer option={item} />
             </div>
           )}
-          values={zrc20Assets[0]}
+          values={zrc20Assets[1]?.symbol}
           onChange={(e) => setSelectedZrc20(e[0])}
           placeholder="Select an option"
         />

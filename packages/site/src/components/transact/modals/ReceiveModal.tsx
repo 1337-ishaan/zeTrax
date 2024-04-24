@@ -46,11 +46,11 @@ const ReceiveModal = ({
             style={{
               display: 'flex',
               flexDirection: 'column',
-              rowGap: '8px',
+              rowGap: '16px',
               position: 'relative',
               justifyContent: 'center',
               alignItems: 'center',
-              background: '#626060',
+              background: '#141417',
               padding: '16px',
               width: 'fit-content',
             }}
@@ -58,6 +58,7 @@ const ReceiveModal = ({
             <CrossIcon
               onClick={() => setIsReceiveModalOpen(false)}
               style={{
+                color: '#fff',
                 cursor: 'pointer',
                 position: 'absolute',
                 top: 20,
@@ -69,7 +70,7 @@ const ReceiveModal = ({
             <Typography color="#fff" size={24}>
               Receive BTC
             </Typography>
-            <QRCode style={{ padding: '8px' }} value={btcAddress} />
+            <QRCode style={{ border: '4px solid #fff' }} value={btcAddress} />
             <Copyable>{btcAddress}</Copyable>
           </div>
         </Modal>

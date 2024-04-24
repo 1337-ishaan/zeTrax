@@ -1,5 +1,7 @@
 import styled from 'styled-components/macro';
 import { ReactComponent as CopyIcon } from '../../assets/copy.svg';
+import { ReactComponent as CheckIcon } from '../../assets/check.svg';
+import { useState } from 'react';
 
 const CopyableWrapper = styled.div`
   background: rgba(0, 0, 0, 0.2);
@@ -23,14 +25,27 @@ interface CopyableProps {
 }
 
 const Copyable = ({ children }: CopyableProps): JSX.Element => {
+  const [isCopying, setIsCopying] = useState(false);
+
   const copy = () => {
-    navigator.clipboard.writeText(children);
-    window.alert('Copied');
+    try {
+      setIsCopying(true);
+      navigator.clipboard.writeText(children);
+    } catch {
+      setIsCopying(false);
+    } finally {
+      setTimeout(() => setIsCopying(false), 1000);
+    }
   };
 
   return (
     <CopyableWrapper onClick={copy}>
-      {children} &nbsp; <CopyIcon className="copy-icon" />
+      {children} &nbsp;
+      {isCopying ? (
+        <CheckIcon className="copy-icon" />
+      ) : (
+        <CopyIcon className="copy-icon" />
+      )}
     </CopyableWrapper>
   );
 };
