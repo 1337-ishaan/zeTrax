@@ -6,18 +6,18 @@ import TrxRow from './TrxRow';
 import useAccount from '../../hooks/useAccount';
 import { ReactComponent as RefreshIcon } from '../../assets/refresh.svg';
 import Loader from '../utils/Loader';
+import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 
 const TrxHistoryWrapper = styled.div`
   a {
     color: white;
   }
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: ${(props) => props.theme.colors.dark?.default};
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
-  width: 100%;
   color: #dadada;
   padding: 32px;
   height: 55vh;
+  width: 41%;
   overflow-y: auto;
   .accordion__button {
     background-color: transparent !important;
@@ -29,7 +29,6 @@ const TrxHistoryWrapper = styled.div`
     border: none;
   }
   .flex-row {
-    display: flex;
     justify-content: space-between;
   }
   .refresh-icon {
@@ -68,13 +67,13 @@ const TrxHistory = (_: TrxHistoryInterface) => {
 
   return (
     <TrxHistoryWrapper>
-      <div className="flex-row">
+      <FlexRowWrapper className="flex-row">
         <Typography>Transactions</Typography>
         <RefreshIcon
           className="refresh-icon"
           onClick={() => setIsRefetched(true)}
         />
-      </div>
+      </FlexRowWrapper>
 
       {isRefetched ? (
         <div>

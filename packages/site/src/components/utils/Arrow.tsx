@@ -5,11 +5,9 @@ const ArrowWrapper = styled(ArrowIcon)<{ isReceived: boolean }>`
   transform: ${(props) => (props.isReceived ? 'rotateZ(180deg)' : 'unset')};
   height: 28px;
   padding: 4px;
-
-  /* background: #eee; */
   border-radius: 12px;
   width: 28px;
-  color: ${(props) => (props.isReceived ? 'green' : 'red')};
+  color: ${(props) => (props.isReceived ? '#008462' : 'red')};
 `;
 
 interface ArrowProps {

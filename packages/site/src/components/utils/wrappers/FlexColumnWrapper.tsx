@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const FlexColumnWrapper = styled.div`
-  width: 100%;
+  width: fit-content;
   height: auto;
   display: flex;
   flex-direction: column;

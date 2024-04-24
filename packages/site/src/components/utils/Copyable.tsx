@@ -4,9 +4,10 @@ import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import { useState } from 'react';
 
 const CopyableWrapper = styled.div`
-  background: rgba(0, 0, 0, 0.2);
-  padding: 4px 8px;
+  background: rgba(0, 0, 0, 1);
+  padding: 6px 8px;
   border-radius: 8px;
+
   cursor: pointer;
   font-size: 14px;
   margin-top: 4px;

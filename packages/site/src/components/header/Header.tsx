@@ -13,14 +13,12 @@ import Copyable from '../utils/Copyable';
 import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { MetaMaskContext } from '../../hooks';
-import Typography from '../utils/Typography';
-import Balances from '../balances/Balances';
 
 const HeaderWrapper = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 40px;
+  padding: 32px 0;
   .connect-wallet-wrapper {
     display: flex;
     flex-direction: column;

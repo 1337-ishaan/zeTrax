@@ -14,16 +14,20 @@ import {
 import CctxItem from './CctxItem';
 import { useEffect, useState } from 'react';
 import Typography from '../utils/Typography';
+import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
+import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 
-const TrxRowWrapper = styled.div`
-  display: flex;
+const TrxRowWrapper = styled(FlexRowWrapper)`
   align-items: center;
   column-gap: 12px;
   width: fit-content;
   .info-column {
-    display: flex;
-    font-size: 16px;
-    flex-direction: column;
+    row-gap: 4px;
+  }
+  .redirect-icon {
+    width: 16px;
+    height: 16px;
   }
 `;
 
@@ -58,18 +62,15 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
         <AccordionItemHeading>
           <AccordionItemButton>
             <TrxRowWrapper>
-              {/* <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`https://mempool.space/testnet/tx/${trx.hash}`}
-                > */}
               <div>
                 <Arrow isReceived={!isSent} />
               </div>
-              <div className="info-column">
-                <div>{isSent ? 'Sent' : 'Received'}</div>
-                <div>
-                  BTC hash:{' '}
+              <FlexColumnWrapper className="info-column">
+                <Typography size={16} color={isSent ? 'red' : '#008462'}>
+                  {isSent ? 'Sent' : 'Received'}
+                </Typography>
+                <Typography size={16}>
+                  BTC trx hash:{' '}
                   <a
                     className=""
                     href={`https://mempool.space/testnet/tx/${trx.hash}`}
@@ -77,17 +78,23 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                     rel="noopener noreferrer"
                   >
                     {trimHexAddress(trx.hash)}
+                    <RedirectIcon className="redirect-icon" />
                   </a>
-                  {/* From:{' '}
-                  {trimHexAddress('0x70991c20c7C4e0021Ef0Bd3685876cC3aC5251F0')} */}
-                </div>
-              </div>
-              <div className="info-column">
+                </Typography>
+              </FlexColumnWrapper>
+              <FlexColumnWrapper className="info-column">
                 {' '}
-                <div>{(amount / 1e8).toFixed(5)} BTC</div>
-                <div>Confirmations: {trx.confirmations}</div>
-              </div>
-              {/* </a> */}
+                <Typography size={16} color={!isSent ? '#008462' : 'red'}>
+                  {isSent ? '-' : '+'}
+                  {(amount / 1e8).toFixed(5)} BTC{' '}
+                </Typography>
+                <Typography
+                  size={16}
+                  color={trx.confirmations > 6 ? '#008462' : 'yellow'}
+                >
+                  {trx.confirmations > 6 ? 'Confirmed' : 'Processing'}
+                </Typography>
+              </FlexColumnWrapper>
             </TrxRowWrapper>
           </AccordionItemButton>
         </AccordionItemHeading>
