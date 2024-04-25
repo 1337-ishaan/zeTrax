@@ -16,6 +16,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   const [balance, setBalance] = useState<any>({});
   const [zetaBalance, setZetaBalance] = useState<any>({});
 
+  console.log(balance, 'balance');
   useEffect(() => {
     if (state.installedSnap || btcAddress) {
       const getBalance = async () => {

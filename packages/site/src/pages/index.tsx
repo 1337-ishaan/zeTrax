@@ -12,6 +12,7 @@ import Transact from '../components/transact';
 import { ReactComponent as Logo } from '../assets/logo.svg';
 import Balances from '../components/balances/Balances';
 import FlexColumnWrapper from '../components/utils/wrappers/FlexColumnWrapper';
+import Disconnected from '../components/screen/Disconnected';
 
 const AppWrapper = styled.div`
   padding: 24px 48px;
@@ -51,7 +52,7 @@ const Index = () => {
           <TrxHistory />
         </div>
       ) : (
-        'Loading'
+        <Disconnected />
       )}
     </AppWrapper>
   );
