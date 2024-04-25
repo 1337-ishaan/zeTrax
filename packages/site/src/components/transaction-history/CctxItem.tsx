@@ -8,12 +8,14 @@ import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
+import InfoBox from '../utils/InfoBox';
 
 const CctxItemWrapper = styled(FlexColumnWrapper)`
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
   row-gap: 8px;
   padding: 20px;
   border-radius: 12px;
+  width: 100%;
   a {
     color: #eee;
     font-size: 16px;
@@ -79,11 +81,11 @@ const CctxItem = ({ cctx }: CctxItemProps): JSX.Element => {
 
       <Typography size={14}>
         Amount:&nbsp;
-        {parseFloat('' + cctx.inbound_tx_params.amount / 1e18).toFixed(18)} ZETA
+        {parseFloat('' + cctx.inbound_tx_params.amount / 1e8).toFixed(8)} tBTC
       </Typography>
 
-      <FlexRowWrapper className="flex-row">
-        <Typography size={14}>
+      {/* <FlexRowWrapper className="flex-row"> */}
+      {/* <Typography size={14}>
           <>
             Sender:{' '}
             <a
@@ -94,14 +96,18 @@ const CctxItem = ({ cctx }: CctxItemProps): JSX.Element => {
               <RedirectIcon className="redirect-icon" />
             </a>
           </>
-        </Typography>
-      </FlexRowWrapper>
+        </Typography> */}
+      {/* </FlexRowWrapper> */}
 
       <FlexRowWrapper className="flex-row">
-        <Typography size={14} color="#fff">
+        <Typography size={14} color="#bed837">
           CCTX Status: {cctx?.inbound_tx_params?.tx_finalization_status}
         </Typography>
       </FlexRowWrapper>
+      <InfoBox>
+        All transaction are processed through ZetaChain, to view more details
+        visit ZetaScan (Trx Hash)
+      </InfoBox>
       {/* <FlexRowWrapper className="flex-row">
         <Typography size={12} color="#4e4">
           Message: {cctx?.cctx_status?.status_message}

@@ -39,36 +39,21 @@ const Balances = ({}: BalancesProps): JSX.Element => {
 
   return (
     <BalancesWrapper>
-      <Typography>Balances</Typography>
+      <Typography size={24}>Balances</Typography>
       <br />
-      <div>
-        <div>
-          <Typography className="addr-type">
-            BTC: {balance?.balance / 1e8} BTC
-          </Typography>
-          <div className="address-text">
-            {btcAddress ? (
-              <>
-                <Copyable>{btcAddress}</Copyable>
-              </>
-            ) : (
-              'Derive BTC address'
-            )}
-          </div>
-        </div>
-        <br />
-        <div>
-          <Typography className="addr-type">
-            <>
-              EVM: {/* <Typography className="balance-text"> */}
-              {(zetaBalance?.amount / 1e18).toFixed(8)}{' '}
-              {zetaBalance?.denom?.toUpperCase()}
-            </>
-          </Typography>
-        </div>
-        <div className="address-text">
-          {address ? <Copyable>{address}</Copyable> : 'Connect Snap'}
-        </div>
+      <Typography className="addr-type">
+        BTC: {balance?.balance / 1e8} BTC
+      </Typography>
+      <div className="address-text">
+        {btcAddress ? <Copyable>{btcAddress}</Copyable> : 'Derive BTC address'}
+      </div>
+      <br />
+      <Typography className="addr-type">
+        EVM: {(zetaBalance?.amount / 1e18).toFixed(8)}{' '}
+        {zetaBalance?.denom?.toUpperCase()}
+      </Typography>
+      <div className="address-text">
+        {address ? <Copyable>{address}</Copyable> : 'Connect Snap'}
       </div>
     </BalancesWrapper>
   );

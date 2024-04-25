@@ -16,7 +16,7 @@ const InfoBoxWrapper = styled.div`
 `;
 
 interface InfoBoxProps {
-  children: string;
+  children: any;
 }
 
 const InfoBox = ({ children }: InfoBoxProps): JSX.Element => {

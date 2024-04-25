@@ -27,6 +27,7 @@ const SendWrapper = styled.div`
   .inputs-wrapper {
     color: white;
     row-gap: 12px;
+    width: 100%;
   }
   .dropdown-item {
     padding: 10px;
@@ -34,7 +35,7 @@ const SendWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(0, 0, 0, 1);
+    background-color: ${(props) => props.theme.colors.background!.default};
     .icon-symbol-wrapper {
       display: flex;
       align-items: center;
@@ -52,7 +53,6 @@ const SendWrapper = styled.div`
     border: none !important;
   }
   .gas-wrapper {
-    display: flex;
     column-gap: 8px;
     justify-content: end;
     .icon {
@@ -74,14 +74,22 @@ const Send = ({}: SendProps): JSX.Element => {
   const [selectedZrc20, setSelectedZrc20] = useState<any>('');
   const [amount, setAmount] = useState(0);
   const [recipentAddress, setRecipentAddress] = useState<any>('');
+  const [isTrxProcessing, setIsTrxProcessing] = useState(false);
 
   const sendTrx = async () => {
-    await transferBtc(
-      recipentAddress!,
-      selectedZrc20.zrc20_contract_address,
-      amount,
-      address as string,
-    );
+    setIsTrxProcessing(true);
+    try {
+      await transferBtc(
+        recipentAddress!,
+        selectedZrc20.zrc20_contract_address,
+        amount,
+        address as string,
+      );
+    } catch {
+      setIsTrxProcessing(true);
+    } finally {
+      setIsTrxProcessing(true);
+    }
   };
 
   const getZrc20Assets = async () => {
@@ -116,13 +124,13 @@ const Send = ({}: SendProps): JSX.Element => {
       <FlexRowWrapper className="transfer-types-wrapper">
         <Typography
           onClick={() => setCurrentActive('zeta')}
-          color={currentActive === 'zeta' ? 'fff' : '#b1cfc1'}
+          color={currentActive === 'zeta' ? '#fff' : '#b1cfc1'}
         >
           Deposit to ZetaChain
         </Typography>
         <Typography
           onClick={() => setCurrentActive('cctx')}
-          color={currentActive === 'cctx' ? 'fff' : '#b1cfc1'}
+          color={currentActive === 'cctx' ? '#fff' : '#b1cfc1'}
         >
           Cross Chain
         </Typography>
@@ -166,11 +174,18 @@ const Send = ({}: SendProps): JSX.Element => {
           : 'Cross chain transfer BTC to ZetaChain either to specified recipent address, if recipent address is not mentioned the assets will be transferred to connected wallet address'}
       </InfoBox>
 
-      <div className="gas-wrapper">
+      <FlexRowWrapper className="gas-wrapper">
         <GasIcon className="icon" /> Fees :
         <span className="amount">12 zeta</span>
-      </div>
-      <StyledButton onClick={sendTrx}>Send</StyledButton>
+      </FlexRowWrapper>
+      <StyledButton
+        disabled={
+          currentActive === 'zeta' ? !amount : !amount || !selectedZrc20
+        }
+        onClick={sendTrx}
+      >
+        {isTrxProcessing ? 'Sending...' : 'Send'}
+      </StyledButton>
     </SendWrapper>
   );
 };

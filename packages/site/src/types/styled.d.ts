@@ -15,5 +15,6 @@ declare module 'styled-components' {
     radii: Record<string, string>;
     shadows: Record<string, string>;
     colors: Record<string, Record<string, string>>;
+    borderRadius: string;
   }
 }

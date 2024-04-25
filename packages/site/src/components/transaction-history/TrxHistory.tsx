@@ -19,6 +19,8 @@ const TrxHistoryWrapper = styled.div`
   height: 55vh;
   width: 41%;
   overflow-y: auto;
+  border-radius: ${(props) => props.theme.borderRadius};
+
   .accordion__button {
     background-color: transparent !important;
     color: white;

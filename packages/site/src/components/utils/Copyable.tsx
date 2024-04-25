@@ -2,6 +2,7 @@ import styled from 'styled-components/macro';
 import { ReactComponent as CopyIcon } from '../../assets/copy.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const CopyableWrapper = styled.div`
   background: rgba(0, 0, 0, 1);
@@ -15,6 +16,7 @@ const CopyableWrapper = styled.div`
   color: #fff;
   display: flex;
   align-items: center;
+  border-radius: ${(props) => props.theme.borderRadius};
   .copy-icon {
     width: 16px;
     height: 16px;

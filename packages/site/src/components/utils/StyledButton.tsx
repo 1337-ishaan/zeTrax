@@ -2,8 +2,10 @@ import styled from 'styled-components';
 
 const StyledButtonWrapper = styled.button`
   border: none;
+  border-radius: ${(props) => props.theme.borderRadius};
+  background: ${(props) => props.theme.colors};
+
   &:hover {
-    background: white;
   }
 `;
 

@@ -1,18 +1,10 @@
+import { useContext } from 'react';
 import styled from 'styled-components/macro';
-import StyledButton from '../utils/StyledButton';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
-import {
-  connectSnap,
-  createBtcWallet,
-  getBtcUtxo,
-  getWalletInfo,
-  getZetaBalance,
-} from '../../utils';
-import useAccount from '../../hooks/useAccount';
-import Copyable from '../utils/Copyable';
-import { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 import { MetaMaskContext } from '../../hooks';
+import useAccount from '../../hooks/useAccount';
+import { connectSnap, createBtcWallet } from '../../utils';
+import StyledButton from '../utils/StyledButton';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -55,12 +47,27 @@ const Header = ({}: HeaderProps): JSX.Element => {
     await createBtcWallet();
   };
 
+  const onDisconnectSnap = async () => {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_revokePermissions',
+        params: [
+          {
+            eth_accounts: {},
+          },
+        ],
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <HeaderWrapper>
       <Logo className="logo" />
       <div className="connect-wallet-wrapper">
         {state.installedSnap || address ? (
-          <StyledButton onClick={onConnectSnap}>Disconnect</StyledButton> // TODO: Add disconnection logic
+          <StyledButton onClick={onDisconnectSnap}>Disconnect</StyledButton> // TODO: Add disconnection logic
         ) : (
           <StyledButton onClick={onConnectSnap}>Install zeTrax</StyledButton>
         )}

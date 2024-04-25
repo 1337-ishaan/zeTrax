@@ -7,7 +7,7 @@ const ArrowWrapper = styled(ArrowIcon)<{ isReceived: boolean }>`
   padding: 4px;
   border-radius: 12px;
   width: 28px;
-  color: ${(props) => (props.isReceived ? '#008462' : 'red')};
+  color: ${(props) => (props.isReceived ? '#008462' : '#ff4a3d')};
 `;
 
 interface ArrowProps {

@@ -17,8 +17,14 @@ const TransactWrapper = styled(FlexRowWrapper)`
     min-width: 80px;
     padding: 24px;
     cursor: pointer;
+    border-radius: ${(props) => props.theme.borderRadius};
+    transition: all 0.3s;
+
     &:hover {
+      transform: scale(1.2);
       border: 1px solid #fff;
+      transition: all 0.3s;
+      box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
     }
   }
 `;

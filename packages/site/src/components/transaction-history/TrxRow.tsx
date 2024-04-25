@@ -66,7 +66,7 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                 <Arrow isReceived={!isSent} />
               </div>
               <FlexColumnWrapper className="info-column">
-                <Typography size={16} color={isSent ? 'red' : '#008462'}>
+                <Typography size={16} color={isSent ? '#ff4a3d' : '#008462'}>
                   {isSent ? 'Sent' : 'Received'}
                 </Typography>
                 <Typography size={16}>
@@ -84,7 +84,7 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
               </FlexColumnWrapper>
               <FlexColumnWrapper className="info-column">
                 {' '}
-                <Typography size={16} color={!isSent ? '#008462' : 'red'}>
+                <Typography size={16} color={!isSent ? '#008462' : '#ff4a3d'}>
                   {isSent ? '-' : '+'}
                   {(amount / 1e8).toFixed(5)} BTC{' '}
                 </Typography>
