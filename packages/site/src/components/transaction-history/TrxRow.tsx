@@ -92,7 +92,9 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                   size={16}
                   color={trx.confirmations > 6 ? '#008462' : 'yellow'}
                 >
-                  {trx.confirmations > 6 ? 'Confirmed' : 'Processing'}
+                  {trx.confirmations > 6
+                    ? 'Confirmed'
+                    : trx.confirmations + ' confirmations'}
                 </Typography>
               </FlexColumnWrapper>
             </TrxRowWrapper>

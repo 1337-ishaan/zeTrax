@@ -108,9 +108,9 @@ const Send = ({}: SendProps): JSX.Element => {
   const [amount, setAmount] = useState(0);
   const [recipentAddress, setRecipentAddress] = useState<any>('');
   const [isTrxProcessing, setIsTrxProcessing] = useState(false);
-  const [selectedGasPriority, setSelectedGasPriority] = useState<
-    'low' | 'medium' | 'high'
-  >('low');
+  // const [selectedGasPriority, setSelectedGasPriority] = useState<
+  //   'low' | 'medium' | 'high'
+  // >('low');
 
   const sendTrx = async () => {
     setIsTrxProcessing(true);
@@ -123,7 +123,6 @@ const Send = ({}: SendProps): JSX.Element => {
         selectedZrc20.zrc20_contract_address,
         amount,
         address as string,
-        selectedGasPriority,
       );
     } catch (e) {
       setIsTrxProcessing(true);
