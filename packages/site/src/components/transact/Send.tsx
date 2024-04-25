@@ -13,6 +13,7 @@ import { ReactComponent as GasIcon } from '../../assets/gas.svg';
 import InfoBox from '../utils/InfoBox';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import { toast } from 'react-toastify';
 
 const SendWrapper = styled.div`
   display: flex;
@@ -62,6 +63,38 @@ const SendWrapper = styled.div`
       font-size: 16px;
     }
   }
+
+  .priority-wrapper {
+    justify-content: space-evenly;
+    border-radius: ${(props) => props.theme.borderRadius};
+    border: 1px solid white;
+    padding: 12px;
+    width: 94%;
+    margin: auto;
+    column-gap: 8px;
+
+    .priority-item {
+      row-gap: 8px;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      width: 100%;
+      padding: 4px 8px;
+      border-radius: ${(props) => props.theme.borderRadius};
+
+      &:hover {
+        background: rgba(44, 43, 43, 0.892);
+      }
+      &.selected {
+        background: rgba(54, 54, 54, 92);
+      }
+    }
+    .vertical-divider {
+      height: 50px;
+      width: 1px;
+      background-color: #ffffff4e;
+    }
+  }
 `;
 
 interface SendProps {}
@@ -75,18 +108,28 @@ const Send = ({}: SendProps): JSX.Element => {
   const [amount, setAmount] = useState(0);
   const [recipentAddress, setRecipentAddress] = useState<any>('');
   const [isTrxProcessing, setIsTrxProcessing] = useState(false);
+  const [selectedGasPriority, setSelectedGasPriority] = useState<
+    'low' | 'medium' | 'high'
+  >('low');
 
   const sendTrx = async () => {
     setIsTrxProcessing(true);
+    toast('Processing...', {
+      hideProgressBar: false,
+    });
     try {
       await transferBtc(
         recipentAddress!,
         selectedZrc20.zrc20_contract_address,
         amount,
         address as string,
+        selectedGasPriority,
       );
-    } catch {
+    } catch (e) {
       setIsTrxProcessing(true);
+      toast(`Error: ${e}`, {
+        hideProgressBar: false,
+      });
     } finally {
       setIsTrxProcessing(true);
     }
@@ -118,7 +161,6 @@ const Send = ({}: SendProps): JSX.Element => {
     </div>
   );
 
-  console.log(selectedZrc20, 'selected');
   return (
     <SendWrapper>
       <FlexRowWrapper className="transfer-types-wrapper">
@@ -174,9 +216,49 @@ const Send = ({}: SendProps): JSX.Element => {
           : 'Cross chain transfer BTC to ZetaChain either to specified recipent address, if recipent address is not mentioned the assets will be transferred to connected wallet address'}
       </InfoBox>
 
+      {/* <FlexRowWrapper className="priority-wrapper">
+        <FlexColumnWrapper
+          onClick={() => setSelectedGasPriority('low')}
+          className={`priority-item ${
+            selectedGasPriority === 'low' && 'selected'
+          }`}
+        >
+          <Typography color="#ff4a3d" size={16}>
+            Low
+          </Typography>
+          <div>1</div>
+        </FlexColumnWrapper>
+        <div className="vertical-divider" />
+        <FlexColumnWrapper
+          className={`priority-item ${
+            selectedGasPriority === 'medium' && 'selected'
+          }`}
+          onClick={() => setSelectedGasPriority('medium')}
+        >
+          <Typography color="#eded4c" size={16}>
+            Medium
+          </Typography>
+          <div>1</div>
+        </FlexColumnWrapper>
+        <div className="vertical-divider" />
+
+        <FlexColumnWrapper
+          className={`priority-item ${
+            selectedGasPriority === 'high' && 'selected'
+          }`}
+          onClick={() => setSelectedGasPriority('high')}
+        >
+          <Typography color="#008462" size={16}>
+            High
+          </Typography>
+
+          <div>1</div>
+        </FlexColumnWrapper>
+      </FlexRowWrapper> */}
+
       <FlexRowWrapper className="gas-wrapper">
         <GasIcon className="icon" /> Fees :
-        <span className="amount">12 zeta</span>
+        <span className="amount">~10000 sats</span>
       </FlexRowWrapper>
       <StyledButton
         disabled={

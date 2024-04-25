@@ -104,6 +104,7 @@ export const createBtcTestnetAddr = async () => {
 
 export const getBtcDepositFees = async () => {
   const feePerKb = await getFees();
+  // DepositFee = AverageFeeRateBlockX * GasPriceMultiplier * DepositIncurredVBytes
   return feePerKb.high_fee_per_kb * 2 * 68;
 };
 

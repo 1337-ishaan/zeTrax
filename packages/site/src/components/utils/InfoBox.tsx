@@ -4,7 +4,8 @@ import { ReactComponent as InfoIcon } from '../../assets/info.svg';
 const InfoBoxWrapper = styled.div`
   padding: 8px;
   background: rgba(255, 255, 0, 0.3);
-  border-radius: 4px;
+  border-radius: ${(props) => props.theme.borderRadius};
+
   display: flex;
   align-items: center;
   column-gap: 8px;
