@@ -3,7 +3,7 @@ import StyledInput from '../utils/StyledInput';
 import Typography from '../utils/Typography';
 import { useEffect, useState } from 'react';
 import StyledButton from '../utils/StyledButton';
-import { transferBtc } from '../../utils/snap';
+import { getBtcFees, transferBtc } from '../../utils/snap';
 import useAccount from '../../hooks/useAccount';
 import Select from 'react-dropdown-select';
 import axios from 'axios';
@@ -108,9 +108,11 @@ const Send = ({}: SendProps): JSX.Element => {
   const [amount, setAmount] = useState(0);
   const [recipentAddress, setRecipentAddress] = useState<any>('');
   const [isTrxProcessing, setIsTrxProcessing] = useState(false);
-  // const [selectedGasPriority, setSelectedGasPriority] = useState<
-  //   'low' | 'medium' | 'high'
-  // >('low');
+  const [selectedGasPriority, setSelectedGasPriority] = useState<
+    'low' | 'medium' | 'high'
+  >('low');
+
+  const [depositFees, setDepositFees] = useState<any>();
 
   const sendTrx = async () => {
     setIsTrxProcessing(true);
@@ -123,10 +125,11 @@ const Send = ({}: SendProps): JSX.Element => {
         selectedZrc20.zrc20_contract_address,
         amount,
         address as string,
+        selectedGasPriority,
       );
-    } catch (e) {
+    } catch (e: any) {
       setIsTrxProcessing(true);
-      toast(`Error: ${e}`, {
+      toast(`Error: ${e?.message}`, {
         hideProgressBar: false,
       });
     } finally {
@@ -144,6 +147,17 @@ const Send = ({}: SendProps): JSX.Element => {
 
   useEffect(() => {
     getZrc20Assets();
+  }, []);
+
+  useEffect(() => {
+    if (!depositFees) {
+      const getFees = async () => {
+        let fees: any = await getBtcFees();
+        setDepositFees(fees);
+      };
+      getFees();
+      return () => {};
+    }
   }, []);
 
   const CustomItemRenderer = ({ option }: any) => (
@@ -215,7 +229,7 @@ const Send = ({}: SendProps): JSX.Element => {
           : 'Cross chain transfer BTC to ZetaChain either to specified recipent address, if recipent address is not mentioned the assets will be transferred to connected wallet address'}
       </InfoBox>
 
-      {/* <FlexRowWrapper className="priority-wrapper">
+      <FlexRowWrapper className="priority-wrapper">
         <FlexColumnWrapper
           onClick={() => setSelectedGasPriority('low')}
           className={`priority-item ${
@@ -225,7 +239,9 @@ const Send = ({}: SendProps): JSX.Element => {
           <Typography color="#ff4a3d" size={16}>
             Low
           </Typography>
-          <div>1</div>
+          <Typography color="#ff4a3d" size={14}>
+            ~{depositFees?.low_fee_per_kb} sats
+          </Typography>
         </FlexColumnWrapper>
         <div className="vertical-divider" />
         <FlexColumnWrapper
@@ -237,7 +253,9 @@ const Send = ({}: SendProps): JSX.Element => {
           <Typography color="#eded4c" size={16}>
             Medium
           </Typography>
-          <div>1</div>
+          <Typography color="#eded4c" size={14}>
+            ~{depositFees?.medium_fee_per_kb} sats
+          </Typography>
         </FlexColumnWrapper>
         <div className="vertical-divider" />
 
@@ -250,10 +268,11 @@ const Send = ({}: SendProps): JSX.Element => {
           <Typography color="#008462" size={16}>
             High
           </Typography>
-
-          <div>1</div>
+          <Typography color="#008462" size={14}>
+            ~{depositFees?.high_fee_per_kb} sats
+          </Typography>{' '}
         </FlexColumnWrapper>
-      </FlexRowWrapper> */}
+      </FlexRowWrapper>
 
       <FlexRowWrapper className="gas-wrapper">
         <GasIcon className="icon" /> Fees :

@@ -9,6 +9,8 @@ import {
   crossChainSwapBtc,
   trackCctxTx,
   getZetaBalance,
+  getBtcDepositFees,
+  getFees,
 } from './functions';
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -35,6 +37,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getBtcUtxo();
     case 'get-btc-trxs':
       return getBtcTrxs();
+    case 'get-deposit-fees':
+      return getFees();
     case 'get-zeta-balance':
       return getZetaBalance(request);
     case 'crosschain-swap-btc':

@@ -29,6 +29,9 @@ const TrxRowWrapper = styled(FlexRowWrapper)`
     width: 16px;
     height: 16px;
   }
+  .amount-status-wrapper {
+    align-items: end;
+  }
 `;
 
 interface TrxRowProps {
@@ -69,7 +72,7 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                 <Typography size={16} color={isSent ? '#ff4a3d' : '#008462'}>
                   {isSent ? 'Sent' : 'Received'}
                 </Typography>
-                <Typography size={16}>
+                <Typography size={14}>
                   BTC trx hash:{' '}
                   <a
                     className=""
@@ -82,19 +85,19 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                   </a>
                 </Typography>
               </FlexColumnWrapper>
-              <FlexColumnWrapper className="info-column">
+              <FlexColumnWrapper className="info-column amount-status-wrapper">
                 {' '}
                 <Typography size={16} color={!isSent ? '#008462' : '#ff4a3d'}>
                   {isSent ? '-' : '+'}
                   {(amount / 1e8).toFixed(5)} BTC{' '}
                 </Typography>
                 <Typography
-                  size={16}
+                  size={14}
                   color={trx.confirmations > 6 ? '#008462' : 'yellow'}
                 >
                   {trx.confirmations > 6
                     ? 'Confirmed'
-                    : trx.confirmations + ' confirmations'}
+                    : `${trx.confirmations} confirmations`}
                 </Typography>
               </FlexColumnWrapper>
             </TrxRowWrapper>

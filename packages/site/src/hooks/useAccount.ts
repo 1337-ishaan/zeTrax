@@ -11,7 +11,7 @@ const useAccount = (isSnapInstalled = false) => {
   const provider = new ethers.BrowserProvider(window.ethereum);
 
   useEffect(() => {
-    if (!!isSnapInstalled && !btcAddress && !address) {
+    if (isSnapInstalled && !btcAddress && !address) {
       const getAddresses: any = async () => {
         const derivedBtcAddress: any = await createBtcWallet();
         const connectedAddress = await provider.getSigner();
@@ -22,7 +22,7 @@ const useAccount = (isSnapInstalled = false) => {
 
       getAddresses();
     }
-  }, [address, btcAddress]);
+  }, [isSnapInstalled, address, btcAddress]);
 
   return { address, btcAddress, provider };
 };
