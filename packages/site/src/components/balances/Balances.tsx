@@ -38,13 +38,17 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       getZetaBal();
     }
   }, [state.installedSnap, address]);
+  console.log(balance, 'balance');
 
   return (
     <BalancesWrapper>
       <Typography size={24}>Balances</Typography>
       <br />
       <Typography className="addr-type">
-        BTC: {balance?.balance / 1e8} BTC
+        BTC: {(balance?.balance + balance?.unconfirmed_balance) / 1e8} BTC
+      </Typography>
+      <Typography className="addr-type" size={12} color="yellow">
+        Locked(Unconfirmed): {balance?.unconfirmed_balance / 1e8} BTC
       </Typography>
       <div className="address-text">
         {btcAddress ? <Copyable>{btcAddress}</Copyable> : 'Derive BTC address'}
