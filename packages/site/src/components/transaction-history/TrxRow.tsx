@@ -21,7 +21,6 @@ import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 const TrxRowWrapper = styled(FlexRowWrapper)`
   align-items: center;
   column-gap: 12px;
-  width: fit-content;
   .info-column {
     row-gap: 4px;
   }
@@ -30,7 +29,7 @@ const TrxRowWrapper = styled(FlexRowWrapper)`
     height: 16px;
   }
   .amount-status-wrapper {
-    align-items: end;
+    align-self: end;
   }
 `;
 
@@ -73,7 +72,7 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                   {isSent ? 'Sent' : 'Received'}
                 </Typography>
                 <Typography size={14}>
-                  BTC trx hash:{' '}
+                  BTC trx:{' '}
                   <a
                     className=""
                     href={`https://mempool.space/testnet/tx/${trx.hash}`}

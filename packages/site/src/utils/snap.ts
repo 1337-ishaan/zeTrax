@@ -149,8 +149,9 @@ export const sendBtc = async () => {
 export const transferBtc = async (
   recipentAddress: string,
   zrc20: string,
-  amount: string | number,
+  amount: number,
   address: string,
+  customMemo: string,
   gasPriority: 'low' | 'medium' | 'high',
 ) => {
   try {
@@ -185,7 +186,7 @@ export const transferBtc = async (
         snapId: defaultSnapOrigin,
         request: {
           method: 'crosschain-swap-btc',
-          params: [decAmount, memo, gasPriority],
+          params: [decAmount, !!customMemo ? customMemo : memo, gasPriority],
         },
       },
     });

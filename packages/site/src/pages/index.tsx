@@ -15,9 +15,10 @@ import FlexColumnWrapper from '../components/utils/wrappers/FlexColumnWrapper';
 import Disconnected from '../components/screen/Disconnected';
 
 const AppWrapper = styled.div`
-  padding: 24px 48px;
+  padding: 24px 26px;
   .flex {
     display: flex;
+
     justify-content: space-between;
   }
   .float-logo {
@@ -29,7 +30,8 @@ const AppWrapper = styled.div`
     z-index: -1;
   }
   .balances-transact-wrapper {
-    gap: 64px;
+    column-gap: 64px;
+    row-gap: 24px;
   }
 `;
 
@@ -46,8 +48,8 @@ const Index = () => {
       {state.installedSnap ? (
         <div className="flex">
           <FlexColumnWrapper className="balances-transact-wrapper">
-            <Balances />
             <Transact />
+            <Balances />
           </FlexColumnWrapper>
           <TrxHistory />
         </div>

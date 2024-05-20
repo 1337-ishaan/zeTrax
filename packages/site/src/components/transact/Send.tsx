@@ -9,11 +9,13 @@ import Select from 'react-dropdown-select';
 import axios from 'axios';
 import { getChainIcon } from '../../constants/getChainIcon';
 import { ReactComponent as GasIcon } from '../../assets/gas.svg';
+import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 
 import InfoBox from '../utils/InfoBox';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import { toast } from 'react-toastify';
+import TooltipInfo from '../utils/TooltipInfo';
 
 const SendWrapper = styled.div`
   display: flex;
@@ -24,6 +26,7 @@ const SendWrapper = styled.div`
   height: fit-content;
   flex-direction: column;
   gap: 24px;
+  width: fit-content;
   background: ${(props) => props.theme.colors.background!.default};
   .inputs-wrapper {
     color: white;
@@ -95,6 +98,14 @@ const SendWrapper = styled.div`
       background-color: #ffffff4e;
     }
   }
+  .custom-tooltip-wrapper {
+    align-items: center;
+    column-gap: 8px;
+
+    .custom-memo-input {
+      flex: 1;
+    }
+  }
 `;
 
 interface SendProps {}
@@ -105,13 +116,13 @@ const Send = ({}: SendProps): JSX.Element => {
   const { address } = useAccount(true);
   const [zrc20Assets, setZrc20Assets] = useState<any>();
   const [selectedZrc20, setSelectedZrc20] = useState<any>('');
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState<any>(0);
   const [recipentAddress, setRecipentAddress] = useState<any>('');
   const [isTrxProcessing, setIsTrxProcessing] = useState(false);
   const [selectedGasPriority, setSelectedGasPriority] = useState<
     'low' | 'medium' | 'high'
   >('low');
-
+  const [customMemo, setCustomMemo] = useState('');
   const [depositFees, setDepositFees] = useState<any>();
 
   const sendTrx = async () => {
@@ -122,8 +133,10 @@ const Send = ({}: SendProps): JSX.Element => {
     try {
       await transferBtc(
         recipentAddress!,
+        customMemo,
         selectedZrc20.zrc20_contract_address,
-        amount,
+        //@ts-ignore,
+        +amount,
         address as string,
         selectedGasPriority,
       );
@@ -211,6 +224,7 @@ const Send = ({}: SendProps): JSX.Element => {
           placeholder="Select an option"
         />
       )}
+
       <FlexColumnWrapper className="inputs-wrapper">
         <StyledInput
           placeholder="Recipent Address (Optional)"
@@ -222,6 +236,34 @@ const Send = ({}: SendProps): JSX.Element => {
           min={0.00000000001}
           placeholder="Amount"
         />
+        {currentActive === 'cctx' ? (
+          <FlexRowWrapper className="custom-tooltip-wrapper">
+            <StyledInput
+              className="custom-memo-input"
+              onChange={(e: any) => setCustomMemo(e.target.value)}
+              type="string"
+              placeholder="Custom Memo"
+            />
+            <TooltipInfo placement="bottom">
+              Custom memo is a string in following format ↓
+              <Typography size={14}>
+                → Contract Address + Action Code + ZRC Contract Address +
+                Destination Address
+              </Typography>
+              <a
+                href="https://etherates-organization.gitbook.io/zetrax"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Typography size={12}>
+                  View more <RedirectIcon height={16} width={16} />
+                </Typography>
+              </a>
+            </TooltipInfo>
+          </FlexRowWrapper>
+        ) : (
+          <></>
+        )}
       </FlexColumnWrapper>
       <InfoBox>
         {currentActive === 'zeta'

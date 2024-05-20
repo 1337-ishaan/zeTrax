@@ -1,11 +1,16 @@
 import styled from 'styled-components/macro';
+import FlexRowWrapper from './wrappers/FlexWrapper';
 
-const TypographyWrapper = styled.div<{
+const TypographyWrapper = styled(FlexRowWrapper)<{
   color: string;
   size?: number | null;
   weight?: number | null;
 }>`
   font-weight: ${(props) => (props.weight ? props.weight : 600)};
+  display: flex;
+  column-gap: 8px;
+  align-items: center;
+  width: fit-content;
   color: ${(props) => props.color};
   cursor: pointer;
   font-size: ${(props) => (props.size ? props.size : '24')}px;

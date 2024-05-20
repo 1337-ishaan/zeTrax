@@ -10,9 +10,9 @@ import 'react-toastify/dist/ReactToastify.css';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 5% 160px;
-  box-shadow: 0px 0px 40px 16px rgba(0, 0, 0, 1);
-  border-radius: ${(props) => props.theme.borderRadius};
+  margin: 0 120px;
+  /* box-shadow: 0px 0px 40px 16px rgba(0, 0, 0, 1);
+  border-radius: ${(props) => props.theme.borderRadius}; */
 `;
 
 export type AppProps = {

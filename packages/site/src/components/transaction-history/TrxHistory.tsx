@@ -7,6 +7,7 @@ import useAccount from '../../hooks/useAccount';
 import { ReactComponent as RefreshIcon } from '../../assets/refresh.svg';
 import Loader from '../utils/Loader';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import TooltipInfo from '../utils/TooltipInfo';
 
 const TrxHistoryWrapper = styled.div`
   a {
@@ -15,9 +16,9 @@ const TrxHistoryWrapper = styled.div`
   background: ${(props) => props.theme.colors.dark?.default};
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
   color: #dadada;
-  padding: 32px;
-  height: 55vh;
-  width: 41%;
+  padding: 24px;
+  max-height: 72vh;
+
   overflow-y: auto;
   border-radius: ${(props) => props.theme.borderRadius};
 
@@ -70,7 +71,16 @@ const TrxHistory = (_: TrxHistoryInterface) => {
   return (
     <TrxHistoryWrapper>
       <FlexRowWrapper className="flex-row">
-        <Typography>Transactions</Typography>
+        <Typography>
+          Transactions
+          <TooltipInfo
+            children={
+              <Typography size={14} weight={500}>
+                Track your BTC transactions here ↓
+              </Typography>
+            }
+          />
+        </Typography>
         <RefreshIcon
           className="refresh-icon"
           onClick={() => setIsRefetched(true)}

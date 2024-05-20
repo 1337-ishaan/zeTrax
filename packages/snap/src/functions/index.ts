@@ -59,7 +59,6 @@ export const getWalletInfo = async () => {
       `https://rpc.ankr.com/http/zetachain_athens_testnet/cosmos/bank/v1beta1/balances/${zetaAddr}`,
     );
     const accAddr = await account.text();
-    console.log(accAddr, account);
     const result = await snap.request({
       method: 'snap_dialog',
       params: {
@@ -450,12 +449,17 @@ export const trackCctxTx = async (request: any) => {
 export const getZetaBalance = async (request: any) => {
   try {
     if (!!request.params[0]) {
-      let addr = convertToZeta(request.params[0]);
+      let address = convertToZeta(request.params[0]);
       const zeta = await fetch(
-        `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${addr}`,
+        `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
+      );
+      const nonZeta = await fetch(
+        `https://zetachain-athens-3.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
       );
       const zetaData = await zeta.text();
-      return JSON.parse(zetaData);
+      const nonZetaData = await nonZeta.text();
+
+      return { zeta: JSON.parse(zetaData), nonZeta: JSON.parse(nonZetaData) };
     }
   } catch (error) {
     throw error;
