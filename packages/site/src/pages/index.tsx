@@ -15,11 +15,11 @@ import FlexColumnWrapper from '../components/utils/wrappers/FlexColumnWrapper';
 import Disconnected from '../components/screen/Disconnected';
 
 const AppWrapper = styled.div`
-  padding: 24px 26px;
+  padding: 0px 26px;
   .flex {
     display: flex;
 
-    justify-content: space-between;
+    column-gap: 24px;
   }
   .float-logo {
     position: absolute;
@@ -31,6 +31,7 @@ const AppWrapper = styled.div`
   }
   .balances-transact-wrapper {
     column-gap: 64px;
+    width: 50%;
     row-gap: 24px;
   }
 `;
@@ -49,9 +50,9 @@ const Index = () => {
         <div className="flex">
           <FlexColumnWrapper className="balances-transact-wrapper">
             <Transact />
-            <Balances />
+            <TrxHistory />
           </FlexColumnWrapper>
-          <TrxHistory />
+          <Balances />
         </div>
       ) : (
         <Disconnected />

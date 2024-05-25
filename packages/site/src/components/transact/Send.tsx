@@ -108,9 +108,11 @@ const SendWrapper = styled.div`
   }
 `;
 
-interface SendProps {}
+interface SendProps {
+  setIsSendModalOpen?: any;
+}
 
-const Send = ({}: SendProps): JSX.Element => {
+const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   const [trxInput, setTrxInput] = useState<any>({});
   const [currentActive, setCurrentActive] = useState('zeta');
   const { address } = useAccount(true);
@@ -147,6 +149,7 @@ const Send = ({}: SendProps): JSX.Element => {
       });
     } finally {
       setIsTrxProcessing(true);
+      setIsSendModalOpen(false);
     }
   };
 

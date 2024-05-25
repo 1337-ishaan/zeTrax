@@ -17,7 +17,9 @@ const TrxHistoryWrapper = styled.div`
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
   color: #dadada;
   padding: 24px;
-  max-height: 72vh;
+  /* max-height: 77vh; */
+  height: 30%;
+  width: fit-content;
 
   overflow-y: auto;
   border-radius: ${(props) => props.theme.borderRadius};
@@ -48,7 +50,7 @@ const TrxHistory = (_: TrxHistoryInterface) => {
 
   React.useEffect(() => {
     const getBtcTrx = async () => {
-      if (btcTrx.length === 0 || isRefetched) {
+      if (btcTrx.length === 0) {
         try {
           const results: any = await getBtcUtxo();
           setBtcTrx(results);

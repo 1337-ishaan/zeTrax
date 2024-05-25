@@ -15,7 +15,6 @@ const TransactWrapper = styled(FlexColumnWrapper)`
   background: ${(props) => props.theme.colors.dark?.default};
   box-shadow: 0px 0px 21px 5px #000000;
   color: #dadada;
-  width: 85%;
   padding: 24px;
   overflow-y: auto;
   border-radius: ${(props) => props.theme.borderRadius};
@@ -26,8 +25,8 @@ const TransactWrapper = styled(FlexColumnWrapper)`
       flex-direction: column;
       align-items: center;
       border: 1px solid #eeeeee34;
-      height: 70px;
-      min-width: 80px;
+      height: fit-content;
+      min-width: 112px;
       padding: 24px;
       row-gap: 4px;
       cursor: pointer;
@@ -35,7 +34,7 @@ const TransactWrapper = styled(FlexColumnWrapper)`
       transition: all 0.3s;
 
       &:hover {
-        transform: scale(1.2);
+        transform: scale(1.1);
         border: 1px solid #fff;
         transition: all 0.3s;
         box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);

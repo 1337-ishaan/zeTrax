@@ -69,7 +69,7 @@ const renderActiveShape = (props: any) => {
         z={2}
         textAnchor={textAnchor}
         fill="#fff6f6"
-      >{`${value.toFixed(2)}`}</text>
+      >{`${value.toFixed(4)}`}</text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
@@ -93,17 +93,17 @@ const BalancePie = ({ data }: any) => {
   return (
     <ResponsiveContainer
       // style={{ border: '2px solid red' }}
-      width={400}
+      width={600}
       height={300}
     >
-      <PieChart width={800}>
+      <PieChart width={600}>
         <Pie
           activeIndex={activeIndex}
           activeShape={renderActiveShape}
           data={data}
-          innerRadius={40}
-          outerRadius={75}
-          cy={105}
+          innerRadius={50}
+          outerRadius={95}
+          cy={125}
           fill="#88d884aa"
           dataKey="value"
           onMouseEnter={onPieEnter}

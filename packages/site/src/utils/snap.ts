@@ -41,6 +41,21 @@ export const connectSnap = async (
   }
 };
 
+export const disconnectSnap = async () => {
+  try {
+    await window.ethereum.request({
+      method: 'wallet_revokePermissions',
+      params: [
+        {
+          eth_accounts: {},
+        },
+      ],
+    });
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 /**
  * Get the snap from MetaMask.
  *

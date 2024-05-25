@@ -19,6 +19,7 @@ import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 
 const TrxRowWrapper = styled(FlexRowWrapper)`
+  width: fit-content;
   align-items: center;
   column-gap: 12px;
   .info-column {

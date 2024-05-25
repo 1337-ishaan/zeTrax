@@ -45,7 +45,7 @@ const SendModal = ({
             left: 140,
           }}
         />
-        <Send />
+        <Send setIsSendModalOpen={setIsSendModalOpen} />
       </Modal>
     </SendModalWrapper>
   );

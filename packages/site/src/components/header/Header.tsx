@@ -3,7 +3,7 @@ import styled from 'styled-components/macro';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { MetaMaskContext } from '../../hooks';
 import useAccount from '../../hooks/useAccount';
-import { connectSnap, createBtcWallet } from '../../utils';
+import { connectSnap, createBtcWallet, disconnectSnap } from '../../utils';
 import StyledButton from '../utils/StyledButton';
 
 const HeaderWrapper = styled.header`
@@ -48,18 +48,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
   };
 
   const onDisconnectSnap = async () => {
-    try {
-      await window.ethereum.request({
-        method: 'wallet_revokePermissions',
-        params: [
-          {
-            eth_accounts: {},
-          },
-        ],
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    await disconnectSnap();
   };
 
   return (
