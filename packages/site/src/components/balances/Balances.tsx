@@ -211,7 +211,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
                   <td>
                     <Typography size={14}>
                       {t.label}
-                      {index === 0 ? (
+                      {t.label === 'BTC' ? (
                         <BtcIcon className="chain-icon" />
                       ) : (
                         <ZetaIcon className="chain-icon" />
