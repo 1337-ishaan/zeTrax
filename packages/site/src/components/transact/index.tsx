@@ -73,8 +73,8 @@ const Transact = () => {
         <TooltipInfo
           children={
             <Typography size={14} weight={500}>
-              Send/Deposit BTC to a ZetaChain wallet or Receive BTC to your
-              created BTC wallet
+              Send/Deposit BTC to a ZetaChain wallet <br />
+              or Receive BTC to your created BTC wallet
             </Typography>
           }
         />
@@ -91,20 +91,6 @@ const Transact = () => {
           <Arrow isReceived={true} />
           <Typography size={24}>Receive</Typography>
         </div>
-        {/* <div
-          className="user-action coming-soon"
-          onClick={() => setIsReceiveModalOpen(true)}
-        >
-          <TimeIcon className="time-icon" />
-          <Typography size={12}>Coming soon</Typography>
-        </div>{' '}
-        <div
-          className="user-action coming-soon"
-          onClick={() => setIsReceiveModalOpen(true)}
-        >
-          <TimeIcon className="time-icon" />
-          <Typography size={12}>Coming soon</Typography>
-        </div> */}
         <SendModal
           isSendModalOpen={isSendModalOpen}
           setIsSendModalOpen={setIsSendModalOpen}

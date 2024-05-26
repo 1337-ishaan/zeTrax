@@ -13,10 +13,13 @@ const useAccount = (isSnapInstalled = false) => {
   const getAddresses = useCallback(async () => {
     setLoading(true);
     try {
-      const derivedBtcAddress: any = await createBtcWallet();
-      const connectedAddress = await provider.getSigner();
-      setBtcAddress(derivedBtcAddress);
-      setAddress(connectedAddress.address);
+      if (!btcAddress) {
+        const derivedBtcAddress: any = await createBtcWallet();
+        const connectedAddress = await provider.getSigner();
+
+        setBtcAddress(derivedBtcAddress);
+        setAddress(connectedAddress.address);
+      }
     } catch (error) {
       console.error('Error getting addresses:', error);
     } finally {

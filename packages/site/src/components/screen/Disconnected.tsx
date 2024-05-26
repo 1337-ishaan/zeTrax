@@ -3,10 +3,7 @@ import Typography from '../utils/Typography';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 
 const DisconnectedWrapper = styled(FlexRowWrapper)`
-  /* border: 1px solid red; */
   min-height: 60vh;
-  /* margin: auto; */
-
   align-items: center;
   justify-content: center;
 `;

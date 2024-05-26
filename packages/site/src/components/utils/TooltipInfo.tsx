@@ -25,7 +25,7 @@ const TooltipInfo = ({
       showArrow={false}
       placement={placement}
       overlayInnerStyle={{
-        background: '#008462',
+        background: 'rgba(0, 132, 98,.4)',
         border: 'none',
         color: '#fff',
       }}

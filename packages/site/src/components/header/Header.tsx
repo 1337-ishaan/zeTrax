@@ -20,7 +20,6 @@ const HeaderWrapper = styled.header`
   }
   .address-text {
     font-size: 16px;
-    /* font-family: 'Sans'; */
   }
   .addr-type {
     font-size: 16px;

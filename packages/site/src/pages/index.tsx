@@ -13,15 +13,16 @@ import { ReactComponent as Logo } from '../assets/logo.svg';
 import Balances from '../components/balances/Balances';
 import FlexColumnWrapper from '../components/utils/wrappers/FlexColumnWrapper';
 import Disconnected from '../components/screen/Disconnected';
+import FlexRowWrapper from '../components/utils/wrappers/FlexWrapper';
 
 const AppWrapper = styled.div`
-  padding: 0px 26px;
-  .flex {
-    display: flex;
+  padding: 16px 32px;
 
+  .action-balances-wrapper {
     column-gap: 24px;
   }
-  .float-logo {
+
+  .page-bg-logo {
     position: absolute;
     width: 630px;
     top: 0;
@@ -29,7 +30,7 @@ const AppWrapper = styled.div`
     opacity: 0.1;
     z-index: -1;
   }
-  .balances-transact-wrapper {
+  .trx-transact-wrapper {
     column-gap: 64px;
     width: 50%;
     row-gap: 24px;
@@ -37,23 +38,24 @@ const AppWrapper = styled.div`
 `;
 
 const Index = () => {
-  const [state, dispatch] = useContext(MetaMaskContext);
+  const [state] = useContext(MetaMaskContext);
+
   const isMetaMaskReady = isLocalSnap(defaultSnapOrigin)
     ? state.isFlask
     : state.snapsDetected;
 
   return (
     <AppWrapper>
-      <Logo className="float-logo" />
-      {isMetaMaskReady ? <Header /> : <></>}
+      <Logo className="page-bg-logo" />
+      {isMetaMaskReady && <Header />}
       {state.installedSnap ? (
-        <div className="flex">
-          <FlexColumnWrapper className="balances-transact-wrapper">
+        <FlexRowWrapper className="action-balances-wrapper">
+          <FlexColumnWrapper className="trx-transact-wrapper">
             <Transact />
             <TrxHistory />
           </FlexColumnWrapper>
           <Balances />
-        </div>
+        </FlexRowWrapper>
       ) : (
         <Disconnected />
       )}

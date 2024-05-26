@@ -94,7 +94,7 @@ const BalancePie = ({ data }: any) => {
     <ResponsiveContainer
       // style={{ border: '2px solid red' }}
       width={600}
-      height={300}
+      height={262}
     >
       <PieChart width={600}>
         <Pie
@@ -102,8 +102,8 @@ const BalancePie = ({ data }: any) => {
           activeShape={renderActiveShape}
           data={data}
           innerRadius={50}
-          outerRadius={95}
-          cy={125}
+          outerRadius={75}
+          cy={105}
           fill="#88d884aa"
           dataKey="value"
           onMouseEnter={onPieEnter}

@@ -22,6 +22,7 @@ const TrxRowWrapper = styled(FlexRowWrapper)`
   width: fit-content;
   align-items: center;
   column-gap: 12px;
+
   .info-column {
     row-gap: 4px;
   }
@@ -31,6 +32,12 @@ const TrxRowWrapper = styled(FlexRowWrapper)`
   }
   .amount-status-wrapper {
     align-self: end;
+  }
+  .status-pill {
+    background: rgba(13, 73, 15, 0.6);
+    border-radius: 12px;
+    padding: 4px 8px;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 1);
   }
 `;
 
@@ -92,8 +99,9 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                   {(amount / 1e8).toFixed(5)} BTC{' '}
                 </Typography>
                 <Typography
-                  size={14}
-                  color={trx.confirmations > 6 ? '#008462' : 'yellow'}
+                  size={12}
+                  className="status-pill"
+                  color={trx.confirmations > 6 ? '#ffffff' : 'yellow'}
                 >
                   {trx.confirmations > 6
                     ? 'Confirmed'

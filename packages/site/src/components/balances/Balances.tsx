@@ -5,7 +5,7 @@ import useAccount from '../../hooks/useAccount';
 import { getBtcUtxo, getZetaBalance } from '../../utils';
 import Copyable from '../utils/Copyable';
 import Typography from '../utils/Typography';
-import BalancePie from './BalancePie';
+import BalancePie from './charts/BalancePie';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import { ReactComponent as RightArrow } from '../../assets/right-arrow.svg';
@@ -14,49 +14,45 @@ import { ReactComponent as ZetaIcon } from '../../assets/zetachain.svg';
 
 import TooltipInfo from '../utils/TooltipInfo';
 import { trimHexAddress } from '../../utils/trimHexAddr';
-import LineGraph from './LineGraph';
 
 const BalancesWrapper = styled(FlexColumnWrapper)`
   padding: 32px;
   background: ${(props) => props.theme.colors.dark?.default};
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
-  /* width: fit-content; */
-  height: 100%;
-
+  height: fit-content;
   border-radius: ${(props) => props.theme.borderRadius};
 
-  /* height: 47%; */
   .balance-wrapper {
     align-items: center;
-
-    padding: 0px 0 0 6px;
-
+    padding: 0 0 0 6px;
     column-gap: 16px;
     .right-arrow {
       width: 24px;
       color: #fff;
     }
   }
+
   .balances-list-card {
     justify-items: flex-end;
     padding: 16px 24px;
     max-height: 80%;
     overflow-y: auto;
-    /* width: 100%; */
     border: 1px solid #eeeeee3b;
     border-radius: 20px;
   }
+
   .t-wallet-type {
     border-bottom: 0.1px solid #ffffff;
     padding: 0px 0 4px 0;
     color: #ecececac;
   }
+
   .chart-list-wrapper {
     justify-content: space-between;
     margin-top: 24px;
     align-items: center;
-    /* column-gap: 40px; */
   }
+
   .searched-input {
     outline: none;
     padding: 12px;
@@ -68,8 +64,29 @@ const BalancesWrapper = styled(FlexColumnWrapper)`
     font-size: 16px;
     margin-top: 24px;
   }
+
   .usd-value {
     color: #555555;
+  }
+
+  table {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 4px 8px;
+    color: #eee;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  th {
+    color: #a5a8a5;
+    /* font-size: 14px; */
+    text-transform: uppercase;
   }
 `;
 
@@ -84,7 +101,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   const [searched, setSearched] = useState<any>('');
 
   useEffect(() => {
-    if (state.installedSnap || btcAddress) {
+    if (state.installedSnap && btcAddress) {
       const getBalance = async () => {
         let results: any = await getBtcUtxo();
         setBalance(results);
@@ -92,7 +109,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
 
       getBalance();
     }
-  }, [state.installedSnap]);
+  }, [btcAddress]);
 
   useEffect(() => {
     if (state.installedSnap && address) {
@@ -128,14 +145,17 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   console.log(balance, 'balance');
 
   const onSearched = (searchText: string) => {
+    console.log(searchText, 'search text');
     if (data && !!searchText) {
       console.log(data, 'data in serach');
-      let searchedData = data.filter((t: any) => t.label.includes(searchText));
+      let searchedData = data.filter((t: any) =>
+        t?.label.toLowerCase().includes(searchText.toLowerCase()),
+      );
       setSearched(searchedData);
+    } else {
+      setSearched(data);
     }
   };
-
-  console.log(searched, 'searched');
 
   return (
     <BalancesWrapper>
@@ -150,70 +170,71 @@ const Balances = ({}: BalancesProps): JSX.Element => {
           }
         />
       </Typography>
-      {/* <input
+      <input
         placeholder="Searched Asset"
         onChange={(e) => onSearched(e.target.value)}
         className="searched-input"
-      /> */}
+      />
       <FlexRowWrapper className="chart-list-wrapper">
-        {/* <LineGraph /> */}
         <BalancePie data={searched.length > 0 ? searched : data} />
       </FlexRowWrapper>
       <div>
         {/* className={`${index === 0 || 1 ? 't-wallet-type' : ''}`} */}
-        <FlexColumnWrapper className="balances-list-card">
-          {(searched.length > 0 ? searched : data)?.map(
-            (t: any, index: number) => (
-              <>
-                {index === 0 ? (
-                  <Typography size={18} className="t-wallet-type">
-                    <BtcIcon className="chain-icon" />
-                    <Copyable>{trimHexAddress('' + btcAddress)}</Copyable>
-                  </Typography>
-                ) : (
-                  index === 1 && (
-                    <Typography size={18} className="t-wallet-type">
-                      <ZetaIcon className="chain-icon" />
-                      <Copyable>{trimHexAddress('' + address)}</Copyable>
-                    </Typography>
-                  )
-                )}
-                <FlexRowWrapper className="balance-wrapper">
-                  <Typography size={14}> {t.label.toUpperCase()}</Typography>{' '}
-                  <RightArrow className="right-arrow" />
-                  <Typography size={14}>
-                    {t.value.toFixed(4)} {t.label}
-                    <span className="usd-value">~$0</span>
-                    {/* TODO: USE `exchangeRate` from zeta.tokens to calculate & fetch BTC balance or use tBTC price for BTC to USD conversion*/}
-                  </Typography>
-                </FlexRowWrapper>
-              </>
-            ),
-          )}
-        </FlexColumnWrapper>
-      </div>
+        {/* <FlexColumnWrapper className="balances-list-card"> */}
+        <table>
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Amount</th>
+              <th>Amount ($)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(searched.length > 0 ? searched : data)?.map(
+              (t: any, index: number) => (
+                <tr>
+                  {/* {index === 0 ? (
+                      <Typography size={18} className="t-wallet-type">
+                        <BtcIcon className="chain-icon" />
+                        <Copyable>{trimHexAddress(btcAddress!)}</Copyable>
+                      </Typography>
+                    ) : (
+                      index === 1 && (
+                        <Typography size={18} className="t-wallet-type">
+                          <ZetaIcon className="chain-icon" />
+                          <Copyable>{trimHexAddress(address!)}</Copyable>
+                        </Typography>
+                      )
+                    )} */}
 
-      {/* <Typography className="addr-type">
-          BTC: {(balance?.balance + balance?.unconfirmed_balance) / 1e8} BTC
-        </Typography>
-        <Typography className="addr-type" size={12} color="yellow">
-          Locked(Unconfirmed): {balance?.unconfirmed_balance / 1e8} BTC
-        </Typography>
-        <div className="address-text">
-          {btcAddress ? (
-            <Copyable>{btcAddress}</Copyable>
-          ) : (
-            'Derive BTC address'
-          )}
-        </div>
-        <br />
-        <Typography className="addr-type">
-          ZETA: {(zetaBalance?.zeta?.balances?.[0]?.amount / 1e18).toFixed(8)}{' '}
-          {zetaBalance?.zeta?.balances?.[0]?.denom?.toUpperCase()}
-        </Typography>
-        <div className="address-text">
-          {address ? <Copyable>{address}</Copyable> : 'Connect Snap'}
-        </div> */}
+                  {/* <FlexRowWrapper className="balance-wrapper"> */}
+                  <td>
+                    <Typography size={14}>
+                      {t.label}
+                      {index === 0 ? (
+                        <BtcIcon className="chain-icon" />
+                      ) : (
+                        <ZetaIcon className="chain-icon" />
+                      )}
+                    </Typography>{' '}
+                    {/* <RightArrow className="right-arrow" /> */}
+                  </td>
+                  <td>
+                    <Typography size={14}>
+                      {t.value.toFixed(4)} {t.label}
+                      {/* TODO: USE `exchangeRate` from zeta.tokens to calculate & fetch BTC balance or use tBTC price for BTC to USD conversion*/}
+                    </Typography>
+                  </td>
+                  <td>$0</td>
+
+                  {/* </FlexRowWrapper> */}
+                </tr>
+              ),
+            )}
+          </tbody>
+        </table>
+        {/* </FlexColumnWrapper> */}
+      </div>
     </BalancesWrapper>
   );
 };
