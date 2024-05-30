@@ -69,7 +69,7 @@ const renderActiveShape = (props: any) => {
         z={2}
         textAnchor={textAnchor}
         fill="#fff6f6"
-      >{`${value.toFixed(4)}`}</text>
+      >{`${value.toFixed(5)} ${payload.label}`}</text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}

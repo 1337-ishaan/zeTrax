@@ -134,13 +134,13 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
     });
     try {
       await transferBtc(
-        recipentAddress!,
-        customMemo,
+        recipentAddress ? recipentAddress : address,
         selectedZrc20.zrc20_contract_address,
         //@ts-ignore,
         +amount,
         address as string,
-        selectedGasPriority,
+        customMemo,
+        // selectedGasPriority,
       );
     } catch (e: any) {
       setIsTrxProcessing(true);
@@ -285,7 +285,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             Low
           </Typography>
           <Typography color="#ff4a3d" size={14}>
-            ~{depositFees?.low_fee_per_kb} sats
+            ~{(depositFees?.low_fee_per_kb / 1e8).toFixed(5)} BTC
           </Typography>
         </FlexColumnWrapper>
         <div className="vertical-divider" />
@@ -299,7 +299,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             Medium
           </Typography>
           <Typography color="#eded4c" size={14}>
-            ~{depositFees?.medium_fee_per_kb} sats
+            ~{(depositFees?.medium_fee_per_kb / 1e8).toFixed(5)} BTC
           </Typography>
         </FlexColumnWrapper>
         <div className="vertical-divider" />
@@ -314,15 +314,15 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             High
           </Typography>
           <Typography color="#008462" size={14}>
-            ~{depositFees?.high_fee_per_kb} sats
+            ~{(depositFees?.high_fee_per_kb / 1e8).toFixed(5)} BTC
           </Typography>{' '}
         </FlexColumnWrapper>
       </FlexRowWrapper>
 
-      <FlexRowWrapper className="gas-wrapper">
+      {/* <FlexRowWrapper className="gas-wrapper">
         <GasIcon className="icon" /> Fees :
         <span className="amount">~10000 sats</span>
-      </FlexRowWrapper>
+      </FlexRowWrapper> */}
       <StyledButton
         disabled={
           currentActive === 'zeta' ? !amount : !amount || !selectedZrc20

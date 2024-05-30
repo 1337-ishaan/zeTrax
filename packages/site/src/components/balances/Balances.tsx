@@ -11,6 +11,7 @@ import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import { ReactComponent as RightArrow } from '../../assets/right-arrow.svg';
 import { ReactComponent as BtcIcon } from '../../assets/bitcoin.svg';
 import { ReactComponent as ZetaIcon } from '../../assets/zetachain.svg';
+import { ReactComponent as SearchIcon } from '../../assets/search.svg';
 
 import TooltipInfo from '../utils/TooltipInfo';
 import { trimHexAddress } from '../../utils/trimHexAddr';
@@ -53,16 +54,24 @@ const BalancesWrapper = styled(FlexColumnWrapper)`
     align-items: center;
   }
 
-  .searched-input {
-    outline: none;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    background: rgba(12, 12, 12, 0.8);
-    color: #fff;
-    width: 40%;
-    font-size: 16px;
-    margin-top: 24px;
+  .input-container {
+    position: relative;
+    display: inline-block;
+
+    .searched-input {
+      outline: none;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(12, 12, 12, 0.8);
+      color: #fff;
+      width: 40%;
+      font-size: 16px;
+      margin-top: 24px;
+      position: relative;
+      display: inline-block;
+      padding-left: 30px;
+    }
   }
 
   .usd-value {
@@ -85,7 +94,6 @@ const BalancesWrapper = styled(FlexColumnWrapper)`
 
   th {
     color: #a5a8a5;
-    /* font-size: 14px; */
     text-transform: uppercase;
   }
 `;
@@ -145,9 +153,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   console.log(balance, 'balance');
 
   const onSearched = (searchText: string) => {
-    console.log(searchText, 'search text');
     if (data && !!searchText) {
-      console.log(data, 'data in serach');
       let searchedData = data.filter((t: any) =>
         t?.label.toLowerCase().includes(searchText.toLowerCase()),
       );
@@ -170,11 +176,14 @@ const Balances = ({}: BalancesProps): JSX.Element => {
           }
         />
       </Typography>
-      <input
-        placeholder="Searched Asset"
-        onChange={(e) => onSearched(e.target.value)}
-        className="searched-input"
-      />
+      <div className="input-container">
+        <input
+          placeholder="Search Asset"
+          onChange={(e) => onSearched(e.target.value)}
+          className="searched-input"
+        />
+      </div>
+
       <FlexRowWrapper className="chart-list-wrapper">
         <BalancePie data={searched.length > 0 ? searched : data} />
       </FlexRowWrapper>
@@ -210,18 +219,18 @@ const Balances = ({}: BalancesProps): JSX.Element => {
                   {/* <FlexRowWrapper className="balance-wrapper"> */}
                   <td>
                     <Typography size={14}>
-                      {t.label}
                       {t.label === 'BTC' ? (
                         <BtcIcon className="chain-icon" />
                       ) : (
                         <ZetaIcon className="chain-icon" />
                       )}
+                      {t.label}
                     </Typography>{' '}
                     {/* <RightArrow className="right-arrow" /> */}
                   </td>
                   <td>
                     <Typography size={14}>
-                      {t.value.toFixed(4)} {t.label}
+                      {t.value.toFixed(5)} {t.label}
                       {/* TODO: USE `exchangeRate` from zeta.tokens to calculate & fetch BTC balance or use tBTC price for BTC to USD conversion*/}
                     </Typography>
                   </td>

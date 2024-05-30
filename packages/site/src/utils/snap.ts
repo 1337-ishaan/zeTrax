@@ -167,8 +167,9 @@ export const transferBtc = async (
   amount: number,
   address: string,
   customMemo: string,
-  gasPriority: 'low' | 'medium' | 'high',
+  // gasPriority: 'low' | 'medium' | 'high',
 ) => {
+  console.log(!!zrc20, 'zrc20');
   try {
     let action = '01';
     let addressToSend;
@@ -179,6 +180,7 @@ export const transferBtc = async (
 
     addressToSend = !!recipentAddress ? recipentAddress : address;
 
+    console.log(customMemo, 'aadas');
     const decAmount = parseFloat('' + amount) * 1e8;
     // const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
     let memo;
@@ -191,8 +193,7 @@ export const transferBtc = async (
       memo = `${contract}${action}${zrc}${dest}`;
       console.log(contract, action, zrc, dest, 'contract');
     } else {
-      memo = `${addressToSend.replace(/^0x/, '')}`;
-      console.log(memo, 'deposit contract');
+      memo = dest;
     }
 
     const result = await window.ethereum.request({
@@ -201,7 +202,11 @@ export const transferBtc = async (
         snapId: defaultSnapOrigin,
         request: {
           method: 'crosschain-swap-btc',
-          params: [decAmount, !!customMemo ? customMemo : memo, gasPriority],
+          params: [
+            decAmount,
+            customMemo.length > 0 ? customMemo : memo,
+            !!zrc20,
+          ],
         },
       },
     });

@@ -18,8 +18,8 @@ const TrxHistoryWrapper = styled.div`
   color: #dadada;
   padding: 24px;
   /* max-height: 77vh; */
-  height: 30%;
-  width: fit-content;
+  height: 340px;
+  width: 400px;
 
   overflow-y: auto;
   border-radius: ${(props) => props.theme.borderRadius};
@@ -50,7 +50,7 @@ const TrxHistory = (_: TrxHistoryInterface) => {
 
   React.useEffect(() => {
     const getBtcTrx = async () => {
-      if (btcTrx.length === 0) {
+      if (btcTrx.length === 0 || isRefetched) {
         try {
           const results: any = await getBtcUtxo();
           setBtcTrx(results);
@@ -67,7 +67,7 @@ const TrxHistory = (_: TrxHistoryInterface) => {
 
   const getAmount = (trx: any) => {
     return trx.outputs.filter((t: any) => t.addresses?.[0] === btcAddress)[0]
-      .value;
+      ?.value;
   };
 
   return (

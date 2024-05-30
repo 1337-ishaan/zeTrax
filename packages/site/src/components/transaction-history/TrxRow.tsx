@@ -31,7 +31,8 @@ const TrxRowWrapper = styled(FlexRowWrapper)`
     height: 16px;
   }
   .amount-status-wrapper {
-    align-self: end;
+    align-content: flex-end;
+    justify-content: flex-end;
   }
   .status-pill {
     background: rgba(13, 73, 15, 0.6);

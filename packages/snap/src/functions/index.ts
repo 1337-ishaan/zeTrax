@@ -372,7 +372,8 @@ export const crossChainSwapBtc = async (request: any) => {
         if (memo.length >= 78) throw new Error('Memo too long');
 
         utxos.sort((a: any, b: any) => a.value - b.value);
-        const fee = 10000;
+        const fee = request.params[2] ? 20900 : 40000;
+        // const fee = await getBtcDepositFees(request.params[2]);
         const total = amount + fee;
         let sum = 0;
         const pickUtxos = [];
@@ -397,6 +398,7 @@ export const crossChainSwapBtc = async (request: any) => {
 
         if (memo.length > 0) {
           const embed = bitcoin.payments.embed({ data: [memo] });
+
           if (!embed.output) throw new Error('Unable to embed memo');
           psbt.addOutput({ script: embed.output, value: 0 });
         }

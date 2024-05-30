@@ -31,7 +31,7 @@ const useAccount = (isSnapInstalled = false) => {
     if (isSnapInstalled && !btcAddress && !address && !loading) {
       getAddresses();
     }
-  }, [isSnapInstalled, address, btcAddress, loading, getAddresses]);
+  }, [isSnapInstalled, address, btcAddress, getAddresses]);
 
   return { address, btcAddress, provider };
 };
