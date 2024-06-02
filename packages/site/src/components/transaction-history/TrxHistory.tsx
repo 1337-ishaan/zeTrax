@@ -45,12 +45,12 @@ interface TrxHistoryInterface {}
 
 const TrxHistory = (_: TrxHistoryInterface) => {
   const [btcTrx, setBtcTrx] = useState<any>([]);
-  const { btcAddress } = useAccount(true);
+  const { btcAddress } = useAccount(true, 'TrxHistory');
   const [isRefetched, setIsRefetched] = useState(false);
 
   React.useEffect(() => {
     const getBtcTrx = async () => {
-      if (btcTrx.length === 0 || isRefetched) {
+      if (btcTrx.length === 0) {
         try {
           const results: any = await getBtcUtxo();
           setBtcTrx(results);

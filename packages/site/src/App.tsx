@@ -20,6 +20,7 @@ export type AppProps = {
 };
 
 export const App: FunctionComponent<AppProps> = ({ children }) => {
+  console.log('useAccount App');
   return (
     <>
       <ToastContainer

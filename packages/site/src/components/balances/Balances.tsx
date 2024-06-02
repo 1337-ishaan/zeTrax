@@ -102,14 +102,15 @@ interface BalancesProps {}
 
 const Balances = ({}: BalancesProps): JSX.Element => {
   const [state] = useContext(MetaMaskContext);
-  const { btcAddress, address } = useAccount(!!state.installedSnap);
+  console.log(state, 'state');
+  const { btcAddress, address } = useAccount(!!state.installedSnap, 'balance');
   const [balance, setBalance] = useState<any>({});
   const [zetaBalance, setZetaBalance] = useState<any>({});
   const [data, setData] = useState<any>();
   const [searched, setSearched] = useState<any>('');
 
   useEffect(() => {
-    if (state.installedSnap && btcAddress) {
+    if (state.snapsDetected && btcAddress) {
       const getBalance = async () => {
         let results: any = await getBtcUtxo();
         setBalance(results);
@@ -120,7 +121,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   }, [btcAddress]);
 
   useEffect(() => {
-    if (state.installedSnap && address) {
+    if (state.snapsDetected && address) {
       const getZetaBal = async () => {
         let result: any = await getZetaBalance(address as string);
         console.log(result, 'result');
@@ -149,7 +150,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       };
       getZetaBal();
     }
-  }, [state.installedSnap, address, balance]);
+  }, [state.snapsDetected, address, balance]);
   console.log(balance, 'balance');
 
   const onSearched = (searchText: string) => {

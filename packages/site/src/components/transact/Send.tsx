@@ -115,7 +115,7 @@ interface SendProps {
 const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   const [trxInput, setTrxInput] = useState<any>({});
   const [currentActive, setCurrentActive] = useState('zeta');
-  const { address } = useAccount(true);
+  const { address } = useAccount(true, 'Send');
   const [zrc20Assets, setZrc20Assets] = useState<any>();
   const [selectedZrc20, setSelectedZrc20] = useState<any>('');
   const [amount, setAmount] = useState<any>(0);

@@ -42,7 +42,7 @@ const ReceiveModal = ({
   isReceiveModalOpen,
   setIsReceiveModalOpen,
 }: ReceiveModalProps): JSX.Element => {
-  const { btcAddress, address } = useAccount(true);
+  const { btcAddress, address } = useAccount(true, 'ReceiveModal');
   const [selectedAddressType, setSelectedAddressType] = useState<'BTC' | 'EVM'>(
     'BTC',
   );

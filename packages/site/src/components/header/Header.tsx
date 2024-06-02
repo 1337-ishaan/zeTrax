@@ -39,7 +39,7 @@ interface HeaderProps {}
 const Header = ({}: HeaderProps): JSX.Element => {
   const [state] = useContext(MetaMaskContext);
 
-  const { address } = useAccount(!!state.installedSnap);
+  const { address } = useAccount(!!state.installedSnap, 'useAccount header');
 
   const onConnectSnap = async () => {
     await connectSnap();
@@ -54,7 +54,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
     <HeaderWrapper>
       <Logo className="logo" />
       <div className="connect-wallet-wrapper">
-        {state.installedSnap || address ? (
+        {state.installedSnap && address ? (
           <StyledButton onClick={onDisconnectSnap}>Disconnect</StyledButton> // TODO: Add disconnection logic
         ) : (
           <StyledButton onClick={onConnectSnap}>Install zeTrax</StyledButton>

@@ -100,7 +100,9 @@ export const getWalletInfo = async () => {
   }
 };
 export const createBtcWallet = async () => {
+  console.log('-----useAccount createBtcWallet');
   // invoke snap
+
   try {
     const result = await window.ethereum.request({
       method: 'wallet_invokeSnap',
