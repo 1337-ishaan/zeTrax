@@ -6,8 +6,9 @@ import 'react-dropdown/style.css';
 import 'react-accessible-accordion/dist/fancy-example.css';
 import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { StoreProvider } from './hooks/useStore';
 
-const Wrapper = styled.div`
+const Wrapper = styled(StoreProvider)`
   display: flex;
   flex-direction: column;
   margin: 0 120px;

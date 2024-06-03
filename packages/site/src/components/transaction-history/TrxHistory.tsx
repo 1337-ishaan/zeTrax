@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { getBtcUtxo, trackCctx } from '../../utils';
 import styled from 'styled-components';
 import Typography from '../utils/Typography';
 import TrxRow from './TrxRow';
-import useAccount from '../../hooks/useAccount';
 import { ReactComponent as RefreshIcon } from '../../assets/refresh.svg';
 import Loader from '../utils/Loader';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import TooltipInfo from '../utils/TooltipInfo';
+import { StoreContext } from '../../hooks/useStore';
 
 const TrxHistoryWrapper = styled.div`
   a {
@@ -45,7 +45,7 @@ interface TrxHistoryInterface {}
 
 const TrxHistory = (_: TrxHistoryInterface) => {
   const [btcTrx, setBtcTrx] = useState<any>([]);
-  const { btcAddress } = useAccount(true, 'TrxHistory');
+  const { globalState } = useContext(StoreContext);
   const [isRefetched, setIsRefetched] = useState(false);
 
   React.useEffect(() => {
@@ -66,8 +66,9 @@ const TrxHistory = (_: TrxHistoryInterface) => {
   }, [isRefetched]);
 
   const getAmount = (trx: any) => {
-    return trx.outputs.filter((t: any) => t.addresses?.[0] === btcAddress)[0]
-      ?.value;
+    return trx.outputs.filter(
+      (t: any) => t.addresses?.[0] === globalState.btcAddress,
+    )[0]?.value;
   };
 
   return (
@@ -97,7 +98,7 @@ const TrxHistory = (_: TrxHistoryInterface) => {
         btcTrx?.txs?.map((trx: any) => (
           <TrxRow
             trx={trx}
-            isSent={trx.inputs[0].addresses?.includes(btcAddress)}
+            isSent={trx.inputs[0].addresses?.includes(globalState.btcAddress)}
             amount={getAmount(trx)}
           />
         ))

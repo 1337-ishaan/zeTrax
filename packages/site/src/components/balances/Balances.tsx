@@ -1,7 +1,6 @@
 import styled from 'styled-components/macro';
 import { useContext, useEffect, useState } from 'react';
 import { MetaMaskContext } from '../../hooks';
-import useAccount from '../../hooks/useAccount';
 import { getBtcUtxo, getZetaBalance } from '../../utils';
 import Copyable from '../utils/Copyable';
 import Typography from '../utils/Typography';
@@ -15,6 +14,7 @@ import { ReactComponent as SearchIcon } from '../../assets/search.svg';
 
 import TooltipInfo from '../utils/TooltipInfo';
 import { trimHexAddress } from '../../utils/trimHexAddr';
+import { StoreContext } from '../../hooks/useStore';
 
 const BalancesWrapper = styled(FlexColumnWrapper)`
   padding: 32px;
@@ -103,27 +103,34 @@ interface BalancesProps {}
 const Balances = ({}: BalancesProps): JSX.Element => {
   const [state] = useContext(MetaMaskContext);
   console.log(state, 'state');
-  const { btcAddress, address } = useAccount(!!state.installedSnap, 'balance');
+  const { globalState, setGlobalState } = useContext(StoreContext);
   const [balance, setBalance] = useState<any>({});
   const [zetaBalance, setZetaBalance] = useState<any>({});
   const [data, setData] = useState<any>();
   const [searched, setSearched] = useState<any>('');
 
   useEffect(() => {
-    if (state.snapsDetected && btcAddress) {
+    if (state.snapsDetected && globalState.btcAddress) {
       const getBalance = async () => {
         let results: any = await getBtcUtxo();
         setBalance(results);
+        setGlobalState({
+          ...globalState,
+          utxo: results.final_balance - results.unconfirmed_balance,
+        });
       };
 
       getBalance();
     }
-  }, [btcAddress]);
+  }, [globalState.btcAddress]);
 
+  console.log(globalState.evmAddress, balance, 'evm');
   useEffect(() => {
-    if (state.snapsDetected && address) {
+    if (state.snapsDetected && globalState.evmAddress) {
       const getZetaBal = async () => {
-        let result: any = await getZetaBalance(address as string);
+        let result: any = await getZetaBalance(
+          globalState.evmAddress as string,
+        );
         console.log(result, 'result');
         setZetaBalance(result);
 
@@ -150,7 +157,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       };
       getZetaBal();
     }
-  }, [state.snapsDetected, address, balance]);
+  }, [state.snapsDetected, globalState.evmAddress, balance]);
   console.log(balance, 'balance');
 
   const onSearched = (searchText: string) => {
@@ -203,21 +210,6 @@ const Balances = ({}: BalancesProps): JSX.Element => {
             {(searched.length > 0 ? searched : data)?.map(
               (t: any, index: number) => (
                 <tr>
-                  {/* {index === 0 ? (
-                      <Typography size={18} className="t-wallet-type">
-                        <BtcIcon className="chain-icon" />
-                        <Copyable>{trimHexAddress(btcAddress!)}</Copyable>
-                      </Typography>
-                    ) : (
-                      index === 1 && (
-                        <Typography size={18} className="t-wallet-type">
-                          <ZetaIcon className="chain-icon" />
-                          <Copyable>{trimHexAddress(address!)}</Copyable>
-                        </Typography>
-                      )
-                    )} */}
-
-                  {/* <FlexRowWrapper className="balance-wrapper"> */}
                   <td>
                     <Typography size={14}>
                       {t.label === 'BTC' ? (
@@ -227,7 +219,6 @@ const Balances = ({}: BalancesProps): JSX.Element => {
                       )}
                       {t.label}
                     </Typography>{' '}
-                    {/* <RightArrow className="right-arrow" /> */}
                   </td>
                   <td>
                     <Typography size={14}>

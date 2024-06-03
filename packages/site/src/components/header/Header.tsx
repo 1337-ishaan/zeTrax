@@ -1,10 +1,12 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+import { StoreContext } from '../../hooks/useStore';
 import styled from 'styled-components/macro';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { MetaMaskContext } from '../../hooks';
-import useAccount from '../../hooks/useAccount';
 import { connectSnap, createBtcWallet, disconnectSnap } from '../../utils';
 import StyledButton from '../utils/StyledButton';
+import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import { ethers } from 'ethers';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -38,24 +40,51 @@ interface HeaderProps {}
 
 const Header = ({}: HeaderProps): JSX.Element => {
   const [state] = useContext(MetaMaskContext);
+  const { globalState, setGlobalState } = useContext(StoreContext);
 
-  const { address } = useAccount(!!state.installedSnap, 'useAccount header');
-
+  console.log(globalState, 'globalState');
   const onConnectSnap = async () => {
     await connectSnap();
-    await createBtcWallet();
+    // await createBtcWallet();
   };
+
+  useEffect(() => {
+    if (!globalState.evmAddress) {
+      const getEvmAddress = async () => {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const connectedAddress = await provider.getSigner();
+        setGlobalState({
+          ...globalState,
+          evmAddress: connectedAddress.address,
+        });
+      };
+      getEvmAddress();
+    }
+  }, [state.installedSnap]);
 
   const onDisconnectSnap = async () => {
     await disconnectSnap();
   };
 
+  const onCreateBtcWallet = async () => {
+    try {
+      const btcAddress = await createBtcWallet();
+      setGlobalState({ ...globalState, btcAddress });
+    } catch {
+      console.log('error');
+    }
+  };
   return (
     <HeaderWrapper>
       <Logo className="logo" />
       <div className="connect-wallet-wrapper">
-        {state.installedSnap && address ? (
-          <StyledButton onClick={onDisconnectSnap}>Disconnect</StyledButton> // TODO: Add disconnection logic
+        {state.installedSnap ? (
+          <FlexRowWrapper>
+            <StyledButton onClick={onDisconnectSnap}>Disconnect</StyledButton>
+            <StyledButton onClick={onCreateBtcWallet}>
+              Create BTC Wallet
+            </StyledButton>
+          </FlexRowWrapper>
         ) : (
           <StyledButton onClick={onConnectSnap}>Install zeTrax</StyledButton>
         )}

@@ -1,10 +1,9 @@
 import styled from 'styled-components/macro';
 import StyledInput from '../utils/StyledInput';
 import Typography from '../utils/Typography';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import StyledButton from '../utils/StyledButton';
 import { getBtcFees, transferBtc } from '../../utils/snap';
-import useAccount from '../../hooks/useAccount';
 import Select from 'react-dropdown-select';
 import axios from 'axios';
 import { getChainIcon } from '../../constants/getChainIcon';
@@ -16,6 +15,7 @@ import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import { toast } from 'react-toastify';
 import TooltipInfo from '../utils/TooltipInfo';
+import { StoreContext } from '../../hooks/useStore';
 
 const SendWrapper = styled.div`
   display: flex;
@@ -106,6 +106,13 @@ const SendWrapper = styled.div`
       flex: 1;
     }
   }
+  .max-utxo {
+    justify-content: end;
+    font-size: 14px;
+    cursor: pointer;
+    color: #6bf08c;
+    font-weight: 600;
+  }
 `;
 
 interface SendProps {
@@ -115,7 +122,6 @@ interface SendProps {
 const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   const [trxInput, setTrxInput] = useState<any>({});
   const [currentActive, setCurrentActive] = useState('zeta');
-  const { address } = useAccount(true, 'Send');
   const [zrc20Assets, setZrc20Assets] = useState<any>();
   const [selectedZrc20, setSelectedZrc20] = useState<any>('');
   const [amount, setAmount] = useState<any>(0);
@@ -126,7 +132,8 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   >('low');
   const [customMemo, setCustomMemo] = useState('');
   const [depositFees, setDepositFees] = useState<any>();
-
+  const { globalState, setGlobalState } = useContext(StoreContext);
+  console.log(globalState, 'globalStte in send');
   const sendTrx = async () => {
     setIsTrxProcessing(true);
     toast('Processing...', {
@@ -134,11 +141,11 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
     });
     try {
       await transferBtc(
-        recipentAddress ? recipentAddress : address,
+        recipentAddress ? recipentAddress : globalState.evmAddress,
         selectedZrc20.zrc20_contract_address,
         //@ts-ignore,
         +amount,
-        address as string,
+        globalState.evmAddress as string,
         customMemo,
         // selectedGasPriority,
       );
@@ -236,9 +243,16 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
         <StyledInput
           onChange={(e: any) => setAmount(e.target.value)}
           type="number"
+          value={amount}
           min={0.00000000001}
           placeholder="Amount"
         />
+        <FlexRowWrapper
+          className="max-utxo"
+          onClick={() => setAmount(globalState.utxo / 1e8)}
+        >
+          Max: {globalState.utxo / 1e8} BTC
+        </FlexRowWrapper>
         {currentActive === 'cctx' ? (
           <FlexRowWrapper className="custom-tooltip-wrapper">
             <StyledInput

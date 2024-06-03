@@ -3,7 +3,6 @@ import Modal from 'react-modal';
 import Send from '../Send';
 import { ReactComponent as CrossIcon } from '../../../assets/cross.svg';
 
-import useAccount from '../../../hooks/useAccount';
 import { useContext, useState } from 'react';
 import { MetaMaskContext } from '../../../hooks';
 import QRCode from 'react-qr-code';
@@ -11,6 +10,7 @@ import Typography from '../../../components/utils/Typography';
 import Copyable from '../../../components/utils/Copyable';
 import FlexColumnWrapper from '../../../components/utils/wrappers/FlexColumnWrapper';
 import FlexRowWrapper from '../../../components/utils/wrappers/FlexWrapper';
+import { StoreContext } from '../../../hooks/useStore';
 
 const ReceiveModalWrapper = styled.div`
   position: relative;
@@ -42,13 +42,13 @@ const ReceiveModal = ({
   isReceiveModalOpen,
   setIsReceiveModalOpen,
 }: ReceiveModalProps): JSX.Element => {
-  const { btcAddress, address } = useAccount(true, 'ReceiveModal');
+  const { globalState, setGlobalState } = useContext(StoreContext);
   const [selectedAddressType, setSelectedAddressType] = useState<'BTC' | 'EVM'>(
     'BTC',
   );
   return (
     <ReceiveModalWrapper>
-      {btcAddress && (
+      {globalState.btcAddress && (
         <Modal style={customStyles} isOpen={isReceiveModalOpen}>
           <div
             style={{
@@ -106,10 +106,16 @@ const ReceiveModal = ({
             </Typography>
             <QRCode
               style={{ border: '4px solid #fff' }}
-              value={selectedAddressType === 'BTC' ? btcAddress : address!}
+              value={
+                selectedAddressType === 'BTC'
+                  ? globalState.btcAddress
+                  : globalState.evmAddress!
+              }
             />
             <Copyable>
-              {selectedAddressType === 'BTC' ? btcAddress : address!}
+              {selectedAddressType === 'BTC'
+                ? globalState.btcAddress
+                : globalState.evmAddress!}
             </Copyable>
           </div>
         </Modal>
