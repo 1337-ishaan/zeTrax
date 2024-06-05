@@ -60,7 +60,6 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
         if (cctxData?.code !== 5) {
           setCctx(cctxData.CrossChainTxs?.[0]);
         }
-        console.log(cctx, 'cc');
       }
     };
     fetchCctx();

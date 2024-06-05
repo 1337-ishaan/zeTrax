@@ -44,30 +44,28 @@ const TrxHistoryWrapper = styled.div`
 interface TrxHistoryInterface {}
 
 const TrxHistory = (_: TrxHistoryInterface) => {
-  const [btcTrx, setBtcTrx] = useState<any>([]);
-  const { globalState } = useContext(StoreContext);
+  const { globalState, setGlobalState } = useContext(StoreContext);
   const [isRefetched, setIsRefetched] = useState(false);
 
   React.useEffect(() => {
-    const getBtcTrx = async () => {
-      if (btcTrx.length === 0) {
+    if ((!!globalState?.btcAddress && globalState?.utxo) || isRefetched) {
+      const getBtcTrx = async () => {
         try {
           const results: any = await getBtcUtxo();
-          setBtcTrx(results);
+          setGlobalState({ ...globalState, btcTrxs: results });
         } catch (error) {
           console.error(error);
         } finally {
           setIsRefetched(false);
         }
-      }
-    };
-    getBtcTrx();
-    return () => {};
-  }, [isRefetched]);
+      };
+      getBtcTrx();
+    }
+  }, [globalState?.btcAddress, globalState?.utxo, isRefetched]);
 
   const getAmount = (trx: any) => {
     return trx.outputs.filter(
-      (t: any) => t.addresses?.[0] === globalState.btcAddress,
+      (t: any) => t.addresses?.[0] === globalState?.btcAddress,
     )[0]?.value;
   };
 
@@ -95,10 +93,11 @@ const TrxHistory = (_: TrxHistoryInterface) => {
           <Loader />
         </div>
       ) : (
-        btcTrx?.txs?.map((trx: any) => (
+        globalState?.btcTrxs &&
+        globalState?.btcTrxs?.txs?.map((trx: any) => (
           <TrxRow
             trx={trx}
-            isSent={trx.inputs[0].addresses?.includes(globalState.btcAddress)}
+            isSent={trx.inputs[0].addresses?.includes(globalState?.btcAddress)}
             amount={getAmount(trx)}
           />
         ))

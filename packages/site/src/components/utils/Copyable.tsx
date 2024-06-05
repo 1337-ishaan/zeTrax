@@ -3,6 +3,7 @@ import { ReactComponent as CopyIcon } from '../../assets/copy.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { trimHexAddress } from '../../utils/trimHexAddr';
 
 const CopyableWrapper = styled.div`
   background: rgba(0, 0, 0, 1);
@@ -27,13 +28,13 @@ interface CopyableProps {
   children: any;
 }
 
-const Copyable = ({ children }: CopyableProps): JSX.Element => {
+const Copyable = ({ children: address }: CopyableProps): JSX.Element => {
   const [isCopying, setIsCopying] = useState(false);
 
   const copy = () => {
     try {
       setIsCopying(true);
-      navigator.clipboard.writeText(children);
+      navigator.clipboard.writeText(address);
     } catch {
       setIsCopying(false);
     } finally {
@@ -43,7 +44,7 @@ const Copyable = ({ children }: CopyableProps): JSX.Element => {
 
   return (
     <CopyableWrapper onClick={copy}>
-      {children} &nbsp;
+      {trimHexAddress(address)} &nbsp;
       {isCopying ? (
         <CheckIcon className="copy-icon" />
       ) : (

@@ -45,7 +45,7 @@ export const light: DefaultTheme = {
     background: {
       default: '#000',
       alternative: '#F2F4F6',
-      inverse: '#141618',
+      inverse: '#fff',
     },
     icon: {
       default: '#141618',
@@ -84,7 +84,7 @@ export const dark: DefaultTheme = {
     background: {
       default: '#141417',
       alternative: '#141618',
-      inverse: '#1c3b6aFFF',
+      inverse: '#e0dcdc',
     },
     icon: {
       default: '#1c3b6aFFF',
@@ -139,12 +139,6 @@ export const GlobalStyle = createGlobalStyle`
     transition: background-color .1s linear;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-size: ${(props) => props.theme.fontSizes.heading};
-    ${(props) => props.theme.mediaQueries.small} {
-      font-size: ${(props) => props.theme.fontSizes.mobileHeading};
-    }
-  }
 
   code {
     background-color: ${(props) => props.theme.colors.background?.alternative};

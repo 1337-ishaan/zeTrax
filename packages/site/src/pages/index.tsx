@@ -1,9 +1,6 @@
 import { useContext } from 'react';
 import Header from '../components/header/Header';
-
 import styled from 'styled-components';
-
-import Send from '../components/transact/Send';
 import TrxHistory from '../components/transaction-history/TrxHistory';
 import { defaultSnapOrigin } from '../config';
 import { MetaMaskContext } from '../hooks';
@@ -14,9 +11,12 @@ import Balances from '../components/balances/Balances';
 import FlexColumnWrapper from '../components/utils/wrappers/FlexColumnWrapper';
 import Disconnected from '../components/screen/Disconnected';
 import FlexRowWrapper from '../components/utils/wrappers/FlexWrapper';
+import { StoreContext } from '../hooks/useStore';
 
-const AppWrapper = styled.div`
+const AppWrapper = styled(FlexColumnWrapper)`
   padding: 16px 32px;
+  margin: 0 auto;
+  gap: 0 54px;
 
   .action-balances-wrapper {
     column-gap: 24px;
@@ -30,26 +30,27 @@ const AppWrapper = styled.div`
     opacity: 0.1;
     z-index: -1;
   }
+
   .trx-transact-wrapper {
     column-gap: 64px;
-    width: 50%;
     row-gap: 24px;
   }
 `;
 
 const Index = () => {
   const [state] = useContext(MetaMaskContext);
+  const { globalState } = useContext(StoreContext);
 
-  console.log('useAccount index', state);
   const isMetaMaskReady = isLocalSnap(defaultSnapOrigin)
     ? state.isFlask
     : state.installedSnap;
 
+  console.log(globalState, 'globalState');
   return (
     <AppWrapper>
       <Logo className="page-bg-logo" />
       {isMetaMaskReady && <Header />}
-      {state.installedSnap ? (
+      {!!globalState?.btcAddress ? (
         <FlexRowWrapper className="action-balances-wrapper">
           <FlexColumnWrapper className="trx-transact-wrapper">
             <Transact />

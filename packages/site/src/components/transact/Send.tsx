@@ -141,19 +141,23 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
     });
     try {
       await transferBtc(
-        recipentAddress ? recipentAddress : globalState.evmAddress,
+        recipentAddress ? recipentAddress : globalState?.evmAddress,
         selectedZrc20.zrc20_contract_address,
         //@ts-ignore,
         +amount,
-        globalState.evmAddress as string,
+        globalState?.evmAddress as string,
         customMemo,
         // selectedGasPriority,
       );
+      console.log('222');
+      setGlobalState({ ...globalState, isTrxProcessed: true });
     } catch (e: any) {
       setIsTrxProcessing(true);
       toast(`Error: ${e?.message}`, {
         hideProgressBar: false,
       });
+      console.log('222');
+      setGlobalState({ ...globalState, isTrxProcessed: false });
     } finally {
       setIsTrxProcessing(true);
       setIsSendModalOpen(false);
@@ -249,9 +253,9 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
         />
         <FlexRowWrapper
           className="max-utxo"
-          onClick={() => setAmount(globalState.utxo / 1e8)}
+          onClick={() => setAmount(globalState?.utxo / 1e8)}
         >
-          Max: {globalState.utxo / 1e8} BTC
+          Max: {globalState?.utxo / 1e8} BTC
         </FlexRowWrapper>
         {currentActive === 'cctx' ? (
           <FlexRowWrapper className="custom-tooltip-wrapper">
@@ -299,7 +303,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             Low
           </Typography>
           <Typography color="#ff4a3d" size={14}>
-            ~{(depositFees?.low_fee_per_kb / 1e8).toFixed(5)} BTC
+            ~{((depositFees?.low_fee_per_kb * 2) / 1e8).toFixed(5)} BTC
           </Typography>
         </FlexColumnWrapper>
         <div className="vertical-divider" />
@@ -313,7 +317,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             Medium
           </Typography>
           <Typography color="#eded4c" size={14}>
-            ~{(depositFees?.medium_fee_per_kb / 1e8).toFixed(5)} BTC
+            ~{((depositFees?.medium_fee_per_kb * 2) / 1e8).toFixed(5)} BTC
           </Typography>
         </FlexColumnWrapper>
         <div className="vertical-divider" />
@@ -328,7 +332,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             High
           </Typography>
           <Typography color="#008462" size={14}>
-            ~{(depositFees?.high_fee_per_kb / 1e8).toFixed(5)} BTC
+            ~{((depositFees?.high_fee_per_kb * 2) / 1e8).toFixed(5)} BTC
           </Typography>{' '}
         </FlexColumnWrapper>
       </FlexRowWrapper>

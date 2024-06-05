@@ -8,13 +8,7 @@ import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { StoreProvider } from './hooks/useStore';
 
-const Wrapper = styled(StoreProvider)`
-  display: flex;
-  flex-direction: column;
-  margin: 0 120px;
-  /* box-shadow: 0px 0px 40px 16px rgba(0, 0, 0, 1);
-  border-radius: ${(props) => props.theme.borderRadius}; */
-`;
+const Wrapper = styled(StoreProvider)``;
 
 export type AppProps = {
   children: ReactNode;

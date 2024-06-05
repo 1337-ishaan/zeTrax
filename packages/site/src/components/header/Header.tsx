@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { StoreContext } from '../../hooks/useStore';
 import styled from 'styled-components/macro';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -7,32 +7,32 @@ import { connectSnap, createBtcWallet, disconnectSnap } from '../../utils';
 import StyledButton from '../utils/StyledButton';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import { ethers } from 'ethers';
+import Copyable from '../utils/Copyable';
+import { ReactComponent as BitcoinLogo } from '../../assets/bitcoin.svg';
+import { ReactComponent as ZetaLogo } from '../../assets/zetachain.svg';
 
-const HeaderWrapper = styled.header`
-  display: flex;
+const HeaderWrapper = styled(FlexRowWrapper)`
   justify-content: space-between;
-  align-items: center;
+  /* align-items: center; */
   padding: 32px 0;
-  .connect-wallet-wrapper {
-    display: flex;
-    flex-direction: column;
-    row-gap: 12px;
-    column-gap: 8px;
-    color: #fff;
-  }
-  .address-text {
-    font-size: 16px;
-  }
-  .addr-type {
-    font-size: 16px;
-  }
-  .balance-text {
-    font-size: 16px;
-    padding: 12px 12px 12px 0;
-  }
   .logo {
     height: 40px;
     width: 40px;
+  }
+  .address-header {
+    align-items: center;
+    column-gap: 24px;
+    height: fit-content;
+  }
+  .icon-addr-wrapper {
+    position: relative;
+    .chain-icon {
+      position: absolute;
+      top: -4px;
+      left: -8px;
+      transform: scale(1.4);
+      opacity: 0.4;
+    }
   }
 `;
 
@@ -43,47 +43,59 @@ const Header = ({}: HeaderProps): JSX.Element => {
   const { globalState, setGlobalState } = useContext(StoreContext);
 
   console.log(globalState, 'globalState');
+
   const onConnectSnap = async () => {
-    await connectSnap();
-    // await createBtcWallet();
+    try {
+      await connectSnap();
+      const evmAddress = await getEvmAddress();
+      const btcAddress = await createBtcWallet();
+
+      if (evmAddress && btcAddress) {
+        setGlobalState({ ...globalState, btcAddress, evmAddress });
+      }
+    } catch (e) {
+      console.log('ERROR CONNECTING SNAP -->', e);
+    }
   };
 
-  useEffect(() => {
-    if (!globalState.evmAddress) {
-      const getEvmAddress = async () => {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const connectedAddress = await provider.getSigner();
-        setGlobalState({
-          ...globalState,
-          evmAddress: connectedAddress.address,
-        });
-      };
-      getEvmAddress();
-    }
-  }, [state.installedSnap]);
+  const getEvmAddress = async () => {
+    console.log('provider');
 
+    const provider = new ethers.BrowserProvider(window.ethereum as any);
+    const connectedAddress = await provider.getSigner();
+    return connectedAddress.address;
+  };
   const onDisconnectSnap = async () => {
     await disconnectSnap();
+    setGlobalState({});
   };
-
-  const onCreateBtcWallet = async () => {
-    try {
-      const btcAddress = await createBtcWallet();
-      setGlobalState({ ...globalState, btcAddress });
-    } catch {
-      console.log('error');
-    }
-  };
+  const btcAddress = globalState?.btcAddress;
   return (
     <HeaderWrapper>
       <Logo className="logo" />
       <div className="connect-wallet-wrapper">
         {state.installedSnap ? (
           <FlexRowWrapper>
-            <StyledButton onClick={onDisconnectSnap}>Disconnect</StyledButton>
-            <StyledButton onClick={onCreateBtcWallet}>
-              Create BTC Wallet
-            </StyledButton>
+            {!btcAddress ? (
+              <StyledButton onClick={onConnectSnap}>
+                Connect ZeSnap
+              </StyledButton>
+            ) : (
+              <FlexRowWrapper className="address-header">
+                <div className="icon-addr-wrapper">
+                  <BitcoinLogo className="chain-icon" />
+                  <Copyable>{btcAddress}</Copyable>
+                </div>
+
+                <div className="icon-addr-wrapper">
+                  <ZetaLogo className="chain-icon" />
+                  <Copyable>{globalState?.evmAddress}</Copyable>
+                </div>
+                <StyledButton onClick={onDisconnectSnap}>
+                  Disconnect
+                </StyledButton>
+              </FlexRowWrapper>
+            )}
           </FlexRowWrapper>
         ) : (
           <StyledButton onClick={onConnectSnap}>Install zeTrax</StyledButton>

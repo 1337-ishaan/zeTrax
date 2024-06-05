@@ -10,6 +10,7 @@ const TypographyWrapper = styled(FlexRowWrapper)<{
   display: flex;
   column-gap: 8px;
   align-items: center;
+  line-height: -2px;
   width: fit-content;
   color: ${(props) => props.color};
   cursor: pointer;

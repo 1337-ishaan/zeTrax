@@ -101,38 +101,32 @@ const BalancesWrapper = styled(FlexColumnWrapper)`
 interface BalancesProps {}
 
 const Balances = ({}: BalancesProps): JSX.Element => {
-  const [state] = useContext(MetaMaskContext);
-  console.log(state, 'state');
   const { globalState, setGlobalState } = useContext(StoreContext);
   const [balance, setBalance] = useState<any>({});
-  const [zetaBalance, setZetaBalance] = useState<any>({});
   const [data, setData] = useState<any>();
   const [searched, setSearched] = useState<any>('');
 
   useEffect(() => {
-    if (state.snapsDetected && globalState.btcAddress) {
+    if (globalState?.btcAddress || globalState?.isTrxProcessed) {
       const getBalance = async () => {
+        console.log('111 global state', globalState);
         let results: any = await getBtcUtxo();
         setBalance(results);
         setGlobalState({
           ...globalState,
-          utxo: results.final_balance - results.unconfirmed_balance,
+          utxo: results?.final_balance - results?.unconfirmed_balance,
         });
       };
-
       getBalance();
     }
-  }, [globalState.btcAddress]);
+  }, [globalState?.btcAddress, globalState?.isTrxProcessed]);
 
-  console.log(globalState.evmAddress, balance, 'evm');
   useEffect(() => {
-    if (state.snapsDetected && globalState.evmAddress) {
+    if (globalState?.evmAddress) {
       const getZetaBal = async () => {
         let result: any = await getZetaBalance(
-          globalState.evmAddress as string,
+          globalState?.evmAddress as string,
         );
-        console.log(result, 'result');
-        setZetaBalance(result);
 
         let maps = result?.nonZeta?.map((t: any) => {
           return {
@@ -141,24 +135,21 @@ const Balances = ({}: BalancesProps): JSX.Element => {
           };
         });
         // TODO: Decimals to fix
-        if (balance) {
-          setData([
-            {
-              label: 'BTC',
-              value: balance?.balance / 1e8,
-            },
-            ...maps,
-            {
-              label: result?.zeta?.balances[0]?.denom,
-              value: result?.zeta?.balances[0]?.amount / 1e15,
-            },
-          ]);
-        }
+        setData([
+          {
+            label: 'BTC',
+            value: balance?.balance / 1e8,
+          },
+          ...maps,
+          {
+            label: result?.zeta?.balances[0]?.denom,
+            value: result?.zeta?.balances[0]?.amount / 1e15,
+          },
+        ]);
       };
       getZetaBal();
     }
-  }, [state.snapsDetected, globalState.evmAddress, balance]);
-  console.log(balance, 'balance');
+  }, [globalState?.evmAddress, balance]);
 
   const onSearched = (searchText: string) => {
     if (data && !!searchText) {
@@ -170,6 +161,8 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       setSearched(data);
     }
   };
+
+  console.log(balance, data, '111 balance');
 
   return (
     <BalancesWrapper>
@@ -200,7 +193,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
         {/* <FlexColumnWrapper className="balances-list-card"> */}
         <table>
           <thead>
-            <tr>
+            <tr key="balance-header">
               <th>Asset</th>
               <th>Amount</th>
               <th>Amount ($)</th>
@@ -209,7 +202,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
           <tbody>
             {(searched.length > 0 ? searched : data)?.map(
               (t: any, index: number) => (
-                <tr>
+                <tr key={index}>
                   <td>
                     <Typography size={14}>
                       {t.label === 'BTC' ? (

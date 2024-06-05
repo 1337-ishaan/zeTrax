@@ -8,7 +8,6 @@ import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import ReceiveModal from './modals/ReceiveModal';
 
 import SendModal from './modals/SendModal';
-import { ReactComponent as TimeIcon } from '../../assets/time.svg';
 
 const TransactWrapper = styled(FlexColumnWrapper)`
   row-gap: 32px;
@@ -47,9 +46,7 @@ const TransactWrapper = styled(FlexColumnWrapper)`
           transition: unset;
           border: 1px solid #eeeeee34;
           background: #000000;
-
           box-shadow: unset;
-
           cursor: not-allowed;
         }
       }
