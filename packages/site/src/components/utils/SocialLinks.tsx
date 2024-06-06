@@ -17,6 +17,7 @@ const SocialLinksWrapper = styled(FlexRowWrapper)`
     border-radius: ${(props) => props.theme.borderRadius};
     cursor: pointer;
     column-gap: 4px;
+
     transition: all 0.3s;
 
     &:hover {

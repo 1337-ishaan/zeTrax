@@ -260,6 +260,7 @@ export const sendTrx = async (request: any) => {
 
 const broadcastTransaction = async (hex: string) => {
   try {
+    // convert to blockcypher
     const response: any = await fetch(
       `https://blockstream.info/testnet/api/tx`,
       {
@@ -302,6 +303,7 @@ export const getTrxByHash = async (previousTxHash: string) => {
 
 export const getTrxHex = async (previousTxHash: string) => {
   try {
+    // convert to blockcypher
     const response: any = await fetch(
       `https://blockstream.info/testnet/api/tx/${previousTxHash}/hex`,
     );
@@ -315,7 +317,7 @@ export const getTrxHex = async (previousTxHash: string) => {
 export const getTrxsByAddress = async (address: string) => {
   try {
     const response: any = await fetch(
-      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`, //?unspentOnly=true`,
+      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`, // ?unspentOnly=true`,
     );
     const stringData = await response.text();
     return JSON.parse(stringData);

@@ -107,9 +107,10 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   const [searched, setSearched] = useState<any>('');
 
   useEffect(() => {
+    console.log('BALANCE TRX PROCESSED -->', globalState?.isTrxProcessed);
     if (globalState?.btcAddress || globalState?.isTrxProcessed) {
       const getBalance = async () => {
-        console.log('111 global state', globalState);
+        console.log('111 global state', globalState?.isTrxProcessed);
         let results: any = await getBtcUtxo();
         setBalance(results);
         setGlobalState({
@@ -124,28 +125,32 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   useEffect(() => {
     if (globalState?.evmAddress) {
       const getZetaBal = async () => {
-        let result: any = await getZetaBalance(
-          globalState?.evmAddress as string,
-        );
+        try {
+          let result: any = await getZetaBalance(
+            globalState?.evmAddress as string,
+          );
 
-        let maps = result?.nonZeta?.map((t: any) => {
-          return {
-            label: t?.token?.symbol,
-            value: t?.value / (t?.token?.symbol === 'tBTC' ? 1e6 : 1e12),
-          };
-        });
-        // TODO: Decimals to fix
-        setData([
-          {
-            label: 'BTC',
-            value: balance?.balance / 1e8,
-          },
-          ...maps,
-          {
-            label: result?.zeta?.balances[0]?.denom,
-            value: result?.zeta?.balances[0]?.amount / 1e15,
-          },
-        ]);
+          let maps = result?.nonZeta?.map((t: any) => {
+            return {
+              label: t?.token?.symbol,
+              value: t?.value / (t?.token?.symbol === 'tBTC' ? 1e6 : 1e12),
+            };
+          });
+          // TODO: Decimals to fix
+          setData([
+            {
+              label: 'BTC',
+              value: balance?.balance / 1e8,
+            },
+            ...maps,
+            {
+              label: result?.zeta?.balances[0]?.denom,
+              value: result?.zeta?.balances[0]?.amount / 1e15,
+            },
+          ]);
+        } catch {
+        } finally {
+        }
       };
       getZetaBal();
     }

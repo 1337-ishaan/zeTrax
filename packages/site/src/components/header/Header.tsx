@@ -29,9 +29,9 @@ const HeaderWrapper = styled(FlexRowWrapper)`
     .chain-icon {
       position: absolute;
       top: -4px;
-      left: -8px;
+      left: -12px;
       transform: scale(1.4);
-      opacity: 0.4;
+      opacity: 0.3;
     }
   }
 `;
@@ -41,6 +41,17 @@ interface HeaderProps {}
 const Header = ({}: HeaderProps): JSX.Element => {
   const [state] = useContext(MetaMaskContext);
   const { globalState, setGlobalState } = useContext(StoreContext);
+
+  useEffect(() => {
+    if (
+      globalState?.evmAddress &&
+      globalState?.btcAddress // &&
+      // globalState?.utxo &&
+      // globalState?.btcTrxs
+    ) {
+      localStorage.setItem('zeta-snap', JSON.stringify(globalState));
+    }
+  }, [globalState]);
 
   console.log(globalState, 'globalState');
 
@@ -68,6 +79,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
   const onDisconnectSnap = async () => {
     await disconnectSnap();
     setGlobalState({});
+    localStorage.removeItem('zeta-snap');
   };
   const btcAddress = globalState?.btcAddress;
   return (

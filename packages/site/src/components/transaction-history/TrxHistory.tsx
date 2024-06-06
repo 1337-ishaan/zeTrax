@@ -48,6 +48,8 @@ const TrxHistory = (_: TrxHistoryInterface) => {
   const [isRefetched, setIsRefetched] = useState(false);
 
   React.useEffect(() => {
+    console.log('BALANCE TRX PROCESSED -->', globalState?.isTrxProcessed);
+
     if ((!!globalState?.btcAddress && globalState?.utxo) || isRefetched) {
       const getBtcTrx = async () => {
         try {

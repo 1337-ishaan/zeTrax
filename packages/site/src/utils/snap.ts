@@ -117,6 +117,7 @@ export const createBtcWallet = async () => {
   }
 };
 export const getBtcUtxo = async () => {
+  console.log('SNAPCALL --> getBtcUtxo');
   try {
     // invoke snap
     const result = await window.ethereum.request({
@@ -132,6 +133,8 @@ export const getBtcUtxo = async () => {
   }
 };
 export const getBtcActivity = async () => {
+  console.log('SNAPCALL --> getBtcActivity');
+
   try {
     // invoke snap
     const result = await window.ethereum.request({
@@ -148,7 +151,7 @@ export const getBtcActivity = async () => {
   }
 };
 export const sendBtc = async () => {
-  // invoke snap
+  console.log('SNAPCALL --> sendBtc');
   try {
     const result = await window.ethereum.request({
       method: 'wallet_snap',
@@ -171,7 +174,8 @@ export const transferBtc = async (
   customMemo: string,
   // gasPriority: 'low' | 'medium' | 'high',
 ) => {
-  console.log(!!zrc20, 'zrc20');
+  console.log('SNAPCALL --> transferBtc');
+
   try {
     let action = '01';
     let addressToSend;
@@ -219,6 +223,8 @@ export const transferBtc = async (
 };
 
 export const trackCctx = async (txHash: string) => {
+  console.log('SNAPCALL --> trackCctx');
+
   try {
     const result = await window.ethereum.request({
       method: 'wallet_snap',
@@ -233,6 +239,8 @@ export const trackCctx = async (txHash: string) => {
   }
 };
 export const getZetaBalance = async (addr: string) => {
+  console.log('SNAPCALL --> getZetaBalance');
+
   // invoke snap
   try {
     const result = await window.ethereum.request({
@@ -249,6 +257,7 @@ export const getZetaBalance = async (addr: string) => {
 };
 
 export const getBtcFees = async () => {
+  console.log('SNAPCALL --> getBtcFees');
   try {
     const result = await window.ethereum.request({
       method: 'wallet_snap',

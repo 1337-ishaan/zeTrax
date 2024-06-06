@@ -21,7 +21,13 @@ export const useStore = () => {
 };
 
 const StoreProvider = ({ children }: any) => {
-  const [globalState, setGlobalState] = useState(null);
+  const persistState = JSON.parse(localStorage.getItem('zeta-snap')!);
+  const [globalState, setGlobalState] = useState(
+    persistState ? persistState : null,
+  );
+
+  console.log(persistState, 'persisted');
+
   // {
   //   btcAddress: '',
   //   evmAddress: '',

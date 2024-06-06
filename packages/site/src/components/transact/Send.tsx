@@ -134,6 +134,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   const [depositFees, setDepositFees] = useState<any>();
   const { globalState, setGlobalState } = useContext(StoreContext);
   console.log(globalState, 'globalStte in send');
+
   const sendTrx = async () => {
     setIsTrxProcessing(true);
     toast('Processing...', {
@@ -143,29 +144,28 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
       await transferBtc(
         recipentAddress ? recipentAddress : globalState?.evmAddress,
         selectedZrc20.zrc20_contract_address,
-        //@ts-ignore,
         +amount,
         globalState?.evmAddress as string,
         customMemo,
-        // selectedGasPriority,
       );
       console.log('222');
       setGlobalState({ ...globalState, isTrxProcessed: true });
     } catch (e: any) {
-      setIsTrxProcessing(true);
       toast(`Error: ${e?.message}`, {
         hideProgressBar: false,
       });
       console.log('222');
-      setGlobalState({ ...globalState, isTrxProcessed: false });
     } finally {
-      setIsTrxProcessing(true);
+      setIsTrxProcessing(false);
+      setGlobalState({ ...globalState, isTrxProcessed: true });
+
       setIsSendModalOpen(false);
     }
   };
 
   const getZrc20Assets = async () => {
     let assets = await axios.get(
+      // TODO: make API_URL as constant
       'https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/fungible/foreign_coins',
     );
     setZrc20Assets(assets.data.foreignCoins);
