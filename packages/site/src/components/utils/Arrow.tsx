@@ -12,10 +12,11 @@ const ArrowWrapper = styled(ArrowIcon)<{ isReceived: boolean }>`
 
 interface ArrowProps {
   isReceived?: boolean;
+  onClick?: any;
 }
 
-const Arrow = ({ isReceived = false }: ArrowProps): JSX.Element => {
-  return <ArrowWrapper isReceived={isReceived} />;
+const Arrow = ({ isReceived = false, onClick }: ArrowProps): JSX.Element => {
+  return <ArrowWrapper isReceived={isReceived} onClick={onClick} />;
 };
 
 export default Arrow;

@@ -8,6 +8,8 @@ import Loader from '../utils/Loader';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import TooltipInfo from '../utils/TooltipInfo';
 import { StoreContext } from '../../hooks/useStore';
+import Arrow from '../utils/Arrow';
+import StyledButton from '../utils/StyledButton';
 
 const TrxHistoryWrapper = styled.div`
   a {
@@ -39,6 +41,12 @@ const TrxHistoryWrapper = styled.div`
   .refresh-icon {
     cursor: pointer;
   }
+  .filter-trx-type {
+    justify-content: flex-end;
+    align-items: center;
+    padding: 4px 0;
+    column-gap: 8px;
+  }
 `;
 
 interface TrxHistoryInterface {}
@@ -46,15 +54,25 @@ interface TrxHistoryInterface {}
 const TrxHistory = (_: TrxHistoryInterface) => {
   const { globalState, setGlobalState } = useContext(StoreContext);
   const [isRefetched, setIsRefetched] = useState(false);
+  const [filter, setFilter] = useState('');
 
   React.useEffect(() => {
     console.log('BALANCE TRX PROCESSED -->', globalState?.isTrxProcessed);
 
-    if ((!!globalState?.btcAddress && globalState?.utxo) || isRefetched) {
+    if (
+      (!!globalState?.btcAddress &&
+        !globalState?.btcTrxs &&
+        !globalState?.utxo) ||
+      isRefetched
+    ) {
       const getBtcTrx = async () => {
         try {
           const results: any = await getBtcUtxo();
-          setGlobalState({ ...globalState, btcTrxs: results });
+          setGlobalState({
+            ...globalState,
+            btcTrxs: results,
+            utxo: results?.final_balance - results?.unconfirmed_balance,
+          });
         } catch (error) {
           console.error(error);
         } finally {
@@ -65,6 +83,7 @@ const TrxHistory = (_: TrxHistoryInterface) => {
     }
   }, [globalState?.btcAddress, globalState?.utxo, isRefetched]);
 
+  console.log(filter, 'filter');
   const getAmount = (trx: any) => {
     return trx.outputs.filter(
       (t: any) => t.addresses?.[0] === globalState?.btcAddress,
@@ -84,10 +103,24 @@ const TrxHistory = (_: TrxHistoryInterface) => {
             }
           />
         </Typography>
-        <RefreshIcon
-          className="refresh-icon"
-          onClick={() => setIsRefetched(true)}
-        />
+
+        <FlexRowWrapper className="filter-trx-type">
+          <Arrow
+            onClick={() =>
+              filter !== 'SENT' ? setFilter('SENT') : setFilter('')
+            }
+          />
+          <Arrow
+            isReceived={true}
+            onClick={() =>
+              filter !== 'RECEIVED' ? setFilter('RECEIVED') : setFilter('')
+            }
+          />
+          <RefreshIcon
+            className="refresh-icon"
+            onClick={() => setIsRefetched(true)}
+          />
+        </FlexRowWrapper>
       </FlexRowWrapper>
 
       {isRefetched ? (
@@ -96,13 +129,34 @@ const TrxHistory = (_: TrxHistoryInterface) => {
         </div>
       ) : (
         globalState?.btcTrxs &&
-        globalState?.btcTrxs?.txs?.map((trx: any) => (
-          <TrxRow
-            trx={trx}
-            isSent={trx.inputs[0].addresses?.includes(globalState?.btcAddress)}
-            amount={getAmount(trx)}
-          />
-        ))
+        globalState?.btcTrxs?.txs?.map((trx: any) => {
+          let trxs = () => {
+            if (filter === 'SENT') {
+              return !!trx.inputs[0].addresses?.includes(
+                globalState?.btcAddress,
+              );
+            } else if (filter === 'RECEIVED') {
+              return !trx.inputs[0].addresses?.includes(
+                globalState?.btcAddress,
+              );
+            } else {
+              return true;
+            }
+          };
+          return (
+            <>
+              {trxs() && (
+                <TrxRow
+                  trx={trx}
+                  isSent={trx.inputs[0].addresses?.includes(
+                    globalState?.btcAddress,
+                  )}
+                  amount={getAmount(trx)}
+                />
+              )}
+            </>
+          );
+        })
       )}
     </TrxHistoryWrapper>
   );

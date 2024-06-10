@@ -61,7 +61,6 @@ const ReceiveModal = ({
               rowGap: '16px',
               position: 'relative',
               justifyContent: 'center',
-
               alignItems: 'center',
               background: '#232323',
               padding: '16px',
@@ -70,11 +69,23 @@ const ReceiveModal = ({
             }}
           >
             <FlexRowWrapper
-              style={{ justifyContent: 'space-evenly', alignItems: 'center' }}
+              style={{
+                justifyContent: 'space-evenly',
+                alignItems: 'center',
+              }}
               className="address-type-wrapper"
             >
-              <FlexColumnWrapper onClick={() => setSelectedAddressType('EVM')}>
+              <FlexColumnWrapper
+                onClick={() => setSelectedAddressType('EVM')}
+                style={{
+                  background: '#474747e4',
+
+                  borderRadius: '12px',
+                  padding: '8px 12px',
+                }}
+              >
                 <Typography
+                  className="type-button"
                   color={selectedAddressType === 'EVM' ? '#fff' : '#a49f9f'}
                   size={selectedAddressType === 'EVM' ? 24 : 22}
                 >
@@ -84,8 +95,16 @@ const ReceiveModal = ({
               <div
                 style={{ height: '24px', width: '.1px', background: '#fff' }}
               />
-              <FlexColumnWrapper onClick={() => setSelectedAddressType('BTC')}>
+              <FlexColumnWrapper
+                onClick={() => setSelectedAddressType('BTC')}
+                style={{
+                  background: '#474747e4',
+                  borderRadius: '12px',
+                  padding: '8px 12px',
+                }}
+              >
                 <Typography
+                  className="type-button"
                   color={selectedAddressType === 'BTC' ? '#fff' : '#a49f9f'}
                   size={selectedAddressType === 'BTC' ? 24 : 22}
                 >

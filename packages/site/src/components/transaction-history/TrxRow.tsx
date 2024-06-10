@@ -1,7 +1,6 @@
 import { trimHexAddress } from '../../utils/trimHexAddr';
 import styled from 'styled-components/macro';
 import Arrow from '../utils/Arrow';
-import * as zeta from '@zetachain/toolkit/dist/helpers';
 import { trackCctx } from '../../utils';
 import {
   Accordion,

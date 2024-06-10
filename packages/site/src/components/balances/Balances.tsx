@@ -106,24 +106,24 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   const [data, setData] = useState<any>();
   const [searched, setSearched] = useState<any>('');
 
-  useEffect(() => {
-    console.log('BALANCE TRX PROCESSED -->', globalState?.isTrxProcessed);
-    if (globalState?.btcAddress || globalState?.isTrxProcessed) {
-      const getBalance = async () => {
-        console.log('111 global state', globalState?.isTrxProcessed);
-        let results: any = await getBtcUtxo();
-        setBalance(results);
-        setGlobalState({
-          ...globalState,
-          utxo: results?.final_balance - results?.unconfirmed_balance,
-        });
-      };
-      getBalance();
-    }
-  }, [globalState?.btcAddress, globalState?.isTrxProcessed]);
+  // useEffect(() => {
+  //   console.log('BALANCE TRX PROCESSED -->', globalState?.isTrxProcessed);
+  //   if (globalState?.btcAddress || globalState?.isTrxProcessed) {
+  //     const getBalance = async () => {
+  //       console.log('111 global state', globalState?.isTrxProcessed);
+  //       // let results: any = await getBtcUtxo();
+  //       setBalance(results);
+  //       // setGlobalState({
+  //       //   ...globalState,
+  //       //   utxo: results?.final_balance - results?.unconfirmed_balance,
+  //       // });
+  //     };
+  //     getBalance();
+  //   }
+  // }, [globalState?.btcAddress, globalState?.isTrxProcessed]);
 
   useEffect(() => {
-    if (globalState?.evmAddress) {
+    if (globalState?.evmAddress && globalState?.utxo && !data) {
       const getZetaBal = async () => {
         try {
           let result: any = await getZetaBalance(
@@ -140,7 +140,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
           setData([
             {
               label: 'BTC',
-              value: balance?.balance / 1e8,
+              value: globalState?.utxo / 1e8,
             },
             ...maps,
             {
@@ -154,7 +154,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       };
       getZetaBal();
     }
-  }, [globalState?.evmAddress, balance]);
+  }, [globalState?.evmAddress, globalState?.utxo]);
 
   const onSearched = (searchText: string) => {
     if (data && !!searchText) {
@@ -194,8 +194,6 @@ const Balances = ({}: BalancesProps): JSX.Element => {
         <BalancePie data={searched.length > 0 ? searched : data} />
       </FlexRowWrapper>
       <div>
-        {/* className={`${index === 0 || 1 ? 't-wallet-type' : ''}`} */}
-        {/* <FlexColumnWrapper className="balances-list-card"> */}
         <table>
           <thead>
             <tr key="balance-header">
