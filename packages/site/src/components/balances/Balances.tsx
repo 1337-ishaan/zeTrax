@@ -101,26 +101,9 @@ const BalancesWrapper = styled(FlexColumnWrapper)`
 interface BalancesProps {}
 
 const Balances = ({}: BalancesProps): JSX.Element => {
-  const { globalState, setGlobalState } = useContext(StoreContext);
-  const [balance, setBalance] = useState<any>({});
+  const { globalState } = useContext(StoreContext);
   const [data, setData] = useState<any>();
   const [searched, setSearched] = useState<any>('');
-
-  // useEffect(() => {
-  //   console.log('BALANCE TRX PROCESSED -->', globalState?.isTrxProcessed);
-  //   if (globalState?.btcAddress || globalState?.isTrxProcessed) {
-  //     const getBalance = async () => {
-  //       console.log('111 global state', globalState?.isTrxProcessed);
-  //       // let results: any = await getBtcUtxo();
-  //       setBalance(results);
-  //       // setGlobalState({
-  //       //   ...globalState,
-  //       //   utxo: results?.final_balance - results?.unconfirmed_balance,
-  //       // });
-  //     };
-  //     getBalance();
-  //   }
-  // }, [globalState?.btcAddress, globalState?.isTrxProcessed]);
 
   useEffect(() => {
     if (globalState?.evmAddress && globalState?.utxo && !data) {
@@ -166,8 +149,6 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       setSearched(data);
     }
   };
-
-  console.log(balance, data, '111 balance');
 
   return (
     <BalancesWrapper>
@@ -223,14 +204,11 @@ const Balances = ({}: BalancesProps): JSX.Element => {
                     </Typography>
                   </td>
                   <td>$0</td>
-
-                  {/* </FlexRowWrapper> */}
                 </tr>
               ),
             )}
           </tbody>
         </table>
-        {/* </FlexColumnWrapper> */}
       </div>
     </BalancesWrapper>
   );

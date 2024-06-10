@@ -9,7 +9,6 @@ import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import TooltipInfo from '../utils/TooltipInfo';
 import { StoreContext } from '../../hooks/useStore';
 import Arrow from '../utils/Arrow';
-import StyledButton from '../utils/StyledButton';
 
 const TrxHistoryWrapper = styled.div`
   a {
@@ -19,7 +18,6 @@ const TrxHistoryWrapper = styled.div`
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
   color: #dadada;
   padding: 24px;
-  /* max-height: 77vh; */
   height: 340px;
   width: 400px;
 
@@ -46,6 +44,13 @@ const TrxHistoryWrapper = styled.div`
     align-items: center;
     padding: 4px 0;
     column-gap: 8px;
+
+    .t-filter {
+      cursor: pointer;
+    }
+    .active {
+      background: #d5d5d5;
+    }
   }
 `;
 
@@ -63,7 +68,8 @@ const TrxHistory = (_: TrxHistoryInterface) => {
       (!!globalState?.btcAddress &&
         !globalState?.btcTrxs &&
         !globalState?.utxo) ||
-      isRefetched
+      isRefetched ||
+      globalState.isTrxProcessed
     ) {
       const getBtcTrx = async () => {
         try {
@@ -81,7 +87,12 @@ const TrxHistory = (_: TrxHistoryInterface) => {
       };
       getBtcTrx();
     }
-  }, [globalState?.btcAddress, globalState?.utxo, isRefetched]);
+  }, [
+    globalState?.btcAddress,
+    globalState?.utxo,
+    isRefetched,
+    globalState?.isTrxProcessed,
+  ]);
 
   console.log(filter, 'filter');
   const getAmount = (trx: any) => {
@@ -106,11 +117,13 @@ const TrxHistory = (_: TrxHistoryInterface) => {
 
         <FlexRowWrapper className="filter-trx-type">
           <Arrow
+            className={`t-filter ${filter === 'SENT' && 'active'}`}
             onClick={() =>
               filter !== 'SENT' ? setFilter('SENT') : setFilter('')
             }
           />
           <Arrow
+            className={`t-filter ${filter === 'RECEIVED' && 'active'}`}
             isReceived={true}
             onClick={() =>
               filter !== 'RECEIVED' ? setFilter('RECEIVED') : setFilter('')

@@ -112,6 +112,10 @@ const SendWrapper = styled.div`
     cursor: pointer;
     color: #6bf08c;
     font-weight: 600;
+    &.red {
+      color: #ff4a3d;
+      cursor: disabled;
+    }
   }
 `;
 
@@ -127,9 +131,9 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   const [amount, setAmount] = useState<any>(0);
   const [recipentAddress, setRecipentAddress] = useState<any>('');
   const [isTrxProcessing, setIsTrxProcessing] = useState(false);
-  const [selectedGasPriority, setSelectedGasPriority] = useState<
-    'low' | 'medium' | 'high'
-  >('low');
+  // const [selectedGasPriority, setSelectedGasPriority] = useState<
+  //   'low' | 'medium' | 'high'
+  // >('low');
   const [customMemo, setCustomMemo] = useState('');
   const [depositFees, setDepositFees] = useState<any>();
   const { globalState, setGlobalState } = useContext(StoreContext);
@@ -149,7 +153,6 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
         customMemo,
       );
       console.log('222');
-      setGlobalState({ ...globalState, isTrxProcessed: true });
     } catch (e: any) {
       toast(`Error: ${e?.message}`, {
         hideProgressBar: false,
@@ -200,6 +203,9 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
       </div>
     </div>
   );
+
+  const maxFunds =
+    (globalState?.utxo - (currentActive === 'cctx' ? 20900 : 40000)) / 1e8;
 
   return (
     <SendWrapper>
@@ -252,10 +258,10 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
           placeholder="Amount"
         />
         <FlexRowWrapper
-          className="max-utxo"
-          onClick={() => setAmount(globalState?.utxo / 1e8)}
+          className={`max-utxo ${maxFunds < 0 ? ' red' : ''}`}
+          onClick={() => setAmount(maxFunds)}
         >
-          Max: {globalState?.utxo / 1e8} BTC
+          Max:{maxFunds} BTC
         </FlexRowWrapper>
         {currentActive === 'cctx' ? (
           <FlexRowWrapper className="custom-tooltip-wrapper">
@@ -286,13 +292,18 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
           <></>
         )}
       </FlexColumnWrapper>
+      {maxFunds < 0 && (
+        <InfoBox color="#ff4a3d">
+          You don't have enough funds to proceed with this transaction
+        </InfoBox>
+      )}
       <InfoBox>
         {currentActive === 'zeta'
           ? 'Deposit BTC to ZetaChain either to specified recipent address, if recipent address is not mentioned the assets will be transferred to connected wallet address'
           : 'Cross chain transfer BTC to ZetaChain either to specified recipent address, if recipent address is not mentioned the assets will be transferred to connected wallet address'}
       </InfoBox>
 
-      <FlexRowWrapper className="priority-wrapper">
+      {/* <FlexRowWrapper className="priority-wrapper">
         <FlexColumnWrapper
           onClick={() => setSelectedGasPriority('low')}
           className={`priority-item ${
@@ -335,15 +346,18 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             ~{((depositFees?.high_fee_per_kb * 2) / 1e8).toFixed(5)} BTC
           </Typography>{' '}
         </FlexColumnWrapper>
-      </FlexRowWrapper>
-
-      {/* <FlexRowWrapper className="gas-wrapper">
-        <GasIcon className="icon" /> Fees :
-        <span className="amount">~10000 sats</span>
       </FlexRowWrapper> */}
+
+      <FlexRowWrapper className="gas-wrapper">
+        <GasIcon className="icon" /> Fees :
+        <span className="amount">
+          ~{(currentActive === 'cctx' ? 20900 : 40000) / 1e8} BTC
+        </span>
+      </FlexRowWrapper>
       <StyledButton
         disabled={
-          currentActive === 'zeta' ? !amount : !amount || !selectedZrc20
+          (currentActive === 'zeta' ? !amount : !amount || !selectedZrc20) ||
+          maxFunds < 0
         }
         onClick={sendTrx}
       >

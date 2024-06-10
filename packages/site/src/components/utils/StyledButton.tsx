@@ -11,6 +11,13 @@ const StyledButtonWrapper = styled.button`
     transform: scale(1.1);
     transition: all 0.3s;
   }
+  &:disabled {
+    transform: unset;
+    background: #898989;
+    &:hover {
+      background: #898989;
+    }
+  }
 `;
 
 const StyledButton = ({ ...props }): JSX.Element => {

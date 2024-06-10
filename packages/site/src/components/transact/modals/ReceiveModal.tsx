@@ -62,7 +62,8 @@ const ReceiveModal = ({
               position: 'relative',
               justifyContent: 'center',
               alignItems: 'center',
-              background: '#232323',
+              background: '#141417',
+
               padding: '16px',
               width: '400px',
               transition: '.5s all',

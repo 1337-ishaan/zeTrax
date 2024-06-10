@@ -27,29 +27,6 @@ const convertToZeta = (address: string) => {
   }
 };
 
-export const getAccounts = async () => {
-  try {
-    await ethereum.request({
-      method: 'wallet_requestSnaps',
-      params: {
-        'npm:btcsnap': {},
-      },
-    });
-
-    const response = await ethereum.request({
-      method: 'wallet_snap',
-      params: {
-        snapId: 'npm:btcsnap',
-        request: { method: 'btc_getPublicExtendedKey' },
-      },
-    });
-
-    return { response };
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const getWalletInfo = async () => {
   try {
     const connectedAddr = await getAccInfo();
@@ -209,55 +186,6 @@ export const getFees = async () => {
   }
 };
 
-export const sendTrx = async (request: any) => {
-  try {
-    const result = await snap.request({
-      method: 'snap_dialog',
-      params: {
-        type: 'confirmation',
-        content: panel([
-          text(`**zeTrax** wants to send a dummy trx using ZetaChain`),
-          text('Confirm Transaction'),
-        ]),
-      },
-    });
-
-    if (result) {
-      const postData: any = {
-        tx_bytes: Buffer.from(request, 'hex').toString('hex'),
-        mode: 'BROADCAST_MODE_BLOCK',
-      };
-
-      const trxData = await fetch(
-        'https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/tx/v1beta1/txs',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: postData,
-        },
-      );
-
-      const res = await trxData.json();
-
-      await snap.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'alert',
-          content: panel([text(`Trx Hash: ${JSON.stringify(res)}`)]),
-        },
-      });
-
-      return res.tx_response;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    throw error;
-  }
-};
-
 const broadcastTransaction = async (hex: string) => {
   try {
     // convert to blockcypher
@@ -303,7 +231,6 @@ export const getTrxByHash = async (previousTxHash: string) => {
 
 export const getTrxHex = async (previousTxHash: string) => {
   try {
-    // convert to blockcypher
     const response: any = await fetch(
       `https://blockstream.info/testnet/api/tx/${previousTxHash}/hex`,
     );
@@ -337,10 +264,7 @@ export const crossChainSwapBtc = async (request: any) => {
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
-      content: panel([
-        text(`**${JSON.stringify(request)}** `),
-        text('Confirm Transaction'),
-      ]),
+      content: panel([text('Confirm BTC Transaction')]),
     },
   });
   if (result) {
@@ -375,7 +299,6 @@ export const crossChainSwapBtc = async (request: any) => {
 
         utxos.sort((a: any, b: any) => a.value - b.value);
         const fee = request.params[2] ? 20900 : 40000;
-        // const fee = await getBtcDepositFees(request.params[2]);
         const total = amount + fee;
         let sum = 0;
         const pickUtxos = [];

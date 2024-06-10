@@ -1,15 +1,16 @@
 import styled from 'styled-components/macro';
 import { ReactComponent as InfoIcon } from '../../assets/info.svg';
 
-const InfoBoxWrapper = styled.div`
+const InfoBoxWrapper = styled.div<{ color?: string }>`
   padding: 8px;
-  background: rgba(255, 255, 0, 0.3);
+  background: ${(props) =>
+    props.color ? props.color : 'rgba(255, 255, 0, 0.3)'};
   border-radius: ${(props) => props.theme.borderRadius};
-
   display: flex;
   align-items: center;
   column-gap: 8px;
   font-size: 14px;
+
   .info-icon {
     max-width: 24px;
     max-height: 24px;
@@ -18,11 +19,12 @@ const InfoBoxWrapper = styled.div`
 
 interface InfoBoxProps {
   children: any;
+  color?: string;
 }
 
-const InfoBox = ({ children }: InfoBoxProps): JSX.Element => {
+const InfoBox = ({ children, color }: InfoBoxProps): JSX.Element => {
   return (
-    <InfoBoxWrapper>
+    <InfoBoxWrapper color={color ?? ''}>
       <InfoIcon className="info-icon" />
       {children}
     </InfoBoxWrapper>

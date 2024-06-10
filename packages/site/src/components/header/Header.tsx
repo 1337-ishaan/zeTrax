@@ -43,12 +43,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
   const { globalState, setGlobalState } = useContext(StoreContext);
 
   useEffect(() => {
-    if (
-      globalState?.evmAddress &&
-      globalState?.btcAddress // &&
-      // globalState?.utxo &&
-      // globalState?.btcTrxs
-    ) {
+    if (globalState?.evmAddress && globalState?.btcAddress) {
       localStorage.setItem('zeta-snap', JSON.stringify(globalState));
     }
   }, [globalState]);
@@ -70,8 +65,6 @@ const Header = ({}: HeaderProps): JSX.Element => {
   };
 
   const getEvmAddress = async () => {
-    console.log('provider');
-
     const provider = new ethers.BrowserProvider(window.ethereum as any);
     const connectedAddress = await provider.getSigner();
     return connectedAddress.address;
@@ -81,14 +74,14 @@ const Header = ({}: HeaderProps): JSX.Element => {
     setGlobalState({});
     localStorage.removeItem('zeta-snap');
   };
-  const btcAddress = globalState?.btcAddress;
+
   return (
     <HeaderWrapper>
       <Logo className="logo" />
       <div className="connect-wallet-wrapper">
         {state.installedSnap ? (
           <FlexRowWrapper>
-            {!btcAddress ? (
+            {!globalState?.btcAddress ? (
               <StyledButton onClick={onConnectSnap}>
                 Connect ZeSnap
               </StyledButton>
@@ -96,7 +89,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
               <FlexRowWrapper className="address-header">
                 <div className="icon-addr-wrapper">
                   <BitcoinLogo className="chain-icon" />
-                  <Copyable>{btcAddress}</Copyable>
+                  <Copyable>{globalState?.btcAddress}</Copyable>
                 </div>
 
                 <div className="icon-addr-wrapper">

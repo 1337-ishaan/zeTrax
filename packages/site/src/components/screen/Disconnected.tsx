@@ -8,7 +8,6 @@ const DisconnectedWrapper = styled(FlexRowWrapper)`
   min-height: 80vh;
   width: 80vw;
   margin-top: 88px;
-  /* align-items: center; */
   column-gap: 44px;
   .supported-resources {
     width: 50%;
@@ -21,7 +20,6 @@ interface DisconnectedProps {}
 const Disconnected = ({}: DisconnectedProps): JSX.Element => {
   return (
     <DisconnectedWrapper>
-      {/* <div className="video-responsive"> */}
       <FlexColumnWrapper className="supported-resources">
         <Typography size={24} weight={300}>
           Welcome to ZeSnap 🎉
@@ -44,11 +42,6 @@ const Disconnected = ({}: DisconnectedProps): JSX.Element => {
         referrerPolicy="strict-origin-when-cross-origin"
         allowFullScreen
       ></iframe>
-      {/* </div> */}
-      {/* <Typography>
-        Kindly install zeTrax and connect your wallet by clicking the "Install
-        zeTrax" button to proceed.
-      </Typography> */}
     </DisconnectedWrapper>
   );
 };
