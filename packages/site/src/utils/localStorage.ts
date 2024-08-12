@@ -1,17 +1,16 @@
+import DOMPurify from 'dompurify';
 /**
  * Get a local storage key.
  *
  * @param key - The local storage key to access.
  * @returns The value stored at the key provided if the key exists.
  */
-export const getLocalStorage = (key: string) => {
+export const getLocalStorage = (key: string): string | null => {
   const { localStorage: ls } = window;
-
   if (ls !== null) {
     const data = ls.getItem(key);
-    return data;
+    return data ? DOMPurify.sanitize(data) : null;
   }
-
   throw new Error('Local storage is not available.');
 };
 

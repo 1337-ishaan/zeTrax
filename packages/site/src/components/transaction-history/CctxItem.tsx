@@ -5,114 +5,127 @@ import { getChainIcon } from '../../constants/getChainIcon';
 import Typography from '../utils/Typography';
 import { ReactComponent as RightArrow } from '../../assets/right-arrow.svg';
 import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
-
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import InfoBox from '../utils/InfoBox';
 
+// Styled component for the CctxItem
 const CctxItemWrapper = styled(FlexColumnWrapper)`
   background: rgba(0, 0, 0, 0.3);
   row-gap: 8px;
   padding: 20px;
   border-radius: 12px;
   width: 100%;
+
   a {
     color: #eee;
     font-size: 16px;
   }
+
   .flex-row {
     row-gap: 12px;
   }
+
   .chain-swap {
     margin: 16px 0;
     column-gap: 16px;
     justify-content: start;
+
     .chain-logo {
       height: 48px;
     }
   }
+
   .arrow-icon {
     width: 48px;
   }
+
   .redirect-icon {
     width: 16px;
     height: 16px;
   }
 `;
 
-interface CctxItemProps {
-  cctx: any;
+// Define the structure of the CctxItemProps interface
+interface InboundTxParams {
+  sender_chain_id: number;
+  amount: number;
+  tx_finalization_status: string;
 }
 
-const CctxItem = ({ cctx }: CctxItemProps): JSX.Element => {
+interface OutboundTxParams {
+  receiver_chainId: number;
+  receiver: string;
+}
+
+interface Cctx {
+  index: string;
+  inbound_tx_params: InboundTxParams;
+  outbound_tx_params: OutboundTxParams[];
+}
+
+interface CctxItemProps {
+  cctx: Cctx;
+}
+
+// CctxItem component definition
+const CctxItem: React.FC<CctxItemProps> = ({ cctx }) => {
+  // Log the cctx object for debugging purposes
   console.log(cctx, 'cctx');
+
+  // Error handling: Check if cctx is valid
+  if (!cctx || !cctx.inbound_tx_params || !cctx.outbound_tx_params.length) {
+    return <Typography color="#ff0000">Invalid transaction data.</Typography>;
+  }
+
+  const { inbound_tx_params, outbound_tx_params } = cctx;
+
   return (
     <CctxItemWrapper>
       <Typography color="#a9a8a8" size={18}>
-        ZetaChain CCTX transaction
+        ZetaChain CCTX Transaction
       </Typography>
       <FlexRowWrapper className="chain-swap">
         <img
           className="chain-logo"
           // @ts-ignore
-          src={getChainIcon(+cctx.inbound_tx_params.sender_chain_id)}
+          src={getChainIcon(+inbound_tx_params.sender_chain_id)}
           alt=""
         />
         <RightArrow className="arrow-icon" />
         <img
           className="chain-logo"
           // @ts-ignore
-          src={getChainIcon(+cctx.outbound_tx_params?.[0].receiver_chainId)}
+          src={getChainIcon(+outbound_tx_params?.[0].receiver_chainId)}
           alt=""
         />
       </FlexRowWrapper>
-      <FlexRowWrapper className="flex-row ">
+      <FlexRowWrapper className="flex-row">
         <Typography size={16}>
           Trx Hash:{' '}
           <a
             href={`https://athens.explorer.zetachain.com/cc/tx/${cctx.index}`}
             target="_blank"
+            rel="noopener noreferrer"
           >
             {trimHexAddress(cctx.index)}
             <RedirectIcon className="redirect-icon" />
           </a>
         </Typography>
       </FlexRowWrapper>
-
       <Typography size={14}>
         Amount:&nbsp;
-        {parseFloat('' + cctx.inbound_tx_params.amount / 1e8).toFixed(8)} tBTC
+        {parseFloat((inbound_tx_params.amount / 1e8).toFixed(8))} tBTC
       </Typography>
-
-      {/* <FlexRowWrapper className="flex-row"> */}
-      {/* <Typography size={14}>
-          <>
-            Sender:{' '}
-            <a
-              href={`https://mempool.space/testnet/address/${cctx.outbound_tx_params[0].receiver}`}
-              target="_blank"
-            >
-              {trimHexAddress(cctx.outbound_tx_params?.[0].receiver)}
-              <RedirectIcon className="redirect-icon" />
-            </a>
-          </>
-        </Typography> */}
-      {/* </FlexRowWrapper> */}
-
       <FlexRowWrapper className="flex-row">
         <Typography size={14} color="#bed837">
-          CCTX Status: {cctx?.inbound_tx_params?.tx_finalization_status}
+          CCTX Status: {inbound_tx_params.tx_finalization_status}
         </Typography>
       </FlexRowWrapper>
       <InfoBox>
-        All transaction are processed through ZetaChain, to view more details
-        visit ZetaScan (Trx Hash)
+        All transactions are processed through ZetaChain. To view more details,
+        visit ZetaScan (Trx Hash).
       </InfoBox>
-      {/* <FlexRowWrapper className="flex-row">
-        <Typography size={12} color="#4e4">
-          Message: {cctx?.cctx_status?.status_message}
-        </Typography>
-      </FlexRowWrapper> */}
     </CctxItemWrapper>
   );
 };

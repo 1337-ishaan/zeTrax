@@ -9,7 +9,7 @@ const SendModalWrapper = styled.div`
 
 interface SendModalProps {
   isSendModalOpen: boolean;
-  setIsSendModalOpen: any;
+  setIsSendModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const customStyles = {

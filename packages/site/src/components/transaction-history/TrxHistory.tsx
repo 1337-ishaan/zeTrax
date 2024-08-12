@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { getBtcUtxo, trackCctx } from '../../utils';
+import React, { useContext, useState, useEffect } from 'react';
+import { getBtcUtxo } from '../../utils';
 import styled from 'styled-components';
 import Typography from '../utils/Typography';
 import TrxRow from './TrxRow';
@@ -11,34 +11,39 @@ import { StoreContext } from '../../hooks/useStore';
 import Arrow from '../utils/Arrow';
 
 const TrxHistoryWrapper = styled.div`
-  a {
-    color: white;
-  }
   background: ${(props) => props.theme.colors.dark?.default};
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
   color: #dadada;
   padding: 24px;
   height: 340px;
-  width: 400px;
-
+  overflow-x: none;
   overflow-y: auto;
   border-radius: ${(props) => props.theme.borderRadius};
+
+  a {
+    color: white;
+  }
 
   .accordion__button {
     background-color: transparent !important;
     color: white;
     display: flex;
+    width: fit-content;
     align-items: center;
   }
+
   .accordion {
     border: none;
   }
+
   .flex-row {
     justify-content: space-between;
   }
+
   .refresh-icon {
     cursor: pointer;
   }
+
   .filter-trx-type {
     justify-content: flex-end;
     align-items: center;
@@ -47,21 +52,20 @@ const TrxHistoryWrapper = styled.div`
 
     .t-filter {
       cursor: pointer;
-    }
-    .active {
-      background: #d5d5d5;
+
+      &.active {
+        background: #d5d5d5;
+      }
     }
   }
 `;
 
-interface TrxHistoryInterface {}
-
-const TrxHistory = (_: TrxHistoryInterface) => {
+const TrxHistory: React.FC = () => {
   const { globalState, setGlobalState } = useContext(StoreContext);
   const [isRefetched, setIsRefetched] = useState(false);
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState<'SENT' | 'RECEIVED' | ''>('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('BALANCE TRX PROCESSED -->', globalState?.isTrxProcessed);
 
     if (
@@ -92,9 +96,9 @@ const TrxHistory = (_: TrxHistoryInterface) => {
     globalState?.utxo,
     isRefetched,
     globalState?.isTrxProcessed,
+    setGlobalState,
   ]);
 
-  console.log(filter, 'filter');
   const getAmount = (trx: any) => {
     return trx.outputs.filter(
       (t: any) => t.addresses?.[0] === globalState?.btcAddress,
@@ -106,13 +110,11 @@ const TrxHistory = (_: TrxHistoryInterface) => {
       <FlexRowWrapper className="flex-row">
         <Typography>
           Transactions
-          <TooltipInfo
-            children={
-              <Typography size={14} weight={500}>
-                Track your BTC transactions here ↓
-              </Typography>
-            }
-          />
+          <TooltipInfo>
+            <Typography size={14} weight={500}>
+              Track your BTC transactions here ↓
+            </Typography>
+          </TooltipInfo>
         </Typography>
 
         <FlexRowWrapper className="filter-trx-type">
@@ -137,37 +139,24 @@ const TrxHistory = (_: TrxHistoryInterface) => {
       </FlexRowWrapper>
 
       {isRefetched ? (
-        <div>
-          <Loader />
-        </div>
+        <Loader />
       ) : (
-        globalState?.btcTrxs &&
-        globalState?.btcTrxs?.txs?.map((trx: any) => {
-          let trxs = () => {
-            if (filter === 'SENT') {
-              return !!trx.inputs[0].addresses?.includes(
-                globalState?.btcAddress,
-              );
-            } else if (filter === 'RECEIVED') {
-              return !trx.inputs[0].addresses?.includes(
-                globalState?.btcAddress,
-              );
-            } else {
-              return true;
-            }
-          };
+        globalState?.btcTrxs?.txs?.map((trx: any, index: number) => {
+          const isSent = trx.inputs[0].addresses?.includes(
+            globalState?.btcAddress,
+          );
+          const shouldRender =
+            filter === '' ? true : filter === 'SENT' ? isSent : !isSent;
+
           return (
-            <>
-              {trxs() && (
-                <TrxRow
-                  trx={trx}
-                  isSent={trx.inputs[0].addresses?.includes(
-                    globalState?.btcAddress,
-                  )}
-                  amount={getAmount(trx)}
-                />
-              )}
-            </>
+            shouldRender && (
+              <TrxRow
+                key={index}
+                trx={trx}
+                isSent={isSent}
+                amount={getAmount(trx)}
+              />
+            )
           );
         })
       )}

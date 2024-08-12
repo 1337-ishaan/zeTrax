@@ -1,13 +1,10 @@
 import { createContext, useState, useContext } from 'react';
+import { getLocalStorage } from '../utils';
 import FlexColumnWrapper from '../components/utils/wrappers/FlexColumnWrapper';
 
-type ContextType = {
-  evmAddress: string;
-  btcAddress: string;
-  utxo: any;
-  isTrxProcessed: boolean;
-  btcTrxs: any[];
-};
+interface StoreProviderProps {
+  children: React.ReactNode;
+}
 
 const StoreContext = createContext<any | undefined>(undefined);
 
@@ -20,21 +17,11 @@ export const useStore = () => {
   return context;
 };
 
-const StoreProvider = ({ children }: any) => {
-  const persistState = JSON.parse(localStorage.getItem('zeta-snap')!);
+const StoreProvider = ({ children }: StoreProviderProps) => {
+  const persistState = JSON.parse(getLocalStorage('zeta-snap')!);
   const [globalState, setGlobalState] = useState(
     persistState ? persistState : null,
   );
-
-  console.log(persistState, 'persisted');
-
-  // {
-  //   btcAddress: '',
-  //   evmAddress: '',
-  //   utxo: null,
-  //   isTrxProcessing: false,
-  //   btcTrxs: [],
-  // }
 
   return (
     <StoreContext.Provider value={{ globalState, setGlobalState }}>

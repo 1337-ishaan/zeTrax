@@ -1,18 +1,15 @@
 import styled from 'styled-components/macro';
 import Modal from 'react-modal';
-import Send from '../Send';
 import { ReactComponent as CrossIcon } from '../../../assets/cross.svg';
 import { ReactComponent as BitcoinIcon } from '../../../assets/bitcoin.svg';
 import { ReactComponent as ZetaChainIcon } from '../../../assets/zetachain.svg';
-
 import { useContext, useState } from 'react';
-import { MetaMaskContext } from '../../../hooks';
+import { StoreContext } from '../../../hooks/useStore';
 import QRCode from 'react-qr-code';
 import Typography from '../../../components/utils/Typography';
 import Copyable from '../../../components/utils/Copyable';
 import FlexColumnWrapper from '../../../components/utils/wrappers/FlexColumnWrapper';
 import FlexRowWrapper from '../../../components/utils/wrappers/FlexWrapper';
-import { StoreContext } from '../../../hooks/useStore';
 
 const ReceiveModalWrapper = styled.div`
   position: relative;
@@ -24,7 +21,7 @@ const ReceiveModalWrapper = styled.div`
 
 interface ReceiveModalProps {
   isReceiveModalOpen: boolean;
-  setIsReceiveModalOpen: any;
+  setIsReceiveModalOpen: (isOpen: boolean) => void;
 }
 
 const customStyles = {
@@ -36,7 +33,6 @@ const customStyles = {
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
     padding: 0,
-
     background: 'transparent',
     border: 'none',
   },
@@ -50,6 +46,11 @@ const ReceiveModal = ({
   const [selectedAddressType, setSelectedAddressType] = useState<'BTC' | 'EVM'>(
     'BTC',
   );
+
+  const handleCloseModal = () => {
+    setIsReceiveModalOpen(false);
+  };
+
   return (
     <ReceiveModalWrapper>
       {globalState?.btcAddress && (
@@ -63,7 +64,6 @@ const ReceiveModal = ({
               justifyContent: 'center',
               alignItems: 'center',
               background: '#141417',
-
               padding: '16px',
               width: '400px',
               transition: '.5s all',
@@ -80,7 +80,6 @@ const ReceiveModal = ({
                 onClick={() => setSelectedAddressType('EVM')}
                 style={{
                   background: '#474747e4',
-
                   borderRadius: '12px',
                   padding: '8px 12px',
                 }}
@@ -110,12 +109,12 @@ const ReceiveModal = ({
                   size={selectedAddressType === 'BTC' ? 24 : 22}
                 >
                   BTC <BitcoinIcon />
-                </Typography>{' '}
+                </Typography>
               </FlexColumnWrapper>
             </FlexRowWrapper>
 
             <CrossIcon
-              onClick={() => setIsReceiveModalOpen(false)}
+              onClick={handleCloseModal}
               style={{
                 color: '#fff',
                 cursor: 'pointer',

@@ -20,10 +20,27 @@ import {
  * @returns The result of `snap_dialog`.
  * @throws If the request method is not valid for this snap.
  */
+
+const validOrigins = ['http://localhost:8000'];
+
+interface RpcRequest {
+  method: string;
+  params?: any; // You can further specify this based on your expected parameters
+}
+
+interface OnRpcRequestArgs {
+  origin: string;
+  request: RpcRequest;
+}
+
 export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
-}: any) => {
+}: OnRpcRequestArgs) => {
+  if (!validOrigins.includes(origin)) {
+    throw new Error('Invalid origin');
+  }
+
   switch (request.method) {
     case 'create-btc-testnet':
       return createBtcTestnetAddr();

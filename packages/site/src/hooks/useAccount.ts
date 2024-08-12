@@ -2,11 +2,9 @@ import { ethers } from 'ethers';
 import React, { useEffect, useState, useCallback } from 'react';
 import { createBtcWallet } from '../utils';
 
-interface useAccountInterface {}
-
 const useAccount = (isSnapInstalled = false) => {
-  const [address, setAddress] = useState<null | string>(null);
-  const [btcAddress, setBtcAddress] = useState<null | string>(null);
+  const [address, setAddress] = useState<string | null>(null);
+  const [btcAddress, setBtcAddress] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const provider = new ethers.BrowserProvider(window.ethereum);
 
@@ -14,10 +12,9 @@ const useAccount = (isSnapInstalled = false) => {
     setLoading(true);
     try {
       if (!btcAddress) {
-        const derivedBtcAddress: any = await createBtcWallet();
+        const derivedBtcAddress = await createBtcWallet();
         const connectedAddress = await provider.getSigner();
-
-        setBtcAddress(derivedBtcAddress);
+        setBtcAddress(derivedBtcAddress as string);
         setAddress(connectedAddress.address);
       }
     } catch (error) {

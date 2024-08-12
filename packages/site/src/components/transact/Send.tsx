@@ -120,7 +120,7 @@ const SendWrapper = styled.div`
 `;
 
 interface SendProps {
-  setIsSendModalOpen?: any;
+  setIsSendModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
@@ -153,11 +153,8 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
         customMemo,
       );
       console.log('222');
-    } catch (e: any) {
-      toast(`Error: ${e?.message}`, {
-        hideProgressBar: false,
-      });
-      console.log('222');
+    } catch (e: unknown) {
+      toast(`Error: ${(e as Error).message}`, { hideProgressBar: false });
     } finally {
       setIsTrxProcessing(false);
       setGlobalState({ ...globalState, isTrxProcessed: true });
@@ -182,7 +179,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   useEffect(() => {
     if (!depositFees) {
       const getFees = async () => {
-        let fees: any = await getBtcFees();
+        let fees = await getBtcFees();
         setDepositFees(fees);
       };
       getFees();
@@ -226,7 +223,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
       {currentActive === 'cctx' && (
         <Select
           options={zrc20Assets}
-          contentRenderer={({ props, state }: any) => (
+          contentRenderer={() => (
             <div key={trxInput.key}>
               <>
                 <CustomItemRenderer option={selectedZrc20} />
@@ -234,7 +231,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             </div>
           )}
           valueField="symbol"
-          itemRenderer={({ item, itemIndex, props, state, methods }: any) => (
+          itemRenderer={({ item, itemIndex, methods }) => (
             <div key={itemIndex} onClick={() => methods.addItem(item)}>
               <CustomItemRenderer option={item} />
             </div>
@@ -248,10 +245,14 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
       <FlexColumnWrapper className="inputs-wrapper">
         <StyledInput
           placeholder="Recipent Address (Optional)"
-          onChange={(e: any) => setRecipentAddress(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setRecipentAddress(e.target.value)
+          }
         />
         <StyledInput
-          onChange={(e: any) => setAmount(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setAmount(e.target.value)
+          }
           type="number"
           value={amount}
           min={0.00000000001}
@@ -267,7 +268,9 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
           <FlexRowWrapper className="custom-tooltip-wrapper">
             <StyledInput
               className="custom-memo-input"
-              onChange={(e: any) => setCustomMemo(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setCustomMemo(e.target.value)
+              }
               type="string"
               placeholder="Custom Memo"
             />

@@ -3,7 +3,12 @@ import { StoreContext } from '../../hooks/useStore';
 import styled from 'styled-components/macro';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { MetaMaskContext } from '../../hooks';
-import { connectSnap, createBtcWallet, disconnectSnap } from '../../utils';
+import {
+  connectSnap,
+  createBtcWallet,
+  disconnectSnap,
+  setLocalStorage,
+} from '../../utils';
 import StyledButton from '../utils/StyledButton';
 import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
 import { ethers } from 'ethers';
@@ -13,7 +18,6 @@ import { ReactComponent as ZetaLogo } from '../../assets/zetachain.svg';
 
 const HeaderWrapper = styled(FlexRowWrapper)`
   justify-content: space-between;
-  /* align-items: center; */
   padding: 32px 0;
   .logo {
     height: 40px;
@@ -43,13 +47,20 @@ const Header = ({}: HeaderProps): JSX.Element => {
   const { globalState, setGlobalState } = useContext(StoreContext);
 
   useEffect(() => {
+    // Save the global state to localStorage when it changes
     if (globalState?.evmAddress && globalState?.btcAddress) {
-      localStorage.setItem('zeta-snap', JSON.stringify(globalState));
+      setLocalStorage('zeta-snap', JSON.stringify(globalState));
     }
   }, [globalState]);
 
-  console.log(globalState, 'globalState');
+  // Get EVM address
+  const getEvmAddress = async () => {
+    const provider = new ethers.BrowserProvider(window.ethereum as any);
+    const connectedAddress = await provider.getSigner();
+    return connectedAddress.address;
+  };
 
+  // Connect to the Zeta snap
   const onConnectSnap = async () => {
     try {
       await connectSnap();
@@ -60,19 +71,19 @@ const Header = ({}: HeaderProps): JSX.Element => {
         setGlobalState({ ...globalState, btcAddress, evmAddress });
       }
     } catch (e) {
-      console.log('ERROR CONNECTING SNAP -->', e);
+      console.error('Error connecting to Zeta snap:', e);
     }
   };
 
-  const getEvmAddress = async () => {
-    const provider = new ethers.BrowserProvider(window.ethereum as any);
-    const connectedAddress = await provider.getSigner();
-    return connectedAddress.address;
-  };
+  // Disconnect from the Zeta snap
   const onDisconnectSnap = async () => {
-    await disconnectSnap();
-    setGlobalState({});
-    localStorage.removeItem('zeta-snap');
+    try {
+      await disconnectSnap();
+      setGlobalState({});
+      localStorage.removeItem('zeta-snap');
+    } catch (e) {
+      console.error('Error disconnecting from Zeta snap:', e);
+    }
   };
 
   return (

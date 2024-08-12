@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionItemHeading,
   AccordionItemButton,
-  AccordionItemState,
   AccordionItemPanel,
 } from 'react-accessible-accordion';
 import CctxItem from './CctxItem';
@@ -18,21 +17,24 @@ import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 
 const TrxRowWrapper = styled(FlexRowWrapper)`
-  width: fit-content;
   align-items: center;
   column-gap: 12px;
 
   .info-column {
     row-gap: 4px;
+    width: fit-content;
   }
+
   .redirect-icon {
     width: 16px;
     height: 16px;
   }
+
   .amount-status-wrapper {
     align-content: flex-end;
     justify-content: flex-end;
   }
+
   .status-pill {
     background: rgba(13, 73, 15, 0.6);
     border-radius: 12px;
@@ -41,39 +43,62 @@ const TrxRowWrapper = styled(FlexRowWrapper)`
   }
 `;
 
+interface Trx {
+  hash: string;
+  confirmations: number;
+}
+
 interface TrxRowProps {
-  trx: any;
+  trx: Trx;
   isSent: boolean;
   amount: number;
 }
 
-const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
+const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
   const [cctx, setCctx] = useState<any>({});
   const [trxHash, setTrxHash] = useState('');
+
   useEffect(() => {
     const fetchCctx = async () => {
       if (trxHash) {
         console.log(trxHash);
-        let cctxData: any = await trackCctx(trxHash);
+        const cctxData: any = await trackCctx(trxHash);
         console.log(cctxData);
         if (cctxData?.code !== 5) {
-          setCctx(cctxData.CrossChainTxs?.[0]);
+          setCctx(cctxData!.CrossChainTxs?.[0]);
         }
       }
     };
     fetchCctx();
-    return () => {};
   }, [trxHash]);
 
+  const renderContent = () => {
+    if (cctx?.index && cctx?.code !== 5) {
+      return <CctxItem cctx={cctx} />;
+    } else if (!!cctx && trx.confirmations >= 6 && !isSent) {
+      return (
+        <Typography size={16} color={'#45afec'}>
+          Direct BTC transaction - RECEIVED
+        </Typography>
+      );
+    } else if (trx.confirmations >= 6 && isSent) {
+      return <Typography size={16}>Loading...</Typography>;
+    } else if (trx.confirmations < 6) {
+      return (
+        <Typography size={16} color={'yellow'}>
+          6+ confirmations required
+        </Typography>
+      );
+    }
+  };
+
   return (
-    <Accordion allowZeroExpanded={true}>
+    <Accordion allowZeroExpanded>
       <AccordionItem>
         <AccordionItemHeading>
           <AccordionItemButton>
             <TrxRowWrapper>
-              <div>
-                <Arrow isReceived={!isSent} />
-              </div>
+              <Arrow isReceived={!isSent} />
               <FlexColumnWrapper className="info-column">
                 <Typography size={16} color={isSent ? '#ff4a3d' : '#008462'}>
                   {isSent ? 'Sent' : 'Received'}
@@ -81,7 +106,6 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                 <Typography size={14}>
                   BTC trx:{' '}
                   <a
-                    className=""
                     href={`https://mempool.space/testnet/tx/${trx.hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -92,7 +116,6 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
                 </Typography>
               </FlexColumnWrapper>
               <FlexColumnWrapper className="info-column amount-status-wrapper">
-                {' '}
                 <Typography size={16} color={!isSent ? '#008462' : '#ff4a3d'}>
                   {isSent ? '-' : '+'}
                   {(amount / 1e8).toFixed(5)} BTC{' '}
@@ -110,33 +133,7 @@ const TrxRow = ({ trx, isSent, amount }: TrxRowProps): JSX.Element => {
             </TrxRowWrapper>
           </AccordionItemButton>
         </AccordionItemHeading>
-        <AccordionItemPanel>
-          <AccordionItemState>
-            {({ expanded }) => {
-              if (expanded) {
-                setTrxHash(trx?.hash);
-                if (cctx?.index && cctx?.code !== 5) {
-                  return <CctxItem cctx={cctx} />;
-                } else if (!!cctx && trx.confirmations >= 6 && !isSent) {
-                  return (
-                    <Typography size={16} color={'#45afec'}>
-                      Direct BTC transaction - RECEIVED
-                    </Typography>
-                  );
-                } else if (trx.confirmations >= 6 && isSent) {
-                  return <div>Loading...</div>;
-                } else if (trx.confirmations < 6) {
-                  return (
-                    <Typography size={16} color={'yellow'}>
-                      6+ confirmations required
-                    </Typography>
-                  );
-                }
-              } else {
-              }
-            }}
-          </AccordionItemState>
-        </AccordionItemPanel>
+        <AccordionItemPanel>{renderContent()}</AccordionItemPanel>
       </AccordionItem>
     </Accordion>
   );

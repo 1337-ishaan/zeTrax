@@ -25,7 +25,7 @@ const CopyableWrapper = styled.div`
 `;
 
 interface CopyableProps {
-  children: any;
+  children: string;
 }
 
 const Copyable = ({ children: address }: CopyableProps): JSX.Element => {

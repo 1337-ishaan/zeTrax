@@ -4,6 +4,7 @@ import type { GetSnapsResponse, Snap } from '../types';
 import * as ethers from 'ethers';
 import { getAddress } from '@zetachain/protocol-contracts';
 import { OMNICHAIN_SWAP_CONTRACT_ADDRESS } from '../constants/contracts';
+import { sanitizeInput } from './sanitizeInput';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -186,7 +187,6 @@ export const transferBtc = async (
 
     addressToSend = !!recipentAddress ? recipentAddress : address;
 
-    console.log(customMemo, 'aadas');
     const decAmount = parseFloat('' + amount) * 1e8;
     // const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
     let memo;
@@ -194,12 +194,15 @@ export const transferBtc = async (
     const dest = addressToSend.replace(/^0x/, '');
 
     if (!!zrc20) {
-      const contract = OMNICHAIN_SWAP_CONTRACT_ADDRESS.replace(/^0x/, '');
-      const zrc = zrc20.replace(/^0x/, '');
+      const contract = sanitizeInput(OMNICHAIN_SWAP_CONTRACT_ADDRESS).replace(
+        /^0x/,
+        '',
+      );
+      const zrc = sanitizeInput(zrc20).replace(/^0x/, '');
       memo = `${contract}${action}${zrc}${dest}`;
       console.log(contract, action, zrc, dest, 'contract');
     } else {
-      memo = dest;
+      memo = sanitizeInput(dest);
     }
 
     const result = await window.ethereum.request({

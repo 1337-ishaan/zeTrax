@@ -12,7 +12,7 @@ const ArrowWrapper = styled(ArrowIcon)<{ isReceived: boolean }>`
 
 interface ArrowProps {
   isReceived?: boolean;
-  onClick?: any;
+  onClick?: (event: React.MouseEvent<SVGSVGElement>) => void;
   className?: string;
 }
 
