@@ -9,7 +9,7 @@ import QRCode from 'react-qr-code';
 import Typography from '../../../components/utils/Typography';
 import Copyable from '../../../components/utils/Copyable';
 import FlexColumnWrapper from '../../../components/utils/wrappers/FlexColumnWrapper';
-import FlexRowWrapper from '../../../components/utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../../utils/wrappers/FlexRowWrapper';
 
 const ReceiveModalWrapper = styled.div`
   position: relative;

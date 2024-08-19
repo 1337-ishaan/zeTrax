@@ -7,7 +7,7 @@ import { ReactComponent as BtcIcon } from '../../assets/bitcoin.svg';
 import { ReactComponent as ZetaIcon } from '../../assets/zetachain.svg';
 import Typography from '../utils/Typography';
 import TooltipInfo from '../utils/TooltipInfo';
-import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import BalancePie from './charts/BalancePie';
 import BigNumber from 'bignumber.js';

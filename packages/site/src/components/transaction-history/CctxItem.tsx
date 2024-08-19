@@ -5,7 +5,7 @@ import { getChainIcon } from '../../constants/getChainIcon';
 import Typography from '../utils/Typography';
 import { ReactComponent as RightArrow } from '../../assets/right-arrow.svg';
 import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
-import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import InfoBox from '../utils/InfoBox';
 

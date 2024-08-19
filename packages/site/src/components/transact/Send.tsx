@@ -12,7 +12,7 @@ import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 
 import InfoBox from '../utils/InfoBox';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
-import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import { toast } from 'react-toastify';
 import TooltipInfo from '../utils/TooltipInfo';
 import { StoreContext } from '../../hooks/useStore';

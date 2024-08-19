@@ -18,7 +18,7 @@ const InfoBoxWrapper = styled.div<{ color?: string }>`
 `;
 
 interface InfoBoxProps {
-  children: React.ReactNode;
+  children: React.ReactNode | JSX.Element;
   color?: string;
 }
 

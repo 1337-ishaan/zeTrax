@@ -4,7 +4,7 @@ import styled from 'styled-components/macro';
 import Tooltip from 'rc-tooltip';
 import React from 'react';
 import { ReactComponent as InfoIcon } from '../../assets/info.svg';
-import FlexRowWrapper from './wrappers/FlexWrapper';
+import FlexRowWrapper from './wrappers/FlexRowWrapper';
 
 const TooltipInfoWrapper = styled(Tooltip)`
   width: fit-content;

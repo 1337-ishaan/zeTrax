@@ -1,8 +1,6 @@
 import type { MetaMaskInpageProvider } from '@metamask/providers';
 import { defaultSnapOrigin } from '../config';
 import type { GetSnapsResponse, Snap } from '../types';
-import * as ethers from 'ethers';
-import { getAddress } from '@zetachain/protocol-contracts';
 import { OMNICHAIN_SWAP_CONTRACT_ADDRESS } from '../constants/contracts';
 import { sanitizeInput } from './sanitizeInput';
 

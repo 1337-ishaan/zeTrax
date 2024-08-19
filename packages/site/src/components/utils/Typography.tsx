@@ -1,5 +1,5 @@
 import styled from 'styled-components/macro';
-import FlexRowWrapper from './wrappers/FlexWrapper';
+import FlexRowWrapper from './wrappers/FlexRowWrapper';
 
 const TypographyWrapper = styled(FlexRowWrapper)<{
   color: string;

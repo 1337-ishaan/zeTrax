@@ -10,7 +10,7 @@ import {
   setLocalStorage,
 } from '../../utils';
 import StyledButton from '../utils/StyledButton';
-import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import { ethers } from 'ethers';
 import Copyable from '../utils/Copyable';
 import { ReactComponent as BitcoinLogo } from '../../assets/bitcoin.svg';

@@ -10,7 +10,7 @@ import { ReactComponent as Logo } from '../assets/logo.svg';
 import Balances from '../components/balances/Balances';
 import FlexColumnWrapper from '../components/utils/wrappers/FlexColumnWrapper';
 import Disconnected from '../components/screen/Disconnected';
-import FlexRowWrapper from '../components/utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../components/utils/wrappers/FlexRowWrapper';
 import { StoreContext } from '../hooks/useStore';
 
 const AppWrapper = styled(FlexColumnWrapper)`

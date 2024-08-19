@@ -12,7 +12,7 @@ import {
 import CctxItem from './CctxItem';
 import { useEffect, useState } from 'react';
 import Typography from '../utils/Typography';
-import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 

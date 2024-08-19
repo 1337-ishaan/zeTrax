@@ -5,7 +5,7 @@ import Typography from '../utils/Typography';
 import TrxRow from './TrxRow';
 import { ReactComponent as RefreshIcon } from '../../assets/refresh.svg';
 import Loader from '../utils/Loader';
-import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import TooltipInfo from '../utils/TooltipInfo';
 import { StoreContext } from '../../hooks/useStore';
 import Arrow from '../utils/Arrow';

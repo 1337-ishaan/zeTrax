@@ -1,5 +1,5 @@
 import styled from 'styled-components/macro';
-import FlexRowWrapper from './wrappers/FlexWrapper';
+import FlexRowWrapper from './wrappers/FlexRowWrapper';
 import { ReactComponent as XLogo } from '../../assets/x.svg';
 import { ReactComponent as TelegramLogo } from '../../assets/telegram.svg';
 import { ReactComponent as YoutubeLogo } from '../../assets/youtube.svg';

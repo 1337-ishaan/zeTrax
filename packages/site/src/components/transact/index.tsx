@@ -4,7 +4,7 @@ import Arrow from '../utils/Arrow';
 import TooltipInfo from '../utils/TooltipInfo';
 import Typography from '../utils/Typography';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
-import FlexRowWrapper from '../utils/wrappers/FlexWrapper';
+import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import ReceiveModal from './modals/ReceiveModal';
 
 import SendModal from './modals/SendModal';
