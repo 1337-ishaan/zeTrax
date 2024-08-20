@@ -1,0 +1,1 @@
+export const ZETA_BLOCKPI_API_URL="https://zetachain-athens.blockpi.network/lcd/v1/public"

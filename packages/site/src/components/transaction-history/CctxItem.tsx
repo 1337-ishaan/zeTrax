@@ -70,9 +70,6 @@ interface CctxItemProps {
 
 // CctxItem component definition
 const CctxItem: React.FC<CctxItemProps> = ({ cctx }) => {
-  // Log the cctx object for debugging purposes
-  console.log(cctx, 'cctx');
-
   // Error handling: Check if cctx is valid
   if (!cctx || !cctx.inbound_tx_params || !cctx.outbound_tx_params.length) {
     return <Typography color="#ff0000">Invalid transaction data.</Typography>;

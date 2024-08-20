@@ -1,4 +1,3 @@
-import { copyable, heading, panel, text } from '@metamask/snaps-sdk';
 import { bech32 } from 'bech32';
 import * as bitcoin from 'bitcoinjs-lib';
 import {
@@ -9,7 +8,9 @@ import {
   DERIVATION_PATH,
   ECPair,
   isMainnet,
-} from '../constants';
+  } from '../constants';
+  
+  import { Box, Link, Heading } from "@metamask/snaps-sdk/jsx";
 
 /**
  * Converts an Ethereum address to a Zeta address and vice versa.
@@ -37,33 +38,38 @@ const convertToZeta = (address: string): string => {
  * Fetches wallet information including Zeta address and account balance.
  * @returns An object containing Zeta address, account information, and result of the request.
  */
-export const getWalletInfo = async () => {
-  try {
-    const connectedAddr = await getAccInfo();
-    const zetaAddr = convertToZeta(connectedAddr);
-    const account = await fetch(
-      `https://rpc.ankr.com/http/zetachain_athens_testnet/cosmos/bank/v1beta1/balances/${zetaAddr}`,
-    );
+// export const getWalletInfo = async () => {
+//   try {
+//     const connectedAddr = await getAccInfo();
+//     const zetaAddr = convertToZeta(connectedAddr);
+    
+//     const account = await fetch(
+//       `https://rpc.ankr.com/http/zetachain_athens_testnet/cosmos/bank/v1beta1/balances/${zetaAddr}`
+//     );
 
-    if (!account.ok) {
-      throw new Error('Failed to fetch account information.');
-    }
+//     if (!account.ok) {
+//       throw new Error('Failed to fetch account information.');
+//     }
 
-    const accAddr = await account.text();
-    const result = await snap.request({
-      method: 'snap_dialog',
-      params: {
-        type: 'alert',
-        content: panel([text(`ZetaChain: ${accAddr}`)]),
-      },
-    });
+//     const accAddr = await account.text();
+//     const result = await snap.request({
+//       method: 'snap_dialog',
+//       params: {
+//         type: 'alert',
+//         content: (
+//           <Box>
+//             <Text>Your </Text>
+//         </Box>
+//         )
+//       },
+//     });
 
-    return { zetaAddr, result, accAddr, account };
-  } catch (error) {
-    console.error('Error getting wallet info:', error);
-    throw new Error('Failed to retrieve wallet information.');
-  }
-};
+//     return { zetaAddr, result, accAddr };
+//   } catch (error) {
+//     console.error('Error getting wallet info:', error);
+//     throw new Error('Failed to retrieve wallet information.');
+//   }
+// };
 
 /**
  * Retrieves the connected Ethereum account information.
@@ -264,12 +270,12 @@ const broadcastTransaction = async (hex: string) => {
       method: 'snap_dialog',
       params: {
         type: 'alert',
-        content: panel([
-          copyable(
-            `https://mempool.space/${isMainnet ? '' : 'testnet'}/tx/${txData}`,
-          ),
-          text('See Transaction'),
-        ]),
+        content: (
+        <Box>
+          <Heading>Track you CCTX transaction</Heading>
+          <Link href={`https://mempool.space/testnet/tx/${txData}`}>Mempool</Link>
+        </Box>
+        )
       },
     });
 
@@ -362,17 +368,30 @@ const fetchUtxo = async (btcAddress: string) => {
   }
 };
 
+
+
 /**
  * Executes a cross-chain swap transaction for Bitcoin.
  * @param request - The request object containing transaction parameters.
  * @returns The transaction ID after broadcasting.
  */
 export const crossChainSwapBtc = async (request: any) => {
-  const result = await snap.request({
-    method: 'snap_dialog',
+  const interfaceId = await snap.request({
+    method: "snap_createInterface",
     params: {
-      type: 'confirmation',
-      content: panel([text('Confirm BTC Transaction')]),
+      ui: (
+        <Box>
+          <Heading>Confirm CCTX BTC transaction</Heading>
+        </Box>
+      ),
+    },
+  });
+
+  const result =   await snap.request({
+    method: "snap_dialog",
+    params: {
+      type: "confirmation",
+      id: interfaceId,
     },
   });
 

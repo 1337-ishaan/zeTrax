@@ -2,7 +2,6 @@ import styled from 'styled-components/macro';
 import { ReactComponent as CopyIcon } from '../../assets/copy.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 import { trimHexAddress } from '../../utils/trimHexAddr';
 
 const CopyableWrapper = styled.div`

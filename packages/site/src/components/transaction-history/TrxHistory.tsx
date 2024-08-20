@@ -66,8 +66,6 @@ const TrxHistory: React.FC = () => {
   const [filter, setFilter] = useState<'SENT' | 'RECEIVED' | ''>('');
 
   useEffect(() => {
-    console.log('BALANCE TRX PROCESSED -->', globalState?.isTrxProcessed);
-
     if (
       (!!globalState?.btcAddress &&
         !globalState?.btcTrxs &&

@@ -16,6 +16,7 @@ import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import { toast } from 'react-toastify';
 import TooltipInfo from '../utils/TooltipInfo';
 import { StoreContext } from '../../hooks/useStore';
+import { ZETA_BLOCKPI_API_URL } from '../../constants/api';
 
 const SendWrapper = styled.div`
   display: flex;
@@ -131,13 +132,9 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   const [amount, setAmount] = useState<any>(0);
   const [recipentAddress, setRecipentAddress] = useState<any>('');
   const [isTrxProcessing, setIsTrxProcessing] = useState(false);
-  // const [selectedGasPriority, setSelectedGasPriority] = useState<
-  //   'low' | 'medium' | 'high'
-  // >('low');
   const [customMemo, setCustomMemo] = useState('');
   const [depositFees, setDepositFees] = useState<any>();
   const { globalState, setGlobalState } = useContext(StoreContext);
-  console.log(globalState, 'globalStte in send');
 
   const sendTrx = async () => {
     setIsTrxProcessing(true);
@@ -152,7 +149,6 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
         globalState?.evmAddress as string,
         customMemo,
       );
-      console.log('222');
     } catch (e: unknown) {
       toast(`Error: ${(e as Error).message}`, { hideProgressBar: false });
     } finally {
@@ -166,7 +162,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   const getZrc20Assets = async () => {
     let assets = await axios.get(
       // TODO: make API_URL as constant
-      'https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/fungible/foreign_coins',
+      `${ZETA_BLOCKPI_API_URL}/zeta-chain/fungible/foreign_coins`,
     );
     setZrc20Assets(assets.data.foreignCoins);
     return assets;

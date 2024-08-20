@@ -1,4 +1,4 @@
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { ReactComponent as InfoIcon } from '../../assets/info.svg';
 
 const InfoBoxWrapper = styled.div<{ color?: string }>`
@@ -18,7 +18,7 @@ const InfoBoxWrapper = styled.div<{ color?: string }>`
 `;
 
 interface InfoBoxProps {
-  children: React.ReactNode | JSX.Element;
+  children: JSX.Element | string ;
   color?: string;
 }
 

@@ -32,7 +32,10 @@
   "dependencies": {
     "@lavamoat/allow-scripts": "3.1.0",
     "@lavamoat/preinstall-always-fail": "2.1.0",
+    "@metamask/snaps-cli": "6.2.1",
+    "@metamask/snaps-jest": "8.2.0",
     "@types/crypto-js": "4.2.2",
+    "@types/react": "18.2.25",
     "axios": "^1.7.4",
     "ethers": "^6.13.2",
     "install": "0.13.0",

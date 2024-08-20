@@ -61,9 +61,7 @@ const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
   useEffect(() => {
     const fetchCctx = async () => {
       if (trxHash) {
-        console.log(trxHash);
         const cctxData: any = await trackCctx(trxHash);
-        console.log(cctxData);
         if (cctxData?.code !== 5) {
           setCctx(cctxData!.CrossChainTxs?.[0]);
         }

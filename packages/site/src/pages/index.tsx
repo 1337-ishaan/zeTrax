@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import TrxHistory from '../components/transaction-history/TrxHistory';
 import { defaultSnapOrigin } from '../config';
 import { MetaMaskContext } from '../hooks';
-import { isLocalSnap } from '../utils';
+import { isLocalSnap} from '../utils';
 import Transact from '../components/transact';
 import { ReactComponent as Logo } from '../assets/logo.svg';
 import Balances from '../components/balances/Balances';
@@ -45,7 +45,6 @@ const Index = () => {
     ? state.isFlask
     : state.installedSnap;
 
-  console.log(globalState, 'globalState');
   return (
     <AppWrapper>
       <Logo className="page-bg-logo" />

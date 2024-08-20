@@ -91,17 +91,13 @@ export const getWalletInfo = async () => {
     });
 
     // if user approved request
-    console.log(result, 'result');
-
     return result;
   } catch (error) {
     throw error;
   }
 };
 export const createBtcWallet = async () => {
-  console.log('-----useAccount createBtcWallet');
   // invoke snap
-
   try {
     const result = await window.ethereum.request({
       method: 'wallet_invokeSnap',
@@ -143,7 +139,6 @@ export const getBtcActivity = async () => {
         request: { method: 'get-btc-trxs', params: [] },
       },
     });
-    console.log(result);
     return result;
   } catch (error) {
     throw error;
@@ -198,7 +193,6 @@ export const transferBtc = async (
       );
       const zrc = sanitizeInput(zrc20).replace(/^0x/, '');
       memo = `${contract}${action}${zrc}${dest}`;
-      console.log(contract, action, zrc, dest, 'contract');
     } else {
       memo = sanitizeInput(dest);
     }
