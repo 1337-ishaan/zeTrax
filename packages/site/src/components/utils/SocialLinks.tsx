@@ -6,7 +6,6 @@ import { ReactComponent as YoutubeLogo } from '../../assets/youtube.svg';
 import { ReactComponent as GitbookLogo } from '../../assets/gitbook.svg';
 
 const SocialLinksWrapper = styled(FlexRowWrapper)`
-  /* justify-content: space-between; */
   column-gap: 24px;
 
   a.social {
@@ -15,10 +14,9 @@ const SocialLinksWrapper = styled(FlexRowWrapper)`
     display: flex;
     padding: 12px 12px;
     border-radius: ${(props) => props.theme.borderRadius};
-    cursor: pointer;
     column-gap: 4px;
-
     transition: all 0.3s;
+    cursor: pointer;
 
     &:hover {
       transform: scale(1.2);
@@ -36,19 +34,19 @@ interface SocialLinksProps {}
 const SocialLinks = ({}: SocialLinksProps): JSX.Element => {
   return (
     <SocialLinksWrapper>
-      <a className="social" rel="noopener noreferrer" href="https://x.com">
+      <a className="social" rel="noopener noreferrer" href="https://www.youtube.com/@ZetaMask">
         <YoutubeLogo className="social-logo" />
       </a>
-      <a className="social" rel="noopener noreferrer" href="https://x.com">
+      <a className="social" rel="noopener noreferrer" href="https://x.com/zetamask">
         <XLogo className="social-logo" />
       </a>
-      <a className="social" rel="noopener noreferrer" href="https://x.com">
+      <a className="social" rel="noopener noreferrer" href="https://t.me/zetamask">
         <TelegramLogo className="social-logo" />
-      </a>{' '}
+      </a>
       <a
         className="social"
         rel="noopener noreferrer"
-        href="https://etherates-organization.gitbook.io/zetrax"
+        href="https://etherates-organization.gitbook.io/zetamask"
       >
         <GitbookLogo className="social-logo" />
       </a>

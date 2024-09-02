@@ -6,7 +6,7 @@ import 'react-dropdown/style.css';
 import 'react-accessible-accordion/dist/fancy-example.css';
 import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { StoreContext, StoreProvider } from './hooks/useStore';
+import { StoreProvider } from './hooks/useStore';
 
 const Wrapper = styled(StoreProvider)``;
 

@@ -2,7 +2,7 @@ import { ECPairFactory } from 'ecpair';
 import * as ecc from '@bitcoinerlab/secp256k1';
 import * as bitcoin from 'bitcoinjs-lib';
 
-const isMainnet = false;
+const isMainnet = true;
 const ECPair = ECPairFactory(ecc);
 
 const CRYPTO_CURVE = 'secp256k1';
@@ -14,17 +14,19 @@ const currNetwork = isMainnet
   : bitcoin.networks.testnet;
 
 // Zetachain addresses
-const btcTss = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+const btcTss = isMainnet ? 'bc1qm24wp577nk8aacckv8np465z3dvmu7ry45el6y': 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
 
 // APIs
-const API = `https://blockstream.info${isMainnet ? '' : '/testnet'}/api`;
+const BLOCKSTREAM_API = `https://blockstream.info${!isMainnet ?'/testnet':''}/api`;
+const BLOCKCYPHER_API = `https://api.blockcypher.com/v1/btc/${!isMainnet ? 'test3' : 'main'}`;
 
 export {
   ECPair,
   CRYPTO_CURVE,
   DERIVATION_PATH,
   currNetwork,
-  API,
+  BLOCKSTREAM_API,
+  BLOCKCYPHER_API,
   btcTss,
   isMainnet,
 };

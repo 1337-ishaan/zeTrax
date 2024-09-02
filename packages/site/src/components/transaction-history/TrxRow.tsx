@@ -8,6 +8,7 @@ import {
   AccordionItemHeading,
   AccordionItemButton,
   AccordionItemPanel,
+  AccordionItemState,
 } from 'react-accessible-accordion';
 import CctxItem from './CctxItem';
 import { useEffect, useState } from 'react';
@@ -71,6 +72,7 @@ const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
   }, [trxHash]);
 
   const renderContent = () => {
+    console.log(trxHash, 'cctx');
     if (cctx?.index && cctx?.code !== 5) {
       return <CctxItem cctx={cctx} />;
     } else if (!!cctx && trx.confirmations >= 6 && !isSent) {
@@ -95,7 +97,7 @@ const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
       <AccordionItem>
         <AccordionItemHeading>
           <AccordionItemButton>
-            <TrxRowWrapper>
+            <TrxRowWrapper >
               <Arrow isReceived={!isSent} />
               <FlexColumnWrapper className="info-column">
                 <Typography size={16} color={isSent ? '#ff4a3d' : '#008462'}>
@@ -131,7 +133,16 @@ const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
             </TrxRowWrapper>
           </AccordionItemButton>
         </AccordionItemHeading>
-        <AccordionItemPanel>{renderContent()}</AccordionItemPanel>
+        <AccordionItemPanel>
+          <AccordionItemState>
+            {({expanded}) => {
+              if (expanded) setTrxHash(trx.hash);
+              renderContent();
+              return null;
+
+            }}
+          </AccordionItemState>
+        </AccordionItemPanel>
       </AccordionItem>
     </Accordion>
   );

@@ -1,10 +1,9 @@
 import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
 import {
-  createBtcTestnetAddr,
-  getAccInfo,
+  deriveBtcWallet,
   getBtcUtxo,
   getBtcTrxs,
-  crossChainSwapBtc,
+  transactBtc,
   trackCctxTx,
   getZetaBalance,
   getFees,
@@ -42,10 +41,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 
   switch (request.method) {
-    case 'create-btc-testnet':
-      return createBtcTestnetAddr();
-    case 'connect-account':
-      return getAccInfo();
+    case 'create-btc-wallet':
+      return deriveBtcWallet();
     case 'get-btc-utxo':
       return getBtcUtxo();
     case 'get-btc-trxs':
@@ -54,8 +51,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getFees();
     case 'get-zeta-balance':
       return getZetaBalance(request);
-    case 'crosschain-swap-btc':
-      return crossChainSwapBtc(request);
+    case 'transact-btc':
+      return transactBtc(request);
     case 'track-cctx':
       return trackCctxTx(request);
     default:

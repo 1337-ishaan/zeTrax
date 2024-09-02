@@ -15,10 +15,24 @@ const TrxHistoryWrapper = styled.div`
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
   color: #dadada;
   padding: 24px;
-  height: 340px;
-  overflow-x: none;
-  overflow-y: auto;
+  // width:fit-content;
+  overflow-x: hidden;
   border-radius: ${(props) => props.theme.borderRadius};
+  max-height: 360px;
+  overflow-y: auto;
+  scrollbar-width: none;  /* For Firefox */
+  -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+  &::-webkit-scrollbar {
+    display: none;  /* For Chrome, Safari, and Opera */
+  }
+
+  .no-transactions{
+    display:flex;
+    // width:100%;
+    height:350px;
+    justify-content:center;
+    // align-items:center;
+  }
 
   a {
     color: white;
@@ -136,10 +150,21 @@ const TrxHistory: React.FC = () => {
         </FlexRowWrapper>
       </FlexRowWrapper>
 
+{
+      globalState?.btcTrxs?.txs.length <= 0 &&
+              <div className="no-transactions">
+                <Typography size={22} weight={500}>
+                  No transactions found 📭
+                </Typography>
+              </div>
+
+          }
       {isRefetched ? (
         <Loader />
       ) : (
         globalState?.btcTrxs?.txs?.map((trx: any, index: number) => {
+       
+
           const isSent = trx.inputs[0].addresses?.includes(
             globalState?.btcAddress,
           );
@@ -163,3 +188,4 @@ const TrxHistory: React.FC = () => {
 };
 
 export default TrxHistory;
+

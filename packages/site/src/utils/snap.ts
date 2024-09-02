@@ -103,7 +103,7 @@ export const createBtcWallet = async () => {
       method: 'wallet_invokeSnap',
       params: {
         snapId: defaultSnapOrigin,
-        request: { method: 'create-btc-testnet', params: [] },
+        request: { method: 'create-btc-wallet', params: [] },
       },
     });
     return result;
@@ -166,9 +166,10 @@ export const transferBtc = async (
   amount: number,
   address: string,
   customMemo: string,
+  fee: number,
   // gasPriority: 'low' | 'medium' | 'high',
 ) => {
-  console.trace('SNAPCALL --> transferBtc');
+  console.log(recipentAddress, zrc20, amount, address, customMemo, 'SNAPCALL --> transferBtc');
 
   try {
     let action = '01';
@@ -202,11 +203,11 @@ export const transferBtc = async (
       params: {
         snapId: defaultSnapOrigin,
         request: {
-          method: 'crosschain-swap-btc',
+          method: 'transact-btc',
           params: [
             decAmount,
             customMemo.length > 0 ? customMemo : memo,
-            !!zrc20,
+            fee, 
           ],
         },
       },
@@ -217,15 +218,14 @@ export const transferBtc = async (
   }
 };
 
-export const trackCctx = async (txHash: string) => {
-  console.trace('SNAPCALL --> trackCctx');
+export const trackCctx = async (trxHash: string) => {
 
   try {
     const result = await window.ethereum.request({
       method: 'wallet_snap',
       params: {
         snapId: defaultSnapOrigin,
-        request: { method: 'track-cctx', params: [txHash] },
+        request: { method: 'track-cctx', params: [trxHash] },
       },
     });
     return result;

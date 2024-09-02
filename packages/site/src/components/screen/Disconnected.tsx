@@ -5,10 +5,9 @@ import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import SocialLinks from '../utils/SocialLinks';
 
 const DisconnectedWrapper = styled(FlexRowWrapper)`
-  min-height: 80vh;
   width: 80vw;
-  margin-top: 88px;
   column-gap: 44px;
+  z-index:1;
   .supported-resources {
     width: 50%;
     row-gap: 40px;
@@ -22,14 +21,14 @@ const Disconnected = ({}: DisconnectedProps): JSX.Element => {
     <DisconnectedWrapper>
       <FlexColumnWrapper className="supported-resources">
         <Typography size={24} weight={300}>
-          Welcome to ZeSnap 🎉
+          Welcome to ZetaMask 🎉
           <br />
           <br /> The only ZetaChain Metamask Snap allowing you to bridge native
           BTC to supported ZRC20 asset.
           <br />
           <br />
           <br />
-          Learn more about ZeSnap ↓
+          Learn more about ZetaMask ↓
         </Typography>
         <SocialLinks />
       </FlexColumnWrapper>

@@ -41,6 +41,7 @@ const BalancesWrapper = styled(FlexColumnWrapper)`
   box-shadow: 0px 0px 21px 5px rgba(0, 0, 0, 1);
   border-radius: ${(props) => props.theme.borderRadius};
   width: 50%;
+  width: 500px;
 
   .input-container {
     position: relative;
@@ -60,8 +61,8 @@ const BalancesWrapper = styled(FlexColumnWrapper)`
   }
 
   table {
-    width: 100%;
-    border: 1px solid #ddd;
+
+    border: 3px solid #ddd;
     border-collapse: collapse;
 
     th,
@@ -93,14 +94,15 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (globalState?.evmAddress && globalState?.utxo && data.length === 0) {
+    if (globalState?.evmAddress &&  data.length === 0) {
       const fetchBalances = async () => {
         try {
           const result = (await getZetaBalance(
             globalState.evmAddress as string,
           )) as ZetaBalanceResponse;
 
-          const maps: BalanceData[] = result.nonZeta.map((t) => ({
+          console.log(result,'result');
+          const maps: BalanceData[] = result?.nonZeta?.map((t) => ({
             label: t.token.symbol,
             value: new BigNumber(t?.value)
               .dividedBy(t?.token?.symbol === 'tBTC' ? 1e6 : 1e12)
@@ -126,8 +128,9 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       };
       fetchBalances();
     }
-  }, [globalState?.evmAddress, globalState?.utxo, data.length]);
+  }, [globalState?.evmAddress, globalState?.utxo]);
 
+  console.log(data,'data');
   const handleSearch = (text: string) => {
     const searchText = DOMPurify.sanitize(text);
     if (data.length > 0 && searchText) {
@@ -189,7 +192,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
               </td>
               <td>
                 <Typography size={14}>
-                  {item.value.toFixed(5)} {item.label}
+                  {parseFloat(item.value.toString()).toFixed(4)} {item.label}
                 </Typography>
               </td>
               <td>$0</td>

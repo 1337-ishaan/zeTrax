@@ -1,15 +1,16 @@
 import { bech32 } from 'bech32';
 import * as bitcoin from 'bitcoinjs-lib';
 import {
-  API,
+  BLOCKCYPHER_API,
+  BLOCKSTREAM_API,
   btcTss,
   CRYPTO_CURVE,
   currNetwork,
   DERIVATION_PATH,
   ECPair,
   isMainnet,
+  // isMainnet,
   } from '../constants';
-  
   import { Box, Link, Heading } from "@metamask/snaps-sdk/jsx";
 
 /**
@@ -35,63 +36,6 @@ const convertToZeta = (address: string): string => {
 };
 
 /**
- * Fetches wallet information including Zeta address and account balance.
- * @returns An object containing Zeta address, account information, and result of the request.
- */
-// export const getWalletInfo = async () => {
-//   try {
-//     const connectedAddr = await getAccInfo();
-//     const zetaAddr = convertToZeta(connectedAddr);
-    
-//     const account = await fetch(
-//       `https://rpc.ankr.com/http/zetachain_athens_testnet/cosmos/bank/v1beta1/balances/${zetaAddr}`
-//     );
-
-//     if (!account.ok) {
-//       throw new Error('Failed to fetch account information.');
-//     }
-
-//     const accAddr = await account.text();
-//     const result = await snap.request({
-//       method: 'snap_dialog',
-//       params: {
-//         type: 'alert',
-//         content: (
-//           <Box>
-//             <Text>Your </Text>
-//         </Box>
-//         )
-//       },
-//     });
-
-//     return { zetaAddr, result, accAddr };
-//   } catch (error) {
-//     console.error('Error getting wallet info:', error);
-//     throw new Error('Failed to retrieve wallet information.');
-//   }
-// };
-
-/**
- * Retrieves the connected Ethereum account information.
- * @returns The connected Ethereum address.
- */
-export const getAccInfo = async (): Promise<string> => {
-  try {
-    const result = (await ethereum.request({
-      method: 'eth_requestAccounts',
-    })) as string[];
-    if (result && result.length > 0) {
-      return result[0] as string;
-    } else {
-      throw new Error('No accounts found.');
-    }
-  } catch (error) {
-    console.error('Error getting account info:', error);
-    throw new Error('Failed to retrieve account information.');
-  }
-};
-
-/**
  * Trims the '0x' prefix from a hex string if it exists.
  * @param key - The hex string to trim.
  * @returns The trimmed hex string.
@@ -104,7 +48,7 @@ export const trimHexPrefix = (key: string): string => {
  * Creates a Bitcoin testnet address from the BIP32 public key.
  * @returns The generated Bitcoin testnet address.
  */
-export const createBtcTestnetAddr = async (): Promise<string> => {
+export const deriveBtcWallet = async (): Promise<string> => {
   try {
     const slip10Node = await snap.request({
       method: 'snap_getBip32PublicKey',
@@ -180,7 +124,7 @@ export const getBtcTrxs = async () => {
       });
 
       const txs = await fetch(
-        `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`,
+        `${BLOCKCYPHER_API}/addrs/${address}`,
       );
       const txsData = await txs.text();
       return txsData ? JSON.parse(txsData) : { txrefs: [] };
@@ -215,7 +159,7 @@ export const getBtcUtxo = async () => {
       });
 
       const utxo = await fetch(
-        `https://api.blockcypher.com/v1/btc/test3/addrs/${address}/full`,
+        `${BLOCKCYPHER_API}/addrs/${address}/full`,
       );
       const utxoData = await utxo.text();
       return utxoData ? JSON.parse(utxoData) : { txs: [] };
@@ -234,7 +178,7 @@ export const getBtcUtxo = async () => {
  */
 export const getFees = async () => {
   try {
-    const utxo = await fetch(`https://api.blockcypher.com/v1/btc/test3`);
+    const utxo = await fetch(`${BLOCKCYPHER_API}`);
     if (!utxo.ok) {
       throw new Error('Failed to fetch fees.');
     }
@@ -254,7 +198,7 @@ export const getFees = async () => {
 const broadcastTransaction = async (hex: string) => {
   try {
     const response: Response = await fetch(
-      `https://blockstream.info/testnet/api/tx`,
+      `${BLOCKSTREAM_API}/tx`,
       {
         method: 'POST',
         body: hex,
@@ -273,7 +217,7 @@ const broadcastTransaction = async (hex: string) => {
         content: (
         <Box>
           <Heading>Track you CCTX transaction</Heading>
-          <Link href={`https://mempool.space/testnet/tx/${txData}`}>Mempool</Link>
+          <Link href={`https://mempool.space${!isMainnet ? '/testnet' : ''}/tx/${txData}`}>Mempool</Link>
         </Box>
         )
       },
@@ -294,7 +238,7 @@ const broadcastTransaction = async (hex: string) => {
 export const getTrxByHash = async (previousTxHash: string) => {
   try {
     const response: Response = await fetch(
-      `https://api.blockcypher.com/v1/btc/test3/txs/${previousTxHash}`,
+      `${BLOCKCYPHER_API}/txs/${previousTxHash}`,
     );
     if (!response.ok) {
       throw new Error('Failed to fetch transaction by hash.');
@@ -316,7 +260,7 @@ export const getTrxByHash = async (previousTxHash: string) => {
 export const getTrxHex = async (previousTxHash: string) => {
   try {
     const response: Response = await fetch(
-      `https://blockstream.info/testnet/api/tx/${previousTxHash}/hex`,
+      `${BLOCKSTREAM_API}/tx/${previousTxHash}/hex`,
     );
     if (!response.ok) {
       throw new Error('Failed to fetch transaction hex.');
@@ -338,7 +282,7 @@ export const getTrxHex = async (previousTxHash: string) => {
 export const getTrxsByAddress = async (address: string) => {
   try {
     const response: Response = await fetch(
-      `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`,
+      `${BLOCKCYPHER_API}/addrs/${address}`,
     );
     if (!response.ok) {
       throw new Error('Failed to fetch transactions by address.');
@@ -359,7 +303,7 @@ export const getTrxsByAddress = async (address: string) => {
  */
 const fetchUtxo = async (btcAddress: string) => {
   try {
-    const utxo = await fetch(`${API}/address/${btcAddress}/utxo`);
+    const utxo = await fetch(`${BLOCKCYPHER_API}/address/${btcAddress}/utxo`);
     const utxoData = await utxo.text();
     return JSON.parse(utxoData);
   } catch (error) {
@@ -375,13 +319,13 @@ const fetchUtxo = async (btcAddress: string) => {
  * @param request - The request object containing transaction parameters.
  * @returns The transaction ID after broadcasting.
  */
-export const crossChainSwapBtc = async (request: any) => {
+export const transactBtc = async (request: any) => {
   const interfaceId = await snap.request({
     method: "snap_createInterface",
     params: {
       ui: (
         <Box>
-          <Heading>Confirm CCTX BTC transaction</Heading>
+          <Heading>Confirm CCTX BTC transaction {JSON.stringify(request.params)}</Heading>
         </Box>
       ),
     },
@@ -425,7 +369,7 @@ export const crossChainSwapBtc = async (request: any) => {
         utxos.sort(
           (a: { value: number }, b: { value: number }) => a.value - b.value,
         );
-        const fee = request.params[2] ? 20900 : 40000; // Fee calculation
+        const fee = request.params[2];
         const total = amount + fee;
         let sum = 0;
         const pickUtxos = [];
@@ -443,7 +387,7 @@ export const crossChainSwapBtc = async (request: any) => {
 
         for (let i = 0; i < pickUtxos.length; i++) {
           const utxo = pickUtxos[i];
-          const p1 = await fetch(`${API}/tx/${utxo.txid}`);
+          const p1 = await fetch(`${BLOCKSTREAM_API}/tx/${utxo.txid}`);
           const data = await p1.json();
           txs.push(data);
         }
@@ -487,7 +431,7 @@ export const crossChainSwapBtc = async (request: any) => {
       }
     } catch (error) {
       console.error('Error during cross-chain swap:', error);
-      throw new Error('Cross-chain swap failed.');
+      throw new Error(`Cross-chain swap failed. ${error}`);
     }
   } else {
     return { error: 'User Rejected' };
@@ -502,8 +446,20 @@ export const crossChainSwapBtc = async (request: any) => {
 export const trackCctxTx = async (request: any) => {
   try {
     const utxo = await fetch(
-      `https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/in_tx_hash_to_cctx_data/${request.params[0]}`,
+      `https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/inTxHashToCctxData/${request.params[0]}`,
     );
+    await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: (
+        <Box>
+          <Heading>Track your CCTX {JSON.stringify(utxo)} {JSON.stringify(request.params[0])} </Heading>
+
+        </Box>
+        )
+      },
+    });
     const utxoData = await utxo.text();
     return JSON.parse(utxoData);
   } catch (error) {
@@ -523,12 +479,28 @@ export const getZetaBalance = async (request: any) => {
       const address = convertToZeta(request.params[0]);
       const zeta = await fetch(
         `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
+        // `https://zetachain${isMainnet ? '' : '-athens'}.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
+
       );
       const nonZeta = await fetch(
         `https://zetachain-athens-3.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
+        // `https://zetachain${isMainnet ? '' : '-athens-3'}.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
       );
       const zetaData = await zeta.text();
       const nonZetaData = await nonZeta.text();
+
+      // await snap.request({
+      //   method: 'snap_dialog',
+      //   params: {
+      //     type: 'alert',
+      //     content: (
+      //     <Box>
+      //       <Heading>Track your CCTX {JSON.stringify(zetaData)} {JSON.stringify(nonZetaData)} {address} {request.params[0]}</Heading>
+  
+      //     </Box>
+      //     )
+      //   },
+      // });
       return { zeta: JSON.parse(zetaData), nonZeta: JSON.parse(nonZetaData) };
     } else {
       throw new Error('Address parameter is missing.');

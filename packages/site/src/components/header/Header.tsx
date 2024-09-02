@@ -94,7 +94,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
           <FlexRowWrapper>
             {!globalState?.btcAddress ? (
               <StyledButton onClick={onConnectSnap}>
-                Connect ZeSnap
+                Connect ZetaMask
               </StyledButton>
             ) : (
               <FlexRowWrapper className="address-header">

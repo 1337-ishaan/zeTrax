@@ -123,6 +123,12 @@ const SendWrapper = styled.div`
 interface SendProps {
   setIsSendModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
+// Define the interface for the fees object
+interface Fees {
+  high_fee_per_kb: number;
+  // Add other properties if needed
+}
+
 
 const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   const [trxInput, setTrxInput] = useState<any>({});
@@ -148,6 +154,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
         +amount,
         globalState?.evmAddress as string,
         customMemo,
+        depositFees,
       );
     } catch (e: unknown) {
       toast(`Error: ${(e as Error).message}`, { hideProgressBar: false });
@@ -176,12 +183,14 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
     if (!depositFees) {
       const getFees = async () => {
         let fees = await getBtcFees();
-        setDepositFees(fees);
+        setDepositFees(fees?.high_fee_per_kb * 0.001 * 68 * 2) // DepositFee = AverageFeeRateBlockX (fee/1000 sat/vB) × GasPriceMultiplier(68vB) ×DepositIncurredVBytes(2);
       };
       getFees();
       return () => {};
     }
   }, []);
+
+  console.log(depositFees?.high_fee_per_kb,'fees');
 
   const CustomItemRenderer = ({ option }: any) => (
     <div className="dropdown-item">
@@ -198,7 +207,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   );
 
   const maxFunds =
-    (globalState?.utxo - (currentActive === 'cctx' ? 20900 : 40000)) / 1e8;
+    +((globalState?.utxo - depositFees) / 1e8).toFixed(4);
 
   return (
     <SendWrapper>
@@ -273,11 +282,11 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             <TooltipInfo placement="bottom">
               Custom memo is a string in following format ↓
               <Typography size={14}>
-                → Contract Address + Action Code + ZRC Contract Address +
+         Contract Address + Action Code + ZRC Contract Address +
                 Destination Address
               </Typography>
               <a
-                href="https://etherates-organization.gitbook.io/zetrax"
+                href="https://etherates-organization.gitbook.io/zetamask/bridge-btc-to-zrc20-asset#custom-memo"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -350,7 +359,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
       <FlexRowWrapper className="gas-wrapper">
         <GasIcon className="icon" /> Fees :
         <span className="amount">
-          ~{(currentActive === 'cctx' ? 20900 : 40000) / 1e8} BTC
+          ~{(depositFees / 1e8).toFixed(4)} BTC
         </span>
       </FlexRowWrapper>
       <StyledButton

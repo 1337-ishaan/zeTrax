@@ -16,10 +16,10 @@ import { StoreContext } from '../hooks/useStore';
 const AppWrapper = styled(FlexColumnWrapper)`
   padding: 16px 32px;
   margin: 0 auto;
-  gap: 0 54px;
+  height:fit-content;
 
   .action-balances-wrapper {
-    column-gap: 24px;
+      column-gap: 24px;
   }
 
   .page-bg-logo {
@@ -32,7 +32,6 @@ const AppWrapper = styled(FlexColumnWrapper)`
   }
 
   .trx-transact-wrapper {
-    column-gap: 64px;
     row-gap: 24px;
   }
 `;
@@ -45,8 +44,9 @@ const Index = () => {
     ? state.isFlask
     : state.installedSnap;
 
+const isBtcAddressPresent = !!globalState?.btcAddress;
   return (
-    <AppWrapper>
+    <AppWrapper style={{ rowGap: isBtcAddressPresent ? 'unset' : '15vh' }}>
       <Logo className="page-bg-logo" />
       {isMetaMaskReady && <Header />}
       {!!globalState?.btcAddress ? (

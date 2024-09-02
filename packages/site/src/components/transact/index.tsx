@@ -6,7 +6,6 @@ import Typography from '../utils/Typography';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import ReceiveModal from './modals/ReceiveModal';
-
 import SendModal from './modals/SendModal';
 
 const TransactWrapper = styled(FlexColumnWrapper)`
@@ -16,6 +15,7 @@ const TransactWrapper = styled(FlexColumnWrapper)`
   color: #dadada;
   padding: 24px;
   overflow-y: auto;
+width:auto;
   border-radius: ${(props) => props.theme.borderRadius};
   .actions-wrapper {
     column-gap: 24px;

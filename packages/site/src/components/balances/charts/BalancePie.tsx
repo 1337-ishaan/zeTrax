@@ -26,6 +26,8 @@ interface RenderActiveShapeProps {
   payload: PieData; // Data for the segment
   percent: number; // Percentage of the segment
   value: number; // Value of the segment
+  stroke: string; // Stroke color for the segment
+  strokeWidth: number; // Stroke width for the segment
 }
 
 // Function to render the active shape of the pie segment
@@ -59,7 +61,7 @@ const renderActiveShape = (props: RenderActiveShapeProps) => {
   return (
     <g>
       <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-        {payload.label} {/* Segment label */}
+        {payload.label} 
       </text>
       <Sector
         cx={cx}
@@ -94,7 +96,7 @@ const renderActiveShape = (props: RenderActiveShapeProps) => {
         textAnchor={textAnchor}
         fill="#fff6f6" // Value label color
       >
-        {new Decimal(value).toFixed(3)} {payload.label} {/* Value and label */}
+        {parseFloat(new Decimal(value).toFixed(3))} {payload.label} 
       </text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
@@ -103,7 +105,7 @@ const renderActiveShape = (props: RenderActiveShapeProps) => {
         textAnchor={textAnchor}
         fill="#999" // Percentage label color
       >
-        {new Decimal(percent).times(100).toFixed(2)}% {/* Percentage */}
+        {new Decimal(percent).times(100).toFixed(2)}% 
       </text>
     </g>
   );
@@ -135,7 +137,7 @@ const BalancePie = ({ data }: BalancePieProps) => {
           innerRadius={50} // Inner radius
           outerRadius={75} // Outer radius
           cy={105} // Center Y position
-          fill="#88d884aa" // Default fill color
+          fill="#4db852" // Default fill color
           dataKey="value" // Key for data values
           onMouseEnter={onPieEnter} // Mouse enter handler
         />
