@@ -478,13 +478,13 @@ export const getZetaBalance = async (request: any) => {
     if (request.params[0]) {
       const address = convertToZeta(request.params[0]);
       const zeta = await fetch(
-        `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
-        // `https://zetachain${isMainnet ? '' : '-athens'}.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
+        // `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
+        `https://zetachain${isMainnet ? '' : '-athens'}.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
 
       );
       const nonZeta = await fetch(
-        `https://zetachain-athens-3.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
-        // `https://zetachain${isMainnet ? '' : '-athens-3'}.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
+        // `https://zetachain-athens-3.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
+        `https://zetachain${isMainnet ? '' : '-athens-3'}.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
       );
       const zetaData = await zeta.text();
       const nonZetaData = await nonZeta.text();
