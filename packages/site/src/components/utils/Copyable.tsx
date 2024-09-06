@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { trimHexAddress } from '../../utils/trimHexAddr';
 
 const CopyableWrapper = styled.div`
-  background: rgba(0, 0, 0, 1);
+  background: rgba(0, 0, 0, .5);
   padding: 6px 8px;
   border-radius: 8px;
 

@@ -11,6 +11,7 @@ import FlexRowWrapper from '../utils/wrappers/FlexRowWrapper';
 import FlexColumnWrapper from '../utils/wrappers/FlexColumnWrapper';
 import BalancePie from './charts/BalancePie';
 import BigNumber from 'bignumber.js';
+import EmptyBalance from './EmptyBalance';
 interface BalanceData {
   label: string;
   value: number;
@@ -80,9 +81,16 @@ const BalancesWrapper = styled(FlexColumnWrapper)`
   }
 
   .error-message {
-    color: red;
+    color: #eee;
     margin-top: 16px;
   }
+  .balance-pie-container{
+    width:100%;
+    height:100%;
+    justify-content: space-around;
+
+  }
+
 `;
 
 interface BalancesProps {}
@@ -93,22 +101,34 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   const [searched, setSearched] = useState<BalanceData[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+
   useEffect(() => {
-    if (globalState?.evmAddress &&  data.length === 0) {
+    if (globalState?.evmAddress &&  typeof globalState?.utxo === 'number') {
       const fetchBalances = async () => {
         try {
           const result = (await getZetaBalance(
             globalState.evmAddress as string,
           )) as ZetaBalanceResponse;
 
-          console.log(result,'result');
           const maps: BalanceData[] = result?.nonZeta?.map((t) => ({
             label: t.token.symbol,
             value: new BigNumber(t?.value)
-              .dividedBy(t?.token?.symbol === 'tBTC' ? 1e6 : 1e12)
+              .dividedBy(t?.token?.symbol === 'tBTC' ? 1e8 : 1e18)
               .toNumber(),
           }));
 
+          if (result.zeta.balances.length === 0 && result.nonZeta.length === 0) {
+            setData([
+              {
+                label: 'BTC',
+                value: 0,
+              },
+              {
+                label: 'ZETA',
+                value: 0,
+              },
+            ]);
+          } else {
           setData([
             {
               label: 'BTC',
@@ -117,9 +137,10 @@ const Balances = ({}: BalancesProps): JSX.Element => {
             ...maps,
             {
               label: result.zeta.balances[0]?.denom!,
-              value: result.zeta.balances[0]?.amount! / 1e15,
+              value: result.zeta.balances[0]?.amount! / 1e18 ,
             },
           ]);
+        }
           setError(null);
         } catch (err) {
           setError('Failed to fetch balance data. Please try again later.');
@@ -130,7 +151,6 @@ const Balances = ({}: BalancesProps): JSX.Element => {
     }
   }, [globalState?.evmAddress, globalState?.utxo]);
 
-  console.log(data,'data');
   const handleSearch = (text: string) => {
     const searchText = DOMPurify.sanitize(text);
     if (data.length > 0 && searchText) {
@@ -156,6 +176,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
           }
         />
       </Typography>
+      
       <div className="input-container">
         <input
           placeholder="Search Asset"
@@ -164,11 +185,17 @@ const Balances = ({}: BalancesProps): JSX.Element => {
         />
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message">"Error loading balances, kindly re-install ZetaMask</div>}
 
-      {/* <FlexRowWrapper> */}
-      <BalancePie data={searched.length > 0 ? searched : data} />
-      {/* </FlexRowWrapper> */}
+
+      <FlexColumnWrapper className='balance-pie-container'>
+
+      {data.length >= 2 && data[0]!.value + data[1]!.value > 0 ? (
+        <BalancePie data={data} />
+      ) : (
+        <EmptyBalance />
+      )}
+
       <table>
         <thead>
           <tr>
@@ -178,6 +205,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
           </tr>
         </thead>
         <tbody>
+
           {(searched.length > 0 ? searched : data).map((item, index) => (
             <tr key={index}>
               <td>
@@ -192,7 +220,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
               </td>
               <td>
                 <Typography size={14}>
-                  {parseFloat(item.value.toString()).toFixed(4)} {item.label}
+                  {parseFloat(item.value.toString()).toLocaleString(undefined, {minimumSignificantDigits: 1, maximumSignificantDigits: 8})} {item.label}
                 </Typography>
               </td>
               <td>$0</td>
@@ -200,6 +228,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
           ))}
         </tbody>
       </table>
+    </FlexColumnWrapper>
     </BalancesWrapper>
   );
 };

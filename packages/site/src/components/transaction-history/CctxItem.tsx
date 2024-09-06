@@ -13,10 +13,9 @@ import InfoBox from '../utils/InfoBox';
 const CctxItemWrapper = styled(FlexColumnWrapper)`
   background: rgba(0, 0, 0, 0.3);
   row-gap: 8px;
-  padding: 20px;
+  padding: 24px ;
   border-radius: 12px;
-  width: 100%;
-
+  width: 20em;
   a {
     color: #eee;
     font-size: 16px;
@@ -60,8 +59,8 @@ interface OutboundTxParams {
 
 interface Cctx {
   index: string;
-  inbound_tx_params: InboundTxParams;
-  outbound_tx_params: OutboundTxParams[];
+  inbound_params: InboundTxParams;
+  outbound_params: OutboundTxParams[];
 }
 
 interface CctxItemProps {
@@ -70,13 +69,12 @@ interface CctxItemProps {
 
 // CctxItem component definition
 const CctxItem: React.FC<CctxItemProps> = ({ cctx }) => {
-  console.log(cctx, 'cctx');
   // Error handling: Check if cctx is valid
-  if (!cctx || !cctx.inbound_tx_params || !cctx.outbound_tx_params.length) {
+  if (!cctx || !cctx.inbound_params || !cctx.outbound_params.length) {
     return <Typography color="#ff0000">Invalid transaction data.</Typography>;
   }
 
-  const { inbound_tx_params, outbound_tx_params } = cctx;
+  const { inbound_params, outbound_params } = cctx;
 
   return (
     <CctxItemWrapper>
@@ -87,14 +85,14 @@ const CctxItem: React.FC<CctxItemProps> = ({ cctx }) => {
         <img
           className="chain-logo"
           // @ts-ignore
-          src={getChainIcon(+inbound_tx_params.sender_chain_id)}
+          src={getChainIcon(+inbound_params.sender_chain_id)}
           alt=""
         />
         <RightArrow className="arrow-icon" />
         <img
           className="chain-logo"
           // @ts-ignore
-          src={getChainIcon(+outbound_tx_params?.[0].receiver_chainId)}
+          src={getChainIcon(+outbound_params?.[0].receiver_chainId)}
           alt=""
         />
       </FlexRowWrapper>
@@ -113,11 +111,11 @@ const CctxItem: React.FC<CctxItemProps> = ({ cctx }) => {
       </FlexRowWrapper>
       <Typography size={14}>
         Amount:&nbsp;
-        {parseFloat((inbound_tx_params.amount / 1e8).toFixed(8))} tBTC
+        {parseFloat((inbound_params.amount / 1e8).toFixed(8))} tBTC
       </Typography>
       <FlexRowWrapper className="flex-row">
         <Typography size={14} color="#bed837">
-          CCTX Status: {inbound_tx_params.tx_finalization_status}
+          CCTX Status: {inbound_params.tx_finalization_status}
         </Typography>
       </FlexRowWrapper>
       <InfoBox>

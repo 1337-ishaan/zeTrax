@@ -11,7 +11,10 @@ import {
   isMainnet,
   // isMainnet,
   } from '../constants';
-  import { Box, Link, Heading } from "@metamask/snaps-sdk/jsx";
+import { Box, Link, Heading } from "@metamask/snaps-sdk/jsx";
+
+
+
 
 /**
  * Converts an Ethereum address to a Zeta address and vice versa.
@@ -205,6 +208,17 @@ const broadcastTransaction = async (hex: string) => {
       },
     );
 
+    await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: (
+        <Box>
+          <Heading>Track you CCTX transaction: {JSON.stringify(response)}</Heading>
+        </Box>
+        )
+      },
+    });
     if (!response.ok) {
       throw new Error('Failed to broadcast transaction.');
     }
@@ -218,6 +232,7 @@ const broadcastTransaction = async (hex: string) => {
         <Box>
           <Heading>Track you CCTX transaction</Heading>
           <Link href={`https://mempool.space${!isMainnet ? '/testnet' : ''}/tx/${txData}`}>Mempool</Link>
+          <Text>Refresh your transactions</Text>
         </Box>
         )
       },
@@ -303,7 +318,7 @@ export const getTrxsByAddress = async (address: string) => {
  */
 const fetchUtxo = async (btcAddress: string) => {
   try {
-    const utxo = await fetch(`${BLOCKCYPHER_API}/address/${btcAddress}/utxo`);
+    const utxo = await fetch(`${BLOCKSTREAM_API}/address/${btcAddress}/utxo`);
     const utxoData = await utxo.text();
     return JSON.parse(utxoData);
   } catch (error) {
@@ -319,7 +334,15 @@ const fetchUtxo = async (btcAddress: string) => {
  * @param request - The request object containing transaction parameters.
  * @returns The transaction ID after broadcasting.
  */
+
+
+
+
 export const transactBtc = async (request: any) => {
+  if (!request || !request.params) {
+    throw new Error('Invalid request: missing params');
+  }
+
   const interfaceId = await snap.request({
     method: "snap_createInterface",
     params: {
@@ -331,7 +354,11 @@ export const transactBtc = async (request: any) => {
     },
   });
 
-  const result =   await snap.request({
+  if (!interfaceId) {
+    throw new Error('Failed to create interface');
+  }
+
+  const result = await snap.request({
     method: "snap_dialog",
     params: {
       type: "confirmation",
@@ -349,85 +376,117 @@ export const transactBtc = async (request: any) => {
         },
       });
 
-      if (slip10Node.publicKey) {
-        const privateKeyBuffer = Buffer.from(
-          trimHexPrefix(slip10Node.privateKey as string),
-          'hex',
-        );
-        const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
-        const { address } = bitcoin.payments.p2wpkh({
-          pubkey: keypair.publicKey,
-          network: currNetwork,
-        });
+   
+      if (!slip10Node || !slip10Node.publicKey || !slip10Node.privateKey) {
+        throw new Error('Failed to retrieve key information');
+      }
 
-        const utxos = await fetchUtxo(address as string);
-        const amount = request.params[0];
-        const memo = Buffer.from(request.params[1], 'hex');
+      const privateKeyBuffer = Buffer.from(
+        trimHexPrefix(slip10Node.privateKey),
+        'hex',
+      );
+      const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
+      const { address } = bitcoin.payments.p2wpkh({
+        pubkey: keypair.publicKey,
+        network: currNetwork,
+      });
 
-        if (memo.length >= 78) throw new Error('Memo too long');
+      if (!address) {
+        throw new Error('Failed to generate Bitcoin address');
+      }
 
-        utxos.sort(
-          (a: { value: number }, b: { value: number }) => a.value - b.value,
-        );
-        const fee = request.params[2];
-        const total = amount + fee;
-        let sum = 0;
-        const pickUtxos = [];
+      const utxos = await fetchUtxo(address as string);
 
-        for (let i = 0; i < utxos.length; i++) {
-          const utxo = utxos[i];
-          sum += utxo.value;
-          pickUtxos.push(utxo);
-          if (sum >= total) break;
+      if (!utxos || utxos.length === 0) {
+        throw new Error('No UTXOs found');
+      }
+
+      const amount = Math.floor(request.params[0]);
+      const fee = Math.floor(request.params[2]) + 1; // Send an extra sat to cover for the fee
+
+      const memo = Buffer.from(request.params[1], 'hex');
+
+      if (memo.length >= 78) throw new Error('Memo too long');
+
+      utxos.sort((a: { value: number }, b: { value: number }) => a.value - b.value);
+      if (typeof fee !== 'number') {
+        throw new Error('Invalid fee');
+      }
+
+      const total = amount + fee;
+      let sum = 0;
+      const pickUtxos = [];
+
+      for (const utxo of utxos) {
+        sum += utxo.value;
+        pickUtxos.push(utxo);
+        if (sum >= total) break;
+      }
+
+      if (sum < total) throw new Error('Not enough funds');
+      const change = sum - total;
+      const txs = [];
+
+      for (const utxo of pickUtxos) {
+        const p1 = await fetch(`${BLOCKSTREAM_API}/tx/${utxo.txid}`);
+
+        if (!p1.ok) {
+          throw new Error(`Failed to fetch transaction data for ${utxo.txid}`);
+        }
+        const data = await p1.json();
+        txs.push(data);
+      }
+      
+      //
+      const psbt = new bitcoin.Psbt({ network: currNetwork });
+      psbt.addOutput({ address: btcTss, value: amount });
+
+      if (memo.length > 0) {
+        const embed = bitcoin.payments.embed({ data: [memo] });
+        if (!embed.output) throw new Error('Unable to embed memo');
+        psbt.addOutput({ script: embed.output, value: 0 });
+      }
+
+      if (change > 0) {
+        psbt.addOutput({ address: address, value: change });
+      }
+
+      for (let i = 0; i < pickUtxos.length; i++) {
+        const utxo = pickUtxos[i];
+        const tx = txs[i];
+        if (!tx || !tx.vout || !tx.vout[utxo.vout]) {
+          throw new Error(`Invalid transaction data for UTXO ${utxo.txid}`);
         }
 
-        if (sum < total) throw new Error('Not enough funds');
-        const change = sum - total;
-        const txs = [];
-
-        for (let i = 0; i < pickUtxos.length; i++) {
-          const utxo = pickUtxos[i];
-          const p1 = await fetch(`${BLOCKSTREAM_API}/tx/${utxo.txid}`);
-          const data = await p1.json();
-          txs.push(data);
-        }
-
-        const psbt = new bitcoin.Psbt({ network: currNetwork });
-        psbt.addOutput({ address: btcTss, value: amount });
-
-        if (memo.length > 0) {
-          const embed = bitcoin.payments.embed({ data: [memo] });
-          if (!embed.output) throw new Error('Unable to embed memo');
-          psbt.addOutput({ script: embed.output, value: 0 });
-        }
-
-        if (change > 0) {
-          psbt.addOutput({ address: address!, value: change });
-        }
-
-        for (let i = 0; i < pickUtxos.length; i++) {
-          const utxo = pickUtxos[i];
-          const inputData = { hash: '', index: 0, witnessUtxo: {} };
-          inputData.hash = txs[i].txid;
-          inputData.index = utxo.vout;
-
-          const witnessUtxo = {
-            script: Buffer.from(txs[i].vout[utxo.vout].scriptpubkey, 'hex'),
+        const inputData = {
+          hash: tx.txid,
+          index: utxo.vout,
+          witnessUtxo: {
+            script: Buffer.from(tx.vout[utxo.vout].scriptpubkey, 'hex'),
             value: utxo.value,
-          };
-          inputData.witnessUtxo = witnessUtxo;
-          psbt.addInput(inputData as any);
-        }
+          },
+        };
+        psbt.addInput(inputData as any);
+      }
 
-        for (let i = 0; i < pickUtxos.length; i++) {
-          psbt.signInput(i, keypair);
-        }
+      for (let i = 0; i < pickUtxos.length; i++) {
+        psbt.signInput(i, keypair);
+      }
 
+      try {
         psbt.finalizeAllInputs();
         const tx = psbt.extractTransaction().toHex();
-        return await broadcastTransaction(tx);
-      } else {
-        throw new Error('Failed to retrieve public key.');
+        const broadcastResult = await broadcastTransaction(tx);
+        if (!broadcastResult) {
+          throw new Error('Failed to broadcast transaction');
+        }
+        return broadcastResult;
+      } catch (error) {
+        console.error('Error in finalizing or extracting transaction:', error);
+        if (error instanceof TypeError && error.message.includes("Cannot read properties of null")) {
+          console.error('Detailed error:', JSON.stringify(psbt.data));
+        }
+        throw error;
       }
     } catch (error) {
       console.error('Error during cross-chain swap:', error);
@@ -443,25 +502,27 @@ export const transactBtc = async (request: any) => {
  * @param request - The request object containing the transaction hash.
  * @returns The transaction data.
  */
-export const trackCctxTx = async (request: any) => {
-  try {
-    const utxo = await fetch(
-      `https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/inTxHashToCctxData/${request.params[0]}`,
-    );
-    await snap.request({
-      method: 'snap_dialog',
-      params: {
-        type: 'alert',
-        content: (
-        <Box>
-          <Heading>Track your CCTX {JSON.stringify(utxo)} {JSON.stringify(request.params[0])} </Heading>
 
-        </Box>
-        )
-      },
-    });
+
+export const trackCctxTx = async (request: any) => {
+
+  
+  try {
+
+
+    const cctxIndex = await fetch(`https://zetachain-athens.blockpi.network/lcd/v1/afa7758ad026d7ae54ff629af5883f53bdd82d73/zeta-chain/crosschain/inTxHashToCctx/${request.params[0]}`);
+    const cctxData = await cctxIndex.text();
+    let cctx = JSON.parse(cctxData);
+
+    
+
+    const utxo = await fetch(
+      `https://zetachain${isMainnet ? '' : '-athens'}.blockpi.network/lcd/v1/afa7758ad026d7ae54ff629af5883f53bdd82d73/zeta-chain/crosschain/cctx/${cctx.inboundHashToCctx.cctx_index[0]}`,
+    );
+
     const utxoData = await utxo.text();
     return JSON.parse(utxoData);
+
   } catch (error) {
     console.error('Error tracking cross-chain transaction:', error);
     throw new Error('Failed to track cross-chain transaction.');
@@ -488,19 +549,6 @@ export const getZetaBalance = async (request: any) => {
       );
       const zetaData = await zeta.text();
       const nonZetaData = await nonZeta.text();
-
-      // await snap.request({
-      //   method: 'snap_dialog',
-      //   params: {
-      //     type: 'alert',
-      //     content: (
-      //     <Box>
-      //       <Heading>Track your CCTX {JSON.stringify(zetaData)} {JSON.stringify(nonZetaData)} {address} {request.params[0]}</Heading>
-  
-      //     </Box>
-      //     )
-      //   },
-      // });
       return { zeta: JSON.parse(zetaData), nonZeta: JSON.parse(nonZetaData) };
     } else {
       throw new Error('Address parameter is missing.');
@@ -510,3 +558,7 @@ export const getZetaBalance = async (request: any) => {
     throw new Error('Failed to retrieve Zeta balance.');
   }
 };
+
+
+
+

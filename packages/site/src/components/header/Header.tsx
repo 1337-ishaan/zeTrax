@@ -36,6 +36,15 @@ const HeaderWrapper = styled(FlexRowWrapper)`
       left: -12px;
       transform: scale(1.4);
       opacity: 0.3;
+      transition: opacity 0.3s ease;
+    }
+  }
+  .icon-addr-wrapper {
+    transition: opacity 0.3s ease;
+  }
+
+  .icon-addr-wrapper:hover .chain-icon {
+    opacity: .7;
     }
   }
 `;
@@ -62,6 +71,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
 
   // Connect to the Zeta snap
   const onConnectSnap = async () => {
+    console.log('Connecting to Zeta snap');
     try {
       await connectSnap();
       const evmAddress = await getEvmAddress();

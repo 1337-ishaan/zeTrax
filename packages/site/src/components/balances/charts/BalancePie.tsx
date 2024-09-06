@@ -132,6 +132,7 @@ const BalancePie = ({ data }: BalancePieProps) => {
         <Pie
           activeIndex={activeIndex} // Highlight active segment
           // @ts-ignore
+          
           activeShape={renderActiveShape} // Custom active shape
           data={data} // Pie data
           innerRadius={50} // Inner radius

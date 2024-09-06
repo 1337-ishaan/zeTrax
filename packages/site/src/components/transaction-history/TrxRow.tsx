@@ -19,28 +19,37 @@ import { ReactComponent as RedirectIcon } from '../../assets/redirect.svg';
 
 const TrxRowWrapper = styled(FlexRowWrapper)`
   align-items: center;
-  column-gap: 12px;
-
-  .info-column {
-    row-gap: 4px;
-    width: fit-content;
-  }
-
+  column-gap: 48px;
+  justify-content: space-between;
   .redirect-icon {
     width: 16px;
     height: 16px;
   }
-
+.info-column{
+    row-gap: 4px;
+}
   .amount-status-wrapper {
-    align-content: flex-end;
+    margin-left: auto;
+    display: flex;
     justify-content: flex-end;
+    align-items: flex-end;
+    // width: 100%;
   }
 
   .status-pill {
     background: rgba(13, 73, 15, 0.6);
     border-radius: 12px;
+    white-space:nowrap;
     padding: 4px 8px;
     box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 1);
+  }
+
+  .trx-hash{
+      white-space: nowrap;
+    }
+  } 
+  .t-trx-amount{
+    white-space:nowrap;
   }
 `;
 
@@ -64,16 +73,17 @@ const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
       if (trxHash) {
         const cctxData: any = await trackCctx(trxHash);
         if (cctxData?.code !== 5) {
-          setCctx(cctxData!.CrossChainTxs?.[0]);
+          setCctx(cctxData!.CrossChainTx);
         }
       }
     };
     fetchCctx();
   }, [trxHash]);
 
+  console.log(cctx, 'cctx trx row');
+
   const renderContent = () => {
-    console.log(trxHash, 'cctx');
-    if (cctx?.index && cctx?.code !== 5) {
+    if (cctx?.index ) {
       return <CctxItem cctx={cctx} />;
     } else if (!!cctx && trx.confirmations >= 6 && !isSent) {
       return (
@@ -81,7 +91,7 @@ const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
           Direct BTC transaction - RECEIVED
         </Typography>
       );
-    } else if (trx.confirmations >= 6 && isSent) {
+    } else if (!cctx.index && trx.confirmations >= 6 && isSent) {
       return <Typography size={16}>Loading...</Typography>;
     } else if (trx.confirmations < 6) {
       return (
@@ -95,30 +105,40 @@ const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
   return (
     <Accordion allowZeroExpanded>
       <AccordionItem>
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <TrxRowWrapper >
-              <Arrow isReceived={!isSent} />
-              <FlexColumnWrapper className="info-column">
-                <Typography size={16} color={isSent ? '#ff4a3d' : '#008462'}>
-                  {isSent ? 'Sent' : 'Received'}
-                </Typography>
-                <Typography size={14}>
-                  BTC trx:{' '}
-                  <a
-                    href={`https://mempool.space/testnet/tx/${trx.hash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {trimHexAddress(trx.hash)}
-                    <RedirectIcon className="redirect-icon" />
-                  </a>
-                </Typography>
-              </FlexColumnWrapper>
+        <AccordionItemHeading >
+          <AccordionItemButton style={{ width: 'auto' }}>
+            <TrxRowWrapper>
+              <FlexRowWrapper className="trx-hash-wrapper">
+                <Arrow isReceived={!isSent} />
+                <FlexColumnWrapper className="info-column type-hash-wrapper">
+                  <Typography size={16} color={isSent ? '#ff4a3d' : '#008462'}>
+                    {isSent ? 'Sent' : 'Received'}
+                  </Typography>
+                  <Typography size={14} className="trx-hash">
+                    BTC trx:
+                    <a
+                      href={`https://mempool.space/testnet/tx/${trx.hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {trimHexAddress(trx.hash)}
+                      <RedirectIcon className="redirect-icon" />
+                    </a>
+                  </Typography>
+                </FlexColumnWrapper>
+              </FlexRowWrapper>
+
               <FlexColumnWrapper className="info-column amount-status-wrapper">
-                <Typography size={16} color={!isSent ? '#008462' : '#ff4a3d'}>
+                <Typography
+                  className="t-trx-amount"
+                  size={14}
+                  color={!isSent ? '#008462' : '#ff4a3d'}
+                >
                   {isSent ? '-' : '+'}
-                  {(amount / 1e8).toFixed(5)} BTC{' '}
+                  {isNaN(amount / 1e8)
+                    ? '0'
+                    : parseFloat((amount / 1e8).toFixed(8)).toString()}
+                  BTC{' '}
                 </Typography>
                 <Typography
                   size={12}
@@ -133,13 +153,17 @@ const TrxRow: React.FC<TrxRowProps> = ({ trx, isSent, amount }) => {
             </TrxRowWrapper>
           </AccordionItemButton>
         </AccordionItemHeading>
-        <AccordionItemPanel>
+        <AccordionItemPanel style={{ width: 'min-content' }}>
           <AccordionItemState>
-            {({expanded}) => {
+            {({ expanded }) => {
               if (expanded) setTrxHash(trx.hash);
-              renderContent();
+              if(!!cctx.index){
+                return <CctxItem cctx={cctx} />
+              }else{
+                renderContent();
+              }
+              
               return null;
-
             }}
           </AccordionItemState>
         </AccordionItemPanel>

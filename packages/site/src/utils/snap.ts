@@ -28,6 +28,7 @@ export const connectSnap = async (
   snapId: string = defaultSnapOrigin,
   params: Record<'version' | string, unknown> = {},
 ) => {
+
   try {
     await window.ethereum.request({
       method: 'wallet_requestSnaps',
@@ -183,12 +184,13 @@ export const transferBtc = async (
 
     const decAmount = parseFloat('' + amount) * 1e8;
     // const bitcoinTSSAddress = 'tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur';
+    console.log(decAmount, 'decAmount');
     let memo;
 
     const dest = addressToSend.replace(/^0x/, '');
 
     if (!!zrc20) {
-      const contract = sanitizeInput(OMNICHAIN_SWAP_CONTRACT_ADDRESS).replace(
+      const contract = OMNICHAIN_SWAP_CONTRACT_ADDRESS.replace(
         /^0x/,
         '',
       );
@@ -198,6 +200,7 @@ export const transferBtc = async (
       memo = sanitizeInput(dest);
     }
 
+    console.log(decAmount, memo, fee, 'SNAPCALL --> transferBtc');
     const result = await window.ethereum.request({
       method: 'wallet_snap',
       params: {

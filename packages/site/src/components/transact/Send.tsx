@@ -161,7 +161,6 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
     } finally {
       setIsTrxProcessing(false);
       setGlobalState({ ...globalState, isTrxProcessed: true });
-
       setIsSendModalOpen(false);
     }
   };
@@ -183,14 +182,13 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
     if (!depositFees) {
       const getFees = async () => {
         let fees = await getBtcFees();
+        //@ts-ignore next line
         setDepositFees(fees?.high_fee_per_kb * 0.001 * 68 * 2) // DepositFee = AverageFeeRateBlockX (fee/1000 sat/vB) × GasPriceMultiplier(68vB) ×DepositIncurredVBytes(2);
       };
       getFees();
       return () => {};
     }
   }, []);
-
-  console.log(depositFees?.high_fee_per_kb,'fees');
 
   const CustomItemRenderer = ({ option }: any) => (
     <div className="dropdown-item">
@@ -207,7 +205,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
   );
 
   const maxFunds =
-    +((globalState?.utxo - depositFees) / 1e8).toFixed(4);
+    Math.floor((globalState?.utxo - depositFees) / 1e8 * 1e8) / 1e8;
 
   return (
     <SendWrapper>
@@ -260,7 +258,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
           }
           type="number"
           value={amount}
-          min={0.00000000001}
+          min={0.00000001}
           placeholder="Amount"
         />
         <FlexRowWrapper
@@ -359,7 +357,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
       <FlexRowWrapper className="gas-wrapper">
         <GasIcon className="icon" /> Fees :
         <span className="amount">
-          ~{(depositFees / 1e8).toFixed(4)} BTC
+          ~{(depositFees / 1e8)} BTC
         </span>
       </FlexRowWrapper>
       <StyledButton

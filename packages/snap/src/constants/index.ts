@@ -2,7 +2,7 @@ import { ECPairFactory } from 'ecpair';
 import * as ecc from '@bitcoinerlab/secp256k1';
 import * as bitcoin from 'bitcoinjs-lib';
 
-const isMainnet = true;
+const isMainnet = false;
 const ECPair = ECPairFactory(ecc);
 
 const CRYPTO_CURVE = 'secp256k1';
@@ -24,9 +24,9 @@ export {
   ECPair,
   CRYPTO_CURVE,
   DERIVATION_PATH,
-  currNetwork,
   BLOCKSTREAM_API,
   BLOCKCYPHER_API,
+  currNetwork,
   btcTss,
   isMainnet,
 };
