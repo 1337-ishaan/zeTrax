@@ -4,6 +4,7 @@ import type { GetSnapsResponse, Snap } from '../types';
 import { OMNICHAIN_SWAP_CONTRACT_ADDRESS } from '../constants/contracts';
 import { sanitizeInput } from './sanitizeInput';
 
+
 /**
  * Get the installed snaps in MetaMask.
  *
@@ -97,14 +98,14 @@ export const getWalletInfo = async () => {
     throw error;
   }
 };
-export const createBtcWallet = async () => {
+export const createBtcWallet = async (isMainnet=false) => {
   // invoke snap
   try {
     const result = await window.ethereum.request({
       method: 'wallet_invokeSnap',
       params: {
         snapId: defaultSnapOrigin,
-        request: { method: 'create-btc-wallet', params: [] },
+        request: { method: 'create-btc-wallet', params: [isMainnet] },
       },
     });
     return result;
@@ -114,6 +115,7 @@ export const createBtcWallet = async () => {
 };
 export const getBtcUtxo = async () => {
   console.trace('SNAPCALL --> getBtcUtxo');
+
   try {
     // invoke snap
     const result = await window.ethereum.request({
@@ -128,23 +130,8 @@ export const getBtcUtxo = async () => {
     throw error;
   }
 };
-export const getBtcActivity = async () => {
-  console.trace('SNAPCALL --> getBtcActivity');
 
-  try {
-    // invoke snap
-    const result = await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: {
-        snapId: defaultSnapOrigin,
-        request: { method: 'get-btc-trxs', params: [] },
-      },
-    });
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
+
 export const sendBtc = async () => {
   console.trace('SNAPCALL --> sendBtc');
   try {

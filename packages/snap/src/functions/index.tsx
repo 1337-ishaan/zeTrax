@@ -1,21 +1,27 @@
 import { bech32 } from 'bech32';
 import * as bitcoin from 'bitcoinjs-lib';
 import {
-  BLOCKCYPHER_API,
-  BLOCKSTREAM_API,
-  btcTss,
+ TESTNET_BLOCKCYPHER_API,
+ MAINNET_BLOCKCYPHER_API,
+TESTNET_BLOCKSTREAM_API,
+ MAINNET_BLOCKSTREAM_API,
   CRYPTO_CURVE,
-  currNetwork,
   DERIVATION_PATH,
   ECPair,
-  isMainnet,
-  // isMainnet,
+  TESTNET_MEMPOOL,
+  MAINNET_MEMPOOL,
+  TESTNET_ZETA_BLOCKPI,
+  MAINNET_ZETA_BLOCKPI,
+  TESTNET_ZETA_BLOCKSCOUT,
+  MAINNET_ZETA_BLOCKSCOUT,
+  MAINNET_ZETA_TSS,
+  TESTNET_ZETA_TSS,
   } from '../constants';
 import { Box, Link, Heading } from "@metamask/snaps-sdk/jsx";
 
 
 
-
+  let isMainnet=false;
 /**
  * Converts an Ethereum address to a Zeta address and vice versa.
  * @param address - The Ethereum or Zeta address to convert.
@@ -51,7 +57,9 @@ export const trimHexPrefix = (key: string): string => {
  * Creates a Bitcoin testnet address from the BIP32 public key.
  * @returns The generated Bitcoin testnet address.
  */
-export const deriveBtcWallet = async (): Promise<string> => {
+export const deriveBtcWallet = async (request:any): Promise<string> => {
+  isMainnet = request.params[0]!
+
   try {
     const slip10Node = await snap.request({
       method: 'snap_getBip32PublicKey',
@@ -65,7 +73,7 @@ export const deriveBtcWallet = async (): Promise<string> => {
     if (slip10Node) {
       const { address } = bitcoin.payments.p2wpkh({
         pubkey: Buffer.from(trimHexPrefix(slip10Node), 'hex'),
-        network: currNetwork,
+        network: isMainnet ? bitcoin.networks.bitcoin: bitcoin.networks.testnet,
       });
       return address as string;
     } else {
@@ -74,69 +82,6 @@ export const deriveBtcWallet = async (): Promise<string> => {
   } catch (error) {
     console.error('Error creating BTC testnet address:', error);
     throw new Error('Failed to create Bitcoin testnet address.');
-  }
-};
-
-/**
- * Retrieves Bitcoin deposit fees based on priority.
- * @param priority - The priority level for fee calculation.
- * @returns The calculated deposit fees.
- */
-export const getBtcDepositFees = async (
-  priority: 'low' | 'medium' | 'high',
-): Promise<number> => {
-  try {
-    const feePerKb = await getFees();
-    const multiplier = 2 * 68; // Deposit incurred vBytes
-
-    switch (priority) {
-      case 'low':
-        return feePerKb.low_fee_per_kb * multiplier;
-      case 'medium':
-        return feePerKb.medium_fee_per_kb * multiplier;
-      case 'high':
-        return feePerKb.high_fee_per_kb * multiplier;
-      default:
-        throw new Error('Invalid priority level.');
-    }
-  } catch (error) {
-    console.error('Error getting BTC deposit fees:', error);
-    throw new Error('Failed to retrieve Bitcoin deposit fees.');
-  }
-};
-
-/**
- * Fetches Bitcoin transactions for the connected account.
- * @returns An object containing transaction references.
- */
-export const getBtcTrxs = async () => {
-  try {
-    const slip10Node = await snap.request({
-      method: 'snap_getBip32PublicKey',
-      params: {
-        path: DERIVATION_PATH,
-        curve: CRYPTO_CURVE,
-        compressed: true,
-      },
-    });
-
-    if (slip10Node) {
-      const { address } = bitcoin.payments.p2wpkh({
-        pubkey: Buffer.from(trimHexPrefix(slip10Node), 'hex'),
-        network: currNetwork,
-      });
-
-      const txs = await fetch(
-        `${BLOCKCYPHER_API}/addrs/${address}`,
-      );
-      const txsData = await txs.text();
-      return txsData ? JSON.parse(txsData) : { txrefs: [] };
-    } else {
-      throw new Error('Failed to create Bitcoin testnet address.');
-    }
-  } catch (error) {
-    console.error('Error getting BTC transactions:', error);
-    throw new Error('Failed to retrieve Bitcoin transactions.');
   }
 };
 
@@ -158,11 +103,11 @@ export const getBtcUtxo = async () => {
     if (slip10Node) {
       const { address } = bitcoin.payments.p2wpkh({
         pubkey: Buffer.from(trimHexPrefix(slip10Node), 'hex'),
-        network: currNetwork,
+        network: isMainnet ?bitcoin.networks.bitcoin: bitcoin.networks.testnet,
       });
 
       const utxo = await fetch(
-        `${BLOCKCYPHER_API}/addrs/${address}/full`,
+        `${isMainnet ? MAINNET_BLOCKCYPHER_API: TESTNET_BLOCKCYPHER_API}/addrs/${address}/full`,
       );
       const utxoData = await utxo.text();
       return utxoData ? JSON.parse(utxoData) : { txs: [] };
@@ -181,7 +126,7 @@ export const getBtcUtxo = async () => {
  */
 export const getFees = async () => {
   try {
-    const utxo = await fetch(`${BLOCKCYPHER_API}`);
+    const utxo = await fetch(`${isMainnet ? MAINNET_BLOCKCYPHER_API: TESTNET_BLOCKCYPHER_API}`);
     if (!utxo.ok) {
       throw new Error('Failed to fetch fees.');
     }
@@ -199,31 +144,30 @@ export const getFees = async () => {
  * @returns The transaction ID after broadcasting.
  */
 const broadcastTransaction = async (hex: string) => {
+
+  await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: (
+      <Box>
+        <Heading>Track you CCTX transaction: {JSON.stringify(hex)}</Heading>
+      </Box>
+      )
+    },
+  });
+
   try {
     const response: Response = await fetch(
-      `${BLOCKSTREAM_API}/tx`,
+      `${isMainnet ? MAINNET_BLOCKSTREAM_API :TESTNET_BLOCKSTREAM_API}/tx`,
       {
         method: 'POST',
         body: hex,
       },
     );
 
-    await snap.request({
-      method: 'snap_dialog',
-      params: {
-        type: 'alert',
-        content: (
-        <Box>
-          <Heading>Track you CCTX transaction: {JSON.stringify(response)}</Heading>
-        </Box>
-        )
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to broadcast transaction.');
-    }
-
     const txData = await response.text();
+    
     await snap.request({
       method: 'snap_dialog',
       params: {
@@ -231,7 +175,7 @@ const broadcastTransaction = async (hex: string) => {
         content: (
         <Box>
           <Heading>Track you CCTX transaction</Heading>
-          <Link href={`https://mempool.space${!isMainnet ? '/testnet' : ''}/tx/${txData}`}>Mempool</Link>
+          <Link href={`${isMainnet ? MAINNET_MEMPOOL : TESTNET_MEMPOOL}/tx/${txData}`}>Mempool</Link>
           <Text>Refresh your transactions</Text>
         </Box>
         )
@@ -253,7 +197,7 @@ const broadcastTransaction = async (hex: string) => {
 export const getTrxByHash = async (previousTxHash: string) => {
   try {
     const response: Response = await fetch(
-      `${BLOCKCYPHER_API}/txs/${previousTxHash}`,
+      `${isMainnet ? MAINNET_BLOCKCYPHER_API: TESTNET_BLOCKCYPHER_API}/txs/${previousTxHash}`,
     );
     if (!response.ok) {
       throw new Error('Failed to fetch transaction by hash.');
@@ -275,7 +219,7 @@ export const getTrxByHash = async (previousTxHash: string) => {
 export const getTrxHex = async (previousTxHash: string) => {
   try {
     const response: Response = await fetch(
-      `${BLOCKSTREAM_API}/tx/${previousTxHash}/hex`,
+      `${isMainnet ? MAINNET_BLOCKSTREAM_API : TESTNET_BLOCKSTREAM_API}/tx/${previousTxHash}/hex`,
     );
     if (!response.ok) {
       throw new Error('Failed to fetch transaction hex.');
@@ -297,7 +241,7 @@ export const getTrxHex = async (previousTxHash: string) => {
 export const getTrxsByAddress = async (address: string) => {
   try {
     const response: Response = await fetch(
-      `${BLOCKCYPHER_API}/addrs/${address}`,
+      `${isMainnet ? MAINNET_BLOCKCYPHER_API: TESTNET_BLOCKCYPHER_API}/addrs/${address}`,
     );
     if (!response.ok) {
       throw new Error('Failed to fetch transactions by address.');
@@ -318,7 +262,7 @@ export const getTrxsByAddress = async (address: string) => {
  */
 const fetchUtxo = async (btcAddress: string) => {
   try {
-    const utxo = await fetch(`${BLOCKSTREAM_API}/address/${btcAddress}/utxo`);
+    const utxo = await fetch(`${isMainnet ? MAINNET_BLOCKSTREAM_API :TESTNET_BLOCKSTREAM_API}/address/${btcAddress}/utxo`);
     const utxoData = await utxo.text();
     return JSON.parse(utxoData);
   } catch (error) {
@@ -327,16 +271,11 @@ const fetchUtxo = async (btcAddress: string) => {
   }
 };
 
-
-
 /**
  * Executes a cross-chain swap transaction for Bitcoin.
  * @param request - The request object containing transaction parameters.
  * @returns The transaction ID after broadcasting.
  */
-
-
-
 
 export const transactBtc = async (request: any) => {
   if (!request || !request.params) {
@@ -388,7 +327,7 @@ export const transactBtc = async (request: any) => {
       const keypair = ECPair.fromPrivateKey(privateKeyBuffer);
       const { address } = bitcoin.payments.p2wpkh({
         pubkey: keypair.publicKey,
-        network: currNetwork,
+        network: isMainnet ? bitcoin.networks.bitcoin: bitcoin.networks.testnet,
       });
 
       if (!address) {
@@ -428,7 +367,7 @@ export const transactBtc = async (request: any) => {
       const txs = [];
 
       for (const utxo of pickUtxos) {
-        const p1 = await fetch(`${BLOCKSTREAM_API}/tx/${utxo.txid}`);
+        const p1 = await fetch(`${isMainnet ? MAINNET_BLOCKSTREAM_API :TESTNET_BLOCKSTREAM_API}/tx/${utxo.txid}`);
 
         if (!p1.ok) {
           throw new Error(`Failed to fetch transaction data for ${utxo.txid}`);
@@ -438,8 +377,8 @@ export const transactBtc = async (request: any) => {
       }
       
       //
-      const psbt = new bitcoin.Psbt({ network: currNetwork });
-      psbt.addOutput({ address: btcTss, value: amount });
+      const psbt = new bitcoin.Psbt({ network:  isMainnet ? bitcoin.networks.bitcoin :  bitcoin.networks.testnet});
+      psbt.addOutput({ address: isMainnet ? MAINNET_ZETA_TSS : TESTNET_ZETA_TSS, value: amount });
 
       if (memo.length > 0) {
         const embed = bitcoin.payments.embed({ data: [memo] });
@@ -505,24 +444,16 @@ export const transactBtc = async (request: any) => {
 
 
 export const trackCctxTx = async (request: any) => {
-
-  
   try {
-
-
-    const cctxIndex = await fetch(`https://zetachain-athens.blockpi.network/lcd/v1/afa7758ad026d7ae54ff629af5883f53bdd82d73/zeta-chain/crosschain/inTxHashToCctx/${request.params[0]}`);
+    const cctxIndex = await fetch(`${isMainnet ? MAINNET_ZETA_BLOCKPI: TESTNET_ZETA_BLOCKPI}/zeta-chain/crosschain/inTxHashToCctx/${request.params[0]}`);
     const cctxData = await cctxIndex.text();
     let cctx = JSON.parse(cctxData);
-
-    
-
     const utxo = await fetch(
-      `https://zetachain${isMainnet ? '' : '-athens'}.blockpi.network/lcd/v1/afa7758ad026d7ae54ff629af5883f53bdd82d73/zeta-chain/crosschain/cctx/${cctx.inboundHashToCctx.cctx_index[0]}`,
+      `${isMainnet ? MAINNET_ZETA_BLOCKPI: TESTNET_ZETA_BLOCKPI}/zeta-chain/crosschain/cctx/${cctx.inboundHashToCctx.cctx_index[0]}`,
     );
 
     const utxoData = await utxo.text();
     return JSON.parse(utxoData);
-
   } catch (error) {
     console.error('Error tracking cross-chain transaction:', error);
     throw new Error('Failed to track cross-chain transaction.');
@@ -540,12 +471,11 @@ export const getZetaBalance = async (request: any) => {
       const address = convertToZeta(request.params[0]);
       const zeta = await fetch(
         // `https://zetachain-athens.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
-        `https://zetachain${isMainnet ? '' : '-athens'}.blockpi.network/lcd/v1/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
-
+        `${isMainnet ? MAINNET_ZETA_BLOCKPI: TESTNET_ZETA_BLOCKPI}/public/cosmos/bank/v1beta1/spendable_balances/${address}`,
       );
       const nonZeta = await fetch(
         // `https://zetachain-athens-3.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
-        `https://zetachain${isMainnet ? '' : '-athens-3'}.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
+        `${isMainnet ? MAINNET_ZETA_BLOCKSCOUT: TESTNET_ZETA_BLOCKSCOUT}/addresses/${request.params[0]}/token-balances`,
       );
       const zetaData = await zeta.text();
       const nonZetaData = await nonZeta.text();

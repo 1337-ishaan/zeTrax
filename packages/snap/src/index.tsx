@@ -2,7 +2,6 @@ import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
 import {
   deriveBtcWallet,
   getBtcUtxo,
-  getBtcTrxs,
   transactBtc,
   trackCctxTx,
   getZetaBalance,
@@ -42,11 +41,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   switch (request.method) {
     case 'create-btc-wallet':
-      return deriveBtcWallet();
+      return deriveBtcWallet(request);
     case 'get-btc-utxo':
       return getBtcUtxo();
-    case 'get-btc-trxs':
-      return getBtcTrxs();
     case 'get-deposit-fees':
       return getFees();
     case 'get-zeta-balance':

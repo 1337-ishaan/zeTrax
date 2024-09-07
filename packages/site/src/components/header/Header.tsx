@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 import { StoreContext } from '../../hooks/useStore';
 import styled from 'styled-components/macro';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
+import { ReactComponent as DisconnectIcon } from '../../assets/disconnect.svg';
+
 import { MetaMaskContext } from '../../hooks';
 import {
   connectSnap,
@@ -15,6 +17,7 @@ import { ethers } from 'ethers';
 import Copyable from '../utils/Copyable';
 import { ReactComponent as BitcoinLogo } from '../../assets/bitcoin.svg';
 import { ReactComponent as ZetaLogo } from '../../assets/zetachain.svg';
+import Toggle from '../utils/Toggle';
 
 const HeaderWrapper = styled(FlexRowWrapper)`
   justify-content: space-between;
@@ -47,12 +50,34 @@ const HeaderWrapper = styled(FlexRowWrapper)`
     opacity: .7;
     }
   }
-`;
+    .disconnect-btn-wrapper{
+      background:transparent;
+      border:1px solid #bfbfbf;
+      padding:4px 8px;
+      .disconnect-icon {
+        width: 24px;
+        height: 24px;
+        color:#bfbfbf;
+        transition: color 0.3s all;
+        &:hover{
+        transition: color 0.3s all;
+          color: red;
+        }
+      }
+    }
+
+
+
+    .header-section-disconnected{
+        column-gap:16px;
+    }
+  `;
 
 interface HeaderProps {}
 
 const Header = ({}: HeaderProps): JSX.Element => {
   const [state] = useContext(MetaMaskContext);
+
   const { globalState, setGlobalState } = useContext(StoreContext);
 
   useEffect(() => {
@@ -70,12 +95,12 @@ const Header = ({}: HeaderProps): JSX.Element => {
   };
 
   // Connect to the Zeta snap
-  const onConnectSnap = async () => {
+  const onConnectSnap = async (isMainnet=false) => {
     console.log('Connecting to Zeta snap');
     try {
       await connectSnap();
       const evmAddress = await getEvmAddress();
-      const btcAddress = await createBtcWallet();
+      const btcAddress = await createBtcWallet(isMainnet);
 
       if (evmAddress && btcAddress) {
         setGlobalState({ ...globalState, btcAddress, evmAddress });
@@ -85,11 +110,18 @@ const Header = ({}: HeaderProps): JSX.Element => {
     }
   };
 
+  // useEffect(() => {
+  //   if (globalState.btcAddress && typeof globalState?.isMainnet === "boolean") {
+  //     // onDisconnectSnap();      
+  //     onConnectSnap(globalState?.isMainnet);
+  //   }
+  // }, [globalState?.isMainnet]);
+
   // Disconnect from the Zeta snap
   const onDisconnectSnap = async () => {
     try {
-      await disconnectSnap();
       setGlobalState({});
+      await disconnectSnap();
       localStorage.removeItem('zeta-snap');
     } catch (e) {
       console.error('Error disconnecting from Zeta snap:', e);
@@ -101,11 +133,17 @@ const Header = ({}: HeaderProps): JSX.Element => {
       <Logo className="logo" />
       <div className="connect-wallet-wrapper">
         {state.installedSnap ? (
-          <FlexRowWrapper>
+          <FlexRowWrapper >
             {!globalState?.btcAddress ? (
-              <StyledButton onClick={onConnectSnap}>
+              <FlexRowWrapper className="header-section-disconnected">
+              <Toggle
+                isMainnet={globalState?.isMainnet}
+                onToggle={(option) => setGlobalState({ ...globalState, isMainnet: option })}
+                />
+              <StyledButton onClick={() => onConnectSnap(globalState?.isMainnet)}> 
                 Connect ZetaMask
               </StyledButton>
+                </FlexRowWrapper>
             ) : (
               <FlexRowWrapper className="address-header">
                 <div className="icon-addr-wrapper">
@@ -117,8 +155,9 @@ const Header = ({}: HeaderProps): JSX.Element => {
                   <ZetaLogo className="chain-icon" />
                   <Copyable>{globalState?.evmAddress}</Copyable>
                 </div>
-                <StyledButton onClick={onDisconnectSnap}>
-                  Disconnect
+              
+                <StyledButton className="disconnect-btn-wrapper" onClick={onDisconnectSnap}>
+                  <DisconnectIcon className="disconnect-icon"/>
                 </StyledButton>
               </FlexRowWrapper>
             )}

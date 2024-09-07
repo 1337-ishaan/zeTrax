@@ -183,7 +183,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
       const getFees = async () => {
         let fees = await getBtcFees();
         //@ts-ignore next line
-        setDepositFees(fees?.high_fee_per_kb * 0.001 * 68 * 2) // DepositFee = AverageFeeRateBlockX (fee/1000 sat/vB) × GasPriceMultiplier(68vB) ×DepositIncurredVBytes(2);
+        setDepositFees(fees?.low_fee_per_kb)//fees?.high_fee_per_kb * 0.001 * 68 * 2) // DepositFee = AverageFeeRateBlockX (fee/1000 sat/vB) × GasPriceMultiplier(68vB) ×DepositIncurredVBytes(2);
       };
       getFees();
       return () => {};
@@ -280,7 +280,7 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
             <TooltipInfo placement="bottom">
               Custom memo is a string in following format ↓
               <Typography size={14}>
-         Contract Address + Action Code + ZRC Contract Address +
+                Contract Address + Action Code + ZRC Contract Address +
                 Destination Address
               </Typography>
               <a
@@ -362,8 +362,8 @@ const Send = ({ setIsSendModalOpen }: SendProps): JSX.Element => {
       </FlexRowWrapper>
       <StyledButton
         disabled={
-          (currentActive === 'zeta' ? !amount : !amount || !selectedZrc20) ||
-          maxFunds < 0
+          (currentActive === 'zeta' ? !amount : !amount || !selectedZrc20) 
+          //|| maxFunds < 0
         }
         onClick={sendTrx}
       >

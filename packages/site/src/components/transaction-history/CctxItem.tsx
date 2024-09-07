@@ -110,7 +110,7 @@ const CctxItem: React.FC<CctxItemProps> = ({ cctx }) => {
         </Typography>
       </FlexRowWrapper>
       <Typography size={14}>
-        Amount:&nbsp;
+        Amount after fees:&nbsp;
         {parseFloat((inbound_params.amount / 1e8).toFixed(8))} tBTC
       </Typography>
       <FlexRowWrapper className="flex-row">

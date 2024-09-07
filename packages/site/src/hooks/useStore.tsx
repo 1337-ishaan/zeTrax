@@ -21,6 +21,7 @@ const StoreProvider = ({ children }: StoreProviderProps) => {
   const persistState = JSON.parse(getLocalStorage('zeta-snap')!);
   const [globalState, setGlobalState] = useState(
     persistState ? persistState : null,
+
   );
 
   return (

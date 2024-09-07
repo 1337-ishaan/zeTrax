@@ -82,7 +82,7 @@ const TrxHistory: React.FC = () => {
         !globalState?.btcTrxs &&
         !globalState?.utxo) ||
       isRefetched ||
-      globalState.isTrxProcessed
+      globalState.isTrxProcessed 
     ) {
       const getBtcTrx = async () => {
         try {
@@ -105,14 +105,12 @@ const TrxHistory: React.FC = () => {
     globalState?.utxo,
     isRefetched,
     globalState?.isTrxProcessed,
+    globalState?.isMainnet,
     setGlobalState,
   ]);
 
 
-  console.log(globalState?.btcTrxs?.txs,'trx')
   const getAmount = (trx: any) => {
-
-
     return trx.outputs.filter(
       (t: any) => t.addresses?.[0] === globalState?.btcAddress,
     )[0]?.value;
