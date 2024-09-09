@@ -15,11 +15,16 @@ import EmptyBalance from './EmptyBalance';
 interface BalanceData {
   label: string;
   value: number;
+  exchange_rate?:number | null;
+  icon_url?: string | null  
+
 }
 
 interface NonZetaToken {
   token: {
     symbol: string;
+    exchange_rate:number | null;
+    icon_url: string | null  
   };
   value: number;
 }
@@ -34,6 +39,9 @@ interface ZetaBalanceResponse {
   zeta: {
     balances: ZetaBalance[];
   };
+  zetaPrice: number
+  btcPrice: number
+
 }
 
 const BalancesWrapper = styled(FlexColumnWrapper)`
@@ -100,7 +108,8 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   const [data, setData] = useState<BalanceData[]>([]);
   const [searched, setSearched] = useState<BalanceData[]>([]);
   const [error, setError] = useState<string | null>(null);
-
+  const [zetaPrice,setZetaPrice] = useState<number | null>(null);
+  const [btcPrice,setBtcPrice] = useState<number | null>(null);
 
   useEffect(() => {
     if (globalState?.evmAddress &&  typeof globalState?.utxo === 'number') {
@@ -110,8 +119,14 @@ const Balances = ({}: BalancesProps): JSX.Element => {
             globalState.evmAddress as string,
           )) as ZetaBalanceResponse;
 
+          setZetaPrice(result.zetaPrice);
+          setBtcPrice(result.btcPrice);
+
+          console.log(result,'result');
           const maps: BalanceData[] = result?.nonZeta?.map((t) => ({
             label: t.token.symbol,
+            exchange_rate: +t.token.exchange_rate! ?? 0,
+            icon_url: t.token.icon_url ?? "",
             value: new BigNumber(t?.value)
               .dividedBy(t?.token?.symbol === 'tBTC' ? 1e8 : 1e18)
               .toNumber(),
@@ -133,11 +148,13 @@ const Balances = ({}: BalancesProps): JSX.Element => {
             {
               label: 'BTC',
               value: globalState.utxo / 1e8,
+              exchange_rate: btcPrice
             },
             ...maps,
             {
               label: result.zeta.balances[0]?.denom!,
               value: result.zeta.balances[0]?.amount! / 1e18 ,
+              exchange_rate: zetaPrice
             },
           ]);
         }
@@ -150,6 +167,8 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       fetchBalances();
     }
   }, [globalState?.evmAddress, globalState?.utxo]);
+
+  console.log(data,'data');
 
   const handleSearch = (text: string) => {
     const searchText = DOMPurify.sanitize(text);
@@ -223,7 +242,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
                   {parseFloat(item.value.toString()).toLocaleString(undefined, {minimumSignificantDigits: 1, maximumSignificantDigits: 8})} {item.label}
                 </Typography>
               </td>
-              <td>$0</td>
+              <td>{isNaN(item.value * item.exchange_rate!) ? 0 : (item.value * item.exchange_rate!).toFixed(4)}</td>
             </tr>
           ))}
         </tbody>

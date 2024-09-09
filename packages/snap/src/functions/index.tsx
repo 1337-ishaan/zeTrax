@@ -109,6 +109,7 @@ export const getBtcUtxo = async () => {
       const utxo = await fetch(
         `${isMainnet ? MAINNET_BLOCKCYPHER_API: TESTNET_BLOCKCYPHER_API}/addrs/${address}/full`,
       );
+
       const utxoData = await utxo.text();
       return utxoData ? JSON.parse(utxoData) : { txs: [] };
     } else {
@@ -119,6 +120,9 @@ export const getBtcUtxo = async () => {
     throw new Error('Failed to retrieve Bitcoin UTXOs.');
   }
 };
+
+
+
 
 /**
  * Retrieves current Bitcoin transaction fees.
@@ -292,6 +296,8 @@ export const transactBtc = async (request: any) => {
       ),
     },
   });
+
+
 
   if (!interfaceId) {
     throw new Error('Failed to create interface');
@@ -477,9 +483,21 @@ export const getZetaBalance = async (request: any) => {
         // `https://zetachain-athens-3.blockscout.com/api/v2/addresses/${request.params[0]}/token-balances`,
         `${isMainnet ? MAINNET_ZETA_BLOCKSCOUT: TESTNET_ZETA_BLOCKSCOUT}/addresses/${request.params[0]}/token-balances`,
       );
+
+
+      const currentBtcPriceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+      const btcPriceData = await currentBtcPriceResponse.json();
+      const btcPrice = btcPriceData.bitcoin.usd;
+
+      const zetaPriceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zetachain&vs_currencies=usd');
+      const zetaPriceData = await zetaPriceResponse.text();
+
+      const zetaPrice = JSON.parse(zetaPriceData);
+
       const zetaData = await zeta.text();
       const nonZetaData = await nonZeta.text();
-      return { zeta: JSON.parse(zetaData), nonZeta: JSON.parse(nonZetaData) };
+
+      return { zeta: JSON.parse(zetaData), nonZeta: JSON.parse(nonZetaData), zetaPrice, btcPrice};
     } else {
       throw new Error('Address parameter is missing.');
     }

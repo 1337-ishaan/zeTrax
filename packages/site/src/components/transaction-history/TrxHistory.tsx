@@ -84,9 +84,11 @@ const TrxHistory: React.FC = () => {
       isRefetched ||
       globalState.isTrxProcessed 
     ) {
+
       const getBtcTrx = async () => {
         try {
           const results: any = await getBtcUtxo();
+          console.log(results,'utxo results');
           setGlobalState({
             ...globalState,
             btcTrxs: results,
