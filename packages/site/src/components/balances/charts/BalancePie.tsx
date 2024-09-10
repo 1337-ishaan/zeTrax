@@ -96,7 +96,7 @@ const renderActiveShape = (props: RenderActiveShapeProps) => {
         textAnchor={textAnchor}
         fill="#fff6f6" // Value label color
       >
-        {parseFloat(new Decimal(value).toFixed(3))} {payload.label} 
+        ${parseFloat(new Decimal(value).toFixed(3))}
       </text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
@@ -139,7 +139,7 @@ const BalancePie = ({ data }: BalancePieProps) => {
           outerRadius={75} // Outer radius
           cy={105} // Center Y position
           fill="#4db852" // Default fill color
-          dataKey="value" // Key for data values
+          dataKey="usdPrice" // Key for data values
           onMouseEnter={onPieEnter} // Mouse enter handler
         />
       </PieChart>

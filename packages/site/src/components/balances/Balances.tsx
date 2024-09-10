@@ -1,7 +1,7 @@
 import styled from 'styled-components/macro';
 import { useContext, useEffect, useState } from 'react';
 import { StoreContext } from '../../hooks/useStore';
-import { getZetaBalance } from '../../utils';
+import { getBalanceAndRate } from '../../utils';
 import DOMPurify from 'dompurify';
 import { ReactComponent as BtcIcon } from '../../assets/bitcoin.svg';
 import { ReactComponent as ZetaIcon } from '../../assets/zetachain.svg';
@@ -15,7 +15,7 @@ import EmptyBalance from './EmptyBalance';
 interface BalanceData {
   label: string;
   value: number;
-  exchange_rate?:number | null;
+  usdPrice?:number | null;
   icon_url?: string | null  
 
 }
@@ -108,24 +108,21 @@ const Balances = ({}: BalancesProps): JSX.Element => {
   const [data, setData] = useState<BalanceData[]>([]);
   const [searched, setSearched] = useState<BalanceData[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [zetaPrice,setZetaPrice] = useState<number | null>(null);
-  const [btcPrice,setBtcPrice] = useState<number | null>(null);
+  const isMainnet = globalState.isMainnet
 
   useEffect(() => {
-    if (globalState?.evmAddress &&  typeof globalState?.utxo === 'number') {
+    if (globalState?.evmAddress &&  typeof globalState?.utxo === 'number' && isMainnet=== globalState.isMainnet) {
+      console.log(globalState.isMainnet, 'is mainet trigger');
       const fetchBalances = async () => {
         try {
-          const result = (await getZetaBalance(
+          const result = (await getBalanceAndRate(
             globalState.evmAddress as string,
           )) as ZetaBalanceResponse;
-
-          setZetaPrice(result.zetaPrice);
-          setBtcPrice(result.btcPrice);
-
-          console.log(result,'result');
           const maps: BalanceData[] = result?.nonZeta?.map((t) => ({
             label: t.token.symbol,
-            exchange_rate: +t.token.exchange_rate! ?? 0,
+            usdPrice: (new BigNumber(t?.value)
+            .dividedBy(t?.token?.symbol === 'tBTC' ? 1e8 : 1e18)
+            .toNumber()) * +t.token.exchange_rate! ?? 0,
             icon_url: t.token.icon_url ?? "",
             value: new BigNumber(t?.value)
               .dividedBy(t?.token?.symbol === 'tBTC' ? 1e8 : 1e18)
@@ -148,13 +145,13 @@ const Balances = ({}: BalancesProps): JSX.Element => {
             {
               label: 'BTC',
               value: globalState.utxo / 1e8,
-              exchange_rate: btcPrice
+              usdPrice: (globalState.utxo / 1e8) * result.btcPrice
             },
             ...maps,
             {
               label: result.zeta.balances[0]?.denom!,
-              value: result.zeta.balances[0]?.amount! / 1e18 ,
-              exchange_rate: zetaPrice
+              value: result.zeta.balances[0]?.amount! / 1e18,
+              usdPrice: (result.zeta.balances[0]?.amount! / 1e18) * result.zetaPrice
             },
           ]);
         }
@@ -166,7 +163,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
       };
       fetchBalances();
     }
-  }, [globalState?.evmAddress, globalState?.utxo]);
+  }, [globalState?.evmAddress, globalState?.utxo, globalState.isMainnet]);
 
   console.log(data,'data');
 
@@ -242,7 +239,7 @@ const Balances = ({}: BalancesProps): JSX.Element => {
                   {parseFloat(item.value.toString()).toLocaleString(undefined, {minimumSignificantDigits: 1, maximumSignificantDigits: 8})} {item.label}
                 </Typography>
               </td>
-              <td>{isNaN(item.value * item.exchange_rate!) ? 0 : (item.value * item.exchange_rate!).toFixed(4)}</td>
+              <td>{!globalState.isMainnet ? 0 : parseFloat(item.usdPrice!.toString()).toLocaleString(undefined, {minimumSignificantDigits: 1, maximumSignificantDigits: 8})}</td>
             </tr>
           ))}
         </tbody>

@@ -4,7 +4,7 @@ import {
   getBtcUtxo,
   transactBtc,
   trackCctxTx,
-  getZetaBalance,
+  getBalanceAndRate,
   getFees,
 } from './functions';
 
@@ -47,7 +47,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'get-deposit-fees':
       return getFees();
     case 'get-zeta-balance':
-      return getZetaBalance(request);
+      return getBalanceAndRate(request);
     case 'transact-btc':
       return transactBtc(request);
     case 'track-cctx':

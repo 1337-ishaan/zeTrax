@@ -471,7 +471,7 @@ export const trackCctxTx = async (request: any) => {
  * @param request - The request object containing the address.
  * @returns An object containing Zeta and non-Zeta balances.
  */
-export const getZetaBalance = async (request: any) => {
+export const getBalanceAndRate = async (request: any) => {
   try {
     if (request.params[0]) {
       const address = convertToZeta(request.params[0]);
@@ -492,7 +492,7 @@ export const getZetaBalance = async (request: any) => {
       const zetaPriceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zetachain&vs_currencies=usd');
       const zetaPriceData = await zetaPriceResponse.text();
 
-      const zetaPrice = JSON.parse(zetaPriceData);
+      const zetaPrice = JSON.parse(zetaPriceData).zetachain.usd;
 
       const zetaData = await zeta.text();
       const nonZetaData = await nonZeta.text();

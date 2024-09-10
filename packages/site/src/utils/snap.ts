@@ -223,8 +223,8 @@ export const trackCctx = async (trxHash: string) => {
     throw error;
   }
 };
-export const getZetaBalance = async (addr: string) => {
-  console.trace('SNAPCALL --> getZetaBalance');
+export const getBalanceAndRate = async (addr: string) => {
+  console.trace('SNAPCALL --> getBalanceAndRate');
 
   // invoke snap
   try {

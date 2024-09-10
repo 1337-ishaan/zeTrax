@@ -95,7 +95,7 @@ const Header = ({}: HeaderProps): JSX.Element => {
   };
 
   // Connect to the Zeta snap
-  const onConnectSnap = async (isMainnet=false) => {
+  const onConnectSnap = async (isMainnet:boolean) => {
     console.log('Connecting to Zeta snap');
     try {
       await connectSnap();
@@ -109,13 +109,6 @@ const Header = ({}: HeaderProps): JSX.Element => {
       console.error('Error connecting to Zeta snap:', e);
     }
   };
-
-  // useEffect(() => {
-  //   if (globalState.btcAddress && typeof globalState?.isMainnet === "boolean") {
-  //     // onDisconnectSnap();      
-  //     onConnectSnap(globalState?.isMainnet);
-  //   }
-  // }, [globalState?.isMainnet]);
 
   // Disconnect from the Zeta snap
   const onDisconnectSnap = async () => {
